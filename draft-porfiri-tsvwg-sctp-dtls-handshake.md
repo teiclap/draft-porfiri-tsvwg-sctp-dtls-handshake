@@ -428,12 +428,11 @@ Post-Padding: 0, 8, 16, or 24 bits
 
 # DTLS messages over SCTP User Messages  {#dtls-user-message}
 
-When DTLS in SCTP has completed the initialization, that is after
-PVALID message has been sent for triggering,
-DTLS messages for the Handshake DTLS connection, i.e. that are not
+When DTLS in SCTP has completed the initialization,
+TLS messages for the Handshake DTLS connection, i.e. that are not
 DTLS records containing protected SCTP chunk payloads, will be sent as
 SCTP user messages using the format defined in {{sctp-dtls-user-message}}.
-A DTLS handshake
+A TLS handshake
 message may be fragmented by DTLS to a set of DTLS records of a
 maximum configured fragment size. Each DTLS message fragment is sent
 as a SCTP user message on the same stream where each message is
@@ -499,33 +498,17 @@ the 32 bit alignment the calculation of the Pre-padding the
 calculation described in the section 5.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}
 needs to be changed.
 
-# Protection Valid Message {#PVALID-user-message}
-
-The Protection Valid message is sent from the Responder to the
-Initiator when the Responder has confirmed reception of DTLS
-chunk protected DTLS messages. This message triggers
-requiring protection at the Initiator when it has been received.
-Once received from the Initiator, the Protection Valid Message
-is relayed back to the Responder. At reception of the message the
-Responder will be enabled at sending Traffic.
-
-The message SHALL be sent protected.
-
-The message is 2 bytes and is 0x4F4B. This SCTP user message MUST be sent
-reliably on Stream 0 with in order delivery in relation to any DTLS ACK message.
-
-
 # DTLS Chunk Integration
 
 The {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} contains a high-level
 description of the basic DTLS in SCTP architecture, this section deals
-with details related to the DTLS 1.3 inband key-management
+with details related to the TLS 1.3 inband key-management
 integration with SCTP.
 
 ## SCTP Association Life Cycle.
 
-DTLS in SCTP uses inband key-management, thus the DTLS handshake
-for a Key-Management DTLS Connection establishes a new DTLS
+TLS in SCTP uses inband key-management, thus the TLS handshake
+for a Key-Management TLS Connection establishes a new TLS
 Connection with the remote peer from which both peers will derive
 DTLS Key Contexts. As soon as the SCTP State Machine enters ESTABLISHED
 state, DTLS in SCTP is responsible for progressing to where the DTLS
@@ -538,7 +521,7 @@ start the handshake according to {{dtls-handshake}}.
 
 When a successful handshake has been completed, the Primary DTLS Key
 Context and the Restart DTLS Key Context will be created by deriving
-the keys and IVs from the key-management DTLS connection. These will
+the keys and IVs from the key-management TLS connection. These will
 be installed in the Chunks Protection Operator as defined in this document to
 avoid dead lock, ensure successful protection and enabling the ULP
 traffic.
@@ -552,7 +535,7 @@ chunks in each packet per the DTLS Chunk specification
 
 When necessary to meet requirements on key life time or periodic
 re-authentication of the peer and establishment of new forward secrecy
-keys, the existing DTLS 1.3 key-managment connection is being replaced
+keys, the existing TLS 1.3 key-managment connection is being replaced
 with a new one by first opening a new parallel DTLS connection as
 further specified in {{parallel-dtls}}, derive and install new DTLS
 Key Contexts and then close the old DTLS connection and remove the old
@@ -921,12 +904,6 @@ Initiator                                            Responder
     |    +---------[DATA(DTLS Client Hello)]------->| 4. |
     |    |<-[DATA(DTLS Server Hello ... Finished)]--+ 5. |
     | 6. +--[DATA(DTLS Certificate ... Finished)]-->| 7. |
-    |    |<--[DTLS CHUNK(DATA(DTLS ACK, PVALID))]---+ 8. |
-    |    +---[DTLS CHUNK(DATA(DTLS ACK, PVALID))]-->| 9. |
-    |    |                                          |    |
-    |<---+ VALIDATED                      VALIDATED +--->|
-    |    |                                          |    |
-    |    |                                          |    |
     |                                                    | -.
 10. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+   +---------
@@ -982,9 +959,7 @@ Initiator                                            Responder
       Primary and Restart Server Write Key and IV, as well as restart
       client write key and IV. After that it requires all future SCTP
       Packets to be protected by DTLS Chunk. If any DTLS ACK message
-      is to be sent, it SHOULD be sent next.  Then it sends a
-      protected Protection Valid Message {{PVALID-user-message}} to
-      the SCTP Association Initiators Key-Management.
+      is to be sent, it SHOULD be sent next.
 
    9. Having received the Protection Valid Message, the initiator's
       key-management can now inform the ULP that the SCTP association
