@@ -1,6 +1,6 @@
 ---
-docname: draft-westerlund-tsvwg-sctp-dtls-handshake-latest
-title: Datagram Transport Layer Security (DTLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
+docname: draft-porfiri-tsvwg-sctp-dtls-handshake-latest
+title: Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
 abbrev: DTLS in SCTP
 obsoletes:
 cat: std
@@ -12,7 +12,7 @@ submissiontype: IETF  # also: "independent", "IAB", or "IRTF"
 venue:
   group: Transport Area Working Group (tsvwg)
   mail: tsvwg@ietf.org
-  github: gloinul/draft-westerlund-tsvwg-sctp-dtls-handshake
+  github: teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake
 
 author:
 -
@@ -99,17 +99,17 @@ normative:
 
 --- abstract
 
-This document defines a key-management solution based on Datagram
-Transport Layer Security 1.3 (DTLS) to protect the content of Stream
+This document defines a key-management solution based on
+Transport Layer Security 1.3 (TLS) to protect the content of Stream
 Control Transmission Protocol (SCTP) packets using the packet
 protection framework provided by the SCTP DTLS chunk. The combination
 provides encryption, source authentication, integrity and replay
-protection for the SCTP association with in-band DTLS based
+protection for the SCTP association with in-band TLS based
 key-management and mutual authentication of the peers. The
 specification is enabling very long-lived sessions of weeks and months
 and supports mutual re-authentication and rekeying with ephemeral key
 exchange. The key-management solution does not require any additional
-defined features or implementation support beyond core DTLS 1.3. This
+defined features or implementation support beyond core TLS 1.3. This
 is intended as a replacement to using DTLS/SCTP (RFC6083) and
 SCTP-AUTH (RFC4895).
 
@@ -121,8 +121,8 @@ SCTP-AUTH (RFC4895).
 
 ## Overview
 
-   This document describes the usage of the Datagram Transport Layer
-   Security version 1.3 (DTLS) {{RFC9147}} protocol for key-management
+   This document describes the usage of the Transport Layer
+   Security version 1.3 (TLS) {{RFC8446}} protocol for key-management
    of the SCTP DTLS Chunk packet protection
    {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} securing Stream Control
    Transmission Protocol (SCTP) {{RFC9260}}.  This combination of
@@ -165,7 +165,7 @@ SCTP-AUTH (RFC4895).
 
    The main benefit of this key-management solution over the solution
    proposed by the WG is that this does not require any extensions to
-   DTLS 1.3 to be implemented. It solely relies on the core DTLS
+   TLS 1.3 to be implemented. It solely relies on the core TLS
    handshake to do mutual authentication, creates a main secret, and
    then relies on the TLS exporter to export necessary secrets for the
    DTLS Chunk.
@@ -173,15 +173,15 @@ SCTP-AUTH (RFC4895).
 
 ## Protocol Overview {#protocol_overview}
 
-   DTLS in SCTP is a key management specification for the SCTP DTLS
-   1.3 chunk {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} that together
-   utilizes DTLS 1.3 for the security functions like key
-   exchange, authentication, encryption, integrity protection, and
-   replay protection. All key management message exchange happens
-   inband over the SCTP assocation.
+   TLS handshake for DTLS in SCTP is a key management specification
+   for the SCTP DTLS 1.3 chunk {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}
+   that together utilizes TLS 1.3 and DTLS 1.3 for the security
+   functions like key exchange, authentication, encryption, integrity
+   protection, and replay protection. All key management message exchange
+   happens inband over the SCTP assocation.
 
    In this document we use the terms DTLS Key context for indicating
-   the pair of keys, derived from a DTLS connection, and all relevant
+   the pair of keys, derived from a TLS connection, and all relevant
    data that needs to be provided to the SCTP DTLS Chunk Protection
    Operator for DTLS encryption and decryption.  DTLS Key context
    includes Keys for sending and receiving, replay window, and last used
@@ -196,27 +196,15 @@ SCTP-AUTH (RFC4895).
    * The process starts with a SCTP association where DTLS 1.3 Chunk
    usage has been negotiated and this key-management method has been
    agreed in the SCTP INIT and INIT-ACK. To initialize and authenticate
-   the peer the DTLS handshake is exchanged as SCTP user messages with
+   the peer the TLS handshake is exchanged as SCTP user messages with
    the DTLS Chunk Key-Management Messages PPID (see section 10.6 of
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an initial DTLS
-   connection has been established.  If the DTLS handshake fails, the
+   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an initial TLS
+   connection has been established.  If the TLS handshake fails, the
    SCTP association is aborted. With successful handshake and
-   authentication of the peer the key material is exported from the DTLS
+   authentication of the peer the key material is exported from the TLS
    connection and configured for the DTLS 1.3 chunk. From that point
    until SCTP association termination the DTLS chunk will protect the
-   SCTP packets. When the DTLS connection has been established and the
-   DTLS Chunk configured with DTLS Key context the PVALID message is
-   sent to trigger the peer SCTP Endpoint that Protection initiation
-   has been completed.
-
-   * After PVALID is received, the Upper Layer Protocol(ULP) can
-   start sending messages over the SCTP association. All chunks are
-   protected by encapsulating them in DTLS chunks as defined in
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.  Using the current DTLS
-   Key context the DTLS Chunk Protection operator protects the plain
-   text, which is all chunks to be sent in one SCTP packet, producing
-   a DTLS Record that is encapsulated in the DTLS chunk and then
-   transmitted as a SCTP packet with a common header.
+   SCTP packets.
 
    The DTLS Chunk specifies that in the receiving SCTP endpoint each
    incoming SCTP packet on any of its interfaces and ports are matched
@@ -230,31 +218,20 @@ SCTP-AUTH (RFC4895).
    association along with associated per-packet meta data such as path
    received on, original packet size, and ECN bits.
 
-   When mutual re-authentication or rekeying is needed or desired by
-   either endpoint a new DTLS connection handshake is performed
-   between the SCTP endpoints and new DTLS Key contexts are
-   created. When the handshake is completed, the DTLS in SCTP
-   implementation can simply switch to use the new DTLS Key contexts
-   in the DTLS chunk.  All rekeying SHALL be using ephemeral key
-   exchange and SHALL NOT use the DTLS Key-Update mechanism to avoid
-   confusion about the properties of the DTLS Key Contexts for the
-   DTLS chunk.  After a short while (no longer than 2 min) to enable
-   any outstanding packets to drain from the network path between the
-   endpoints, the old key-management DTLS connection is closed and
-   that signal that the corresponding key context can be deleted from
-   the DTLS chunk's key store.
+## Rekeying
+T.B.D.
 
-   The DTLS connection may send alerts, handshake messages, or
+   The TLS connection may send alerts, handshake messages, or
    other non-application data to its peer at any point in time.
-   All DTLS message will be sent by means of SCTP user messages
+   All TLS message will be sent by means of SCTP user messages
    with the DTLS Chunk Key-Management Messages PPID as specified in
    {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. However, only the
-   DTLS close_notify is expected to be used after the handshake has
+   TLS close_notify is expected to be used after the handshake has
    been completed in this solution.
 
 ~~~~~~~~~~~ aasvg
 +---------------+ +-------------------------------+
-|      ULP      | |            DTLS 1.3           |
+|      ULP      | |            TLS 1.3            |
 |               | |    +---------------------+    |
 |               | | +->+    Key Exporter     +--+ |
 |               | | |  +---------------------+  | |
@@ -300,7 +277,7 @@ in regard to SCTP and upper layer protocol"}
 ## Properties of DTLS in SCTP
 
    DTLS in SCTP (as the combination of the DTLS chunk and the in-band
-   authentication and key-management using DTLS handshakes defined in
+   authentication and key-management using TLS handshakes defined in
    this document) has a number of properties that are attractive.
 
    * Provides confidentiality, integrity protection, and source
@@ -311,19 +288,14 @@ in regard to SCTP and upper layer protocol"}
      as the SCTP functions themselves.
 
    * Provides mutual authentication of the endpoints based on any
-     authentication mechanism supported by DTLS.
+     authentication mechanism supported by TLS.
 
-   * Uses parallel DTLS connections to enable mutual re-authentication
-     and rekeying with ephemeral key-exchange. Thus, enabling SCTP
-     association lifetimes without known limitations and without
-     needing to drain the SCTP association.
-
-   * Uses core of DTLS as it is and updates and fixes to DTLS security
+   * Uses core of TLS as it is and updates and fixes to TLS security
      properties; can be implemented without further changes to this
      specification.
 
-   * No reliance on DTLS implementation used for key-management having
-     to support any features beyond core DTLS specification and the
+   * No reliance on TLS implementation used for key-management having
+     to support any features beyond core TLS specification and the
      TLS exporter.
 
    * Secures all SCTP packets exchanged after SCTP association has
@@ -351,7 +323,7 @@ in regard to SCTP and upper layer protocol"}
    : An SCTP association.
 
    Connection:
-   : A DTLS connection.
+   : A TLS connection.
 
    DTLS Key context:
    : Keys, derived from a DTLS connection, and all relevant data that needs
