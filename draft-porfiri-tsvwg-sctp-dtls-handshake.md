@@ -1,7 +1,7 @@
 ---
 docname: draft-porfiri-tsvwg-sctp-dtls-handshake-latest
 title: Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
-abbrev: DTLS in SCTP
+abbrev: TLS for DTLS in SCTP
 obsoletes:
 cat: std
 ipr: trust200902
@@ -206,7 +206,7 @@ SCTP-AUTH (RFC4895).
    until SCTP association termination the DTLS chunk will protect the
    SCTP packets.
 
-   The DTLS Chunk specifies that in the receiving SCTP endpoint each
+   * The DTLS Chunk specifies that in the receiving SCTP endpoint each
    incoming SCTP packet on any of its interfaces and ports are matched
    to the SCTP association based on ports and VTAG in the common
    header. Using the indicated DTLS Key context(s) for that SCTP
@@ -218,8 +218,19 @@ SCTP-AUTH (RFC4895).
    association along with associated per-packet meta data such as path
    received on, original packet size, and ECN bits.
 
-## Rekeying
-T.B.D.
+   * When mutual re-authentication or rekeying is needed or desired by
+   either endpoint a new TLS connection handshake is performed
+   between the SCTP endpoints and new DTLS Key contexts are
+   created. When the handshake is completed, the DTLS in SCTP
+   implementation can simply switch to use the new DTLS Key contexts
+   in the DTLS chunk.  All rekeying SHALL be using ephemeral key
+   exchange and SHALL NOT use the TLS Key-Update mechanism to avoid
+   confusion about the properties of the DTLS Key Contexts for the
+   DTLS chunk.  After a short while (no longer than 2 min) to enable
+   any outstanding packets to drain from the network path between the
+   endpoints, the old key-management TLS connection is closed and
+   that signal that the corresponding key context can be deleted from
+   the DTLS chunk's key store.
 
    The TLS connection may send alerts, handshake messages, or
    other non-application data to its peer at any point in time.
@@ -289,6 +300,11 @@ in regard to SCTP and upper layer protocol"}
 
    * Provides mutual authentication of the endpoints based on any
      authentication mechanism supported by TLS.
+
+   * Uses parallel TLS connections to enable mutual re-authentication
+     and rekeying with ephemeral key-exchange. Thus, enabling SCTP
+     association lifetimes without known limitations and without
+     needing to drain the SCTP association.
 
    * Uses core of TLS as it is and updates and fixes to TLS security
      properties; can be implemented without further changes to this
@@ -426,7 +442,7 @@ Payload: variable length
 Post-Padding: 0, 8, 16, or 24 bits
 : To ensure the Chunk is whole 32-bit words long.
 
-# DTLS messages over SCTP User Messages  {#dtls-user-message}
+# TLS messages over SCTP User Messages  {#dtls-user-message}
 
 When DTLS in SCTP has completed the initialization,
 TLS messages for the Handshake DTLS connection, i.e. that are not
@@ -455,8 +471,6 @@ MTU it MAY be used as SCTP provides reliability and fragmentation.
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Reserved  |DCI|                                               |
-+-+-+-+-+-+-+-+-+                                               |
 |                                                               |
 |                            DTLS Message                       |
 |                                                               |
@@ -466,25 +480,6 @@ MTU it MAY be used as SCTP provides reliability and fragmentation.
 ~~~~~~~~~~~
 {: #sctp-dtls-user-message title="DTLS User Message Structure"}
 
-Reserved: 6 bits
-
-: Each bit MUST be set to zero (0) on transmission and MUST
-be ignored on reception. These bits MAY in the future be assigned
-a meaning when set to one (1).
-
-DCI: DTLS Connection Index 2 bits (unsigned integer)
-
-: DTLS Connection Index is the lower two bits of an DTLS Connection
-  Index counter which corresponds to the epoch used in the SCTP DTLS
-  Chunk.  This is a counter implemented in DTLS in SCTP that is used
-  to identify which DTLS connection instance that is capable of
-  processing the DTLS message over a user message.  This index is
-  recommended to be the lower part of a 64-bit unsigned integer
-  variable as this is how DTLS epoch counter is defined.  DCI is
-  unrelated to the DTLS Connection ID [RFC9147]. The counters
-  initial value SHALL be three (3).
-
-
 DTLS Message: variable length
 
 : One or more DTLS records. In cases more
@@ -492,11 +487,6 @@ DTLS Message: variable length
    MUST include a length field. Note that this matches what is
    specified in DTLS 1.3 {{RFC9147}} will always include the length
    field in each record.
-
-Since an octet has been added to the DTLS Message, in order to keep
-the 32 bit alignment the calculation of the Pre-padding the
-calculation described in the section 5.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}
-needs to be changed.
 
 # DTLS Chunk Integration
 
@@ -554,113 +544,113 @@ for this association are terminated without further
 transmissions, i.e. DTLS close_notify is not transmitted.
 
 
-## DTLS Connection Handling {#dtls-connection-handling}
+## TLS Connection Handling {#dtls-connection-handling}
 
-It's up to DTLS key-management function to manage the DTLS
+It's up to TLS key-management function to manage the TLS
 connections and their related DTLS Key context in the Chunk
 Protection Operator.
 
-### Add a New DTLS Connection {#add-dtls-connection}
+### Add a New TLS Connection {#add-dtls-connection}
 
-Either peer can add a new DTLS connection to the SCTP association at
-any time, but no more than 2 DTLS connections can exist at the same
+Either peer can add a new TLS connection to the SCTP association at
+any time, but no more than 2 TLS connections can exist at the same
 time. Details of the handshake are described in {{further_dtls_connection}}.
 
-As either endpoint can initiate a DTLS handshake at the same time,
-either endpoint may receive a DTLS ClientHello message when it has
+As either endpoint can initiate a TLS handshake at the same time,
+either endpoint may receive a TLS ClientHello message when it has
 sent its own ClientHello. In this case the ClientHello from the
-endpoint that had the DTLS Client role in the establishment of the
-previous DTLS connection shall be continued to be processed and the
+endpoint that had the TLS Client role in the establishment of the
+previous TLS connection shall be continued to be processed and the
 other dropped.
 
 When the handshake has been completed successfully, the new DTLS Key
 contexts are established by exporting keys and installing them in the
 Chunk Protection Operator, and the new DTLS Key context are
 immediately started to be used.
-If the handshake is not completed successfully, a new DTLS
-handshake attempt will be tried using the same DCI.
+If the handshake is not completed successfully, a new TLS
+handshake attempt will be tried.
 
-### Remove an existing DTLS Connection {#remove-dtls-connection}
+### Remove an existing TLS Connection {#remove-dtls-connection}
 
-A DTLS connection is removed when a
-newer DTLS connection is in use. It is RECOMMENDED to not initiate
+A TLS connection is removed when a
+newer TLS connection is in use. It is RECOMMENDED to not initiate
 removal until at least one SCTP packet protected by the new DTLS Key Context
 has been received, and any transmitted packets protected
 using the new DTLS Key Context has been acknowledged, alternatively
 waiting for one Maximum Segment Lifetime (120 seconds) has elapsed
-since the last SCTP packet protected by the old DTLS connection was
+since the last SCTP packet protected by the old TLS connection was
 transmitted.
 
-Either peers can initiate the removal of a DTLS connection from the
+Either peers can initiate the removal of a TLS connection from the
 current SCTP association when needed when a new have been established.
-The closing of the DTLS connection when the SCTP association is in
-PROTECTED and ESTABLISHED state is done by having the DTLS connection
-sending a DTLS close_notify. When the DTLS closure of a DTLS connection
+The closing of the TLS connection when the SCTP association is in
+PROTECTED and ESTABLISHED state is done by having the TLS connection
+sending a TLS close_notify. When the TLS closure of a TLS connection
 is completed, the related DTLS Key Contexts (Primaryand Restart) in
 the Chunk Protection Operator are released.
 
-### Considerations about removal of DTLS Connections {#removal_dtls_consideration}
+### Considerations about removal of TLS Connections {#removal_dtls_consideration}
 
-Removal of a DTLS connection may happen under circumstances as
+Removal of a TLS connection may happen under circumstances as
 described above in {{remove-dtls-connection}} in different states
 of the Association. This section describes how the implementation
-should take care of the DTLS connection removal in details:
+should take care of the TLS connection removal in details:
 
-* As long as one DTLS connection only exists, that DTLS
+* As long as one TLS connection only exists, that TLS
 connection SHALL NOT be removed as it won't be possible for the
 Association to proceed further.
 
-* A DTLS connection can be removed when there's another
-active DTLS connection with valid DTLS Key Contexts that can be used
-for negotiating further key-management DTLS 1.3 connections.
+* A TLS connection can be removed when there's another
+active TLS connection with valid DTLS Key Contexts that can be used
+for negotiating further key-management TLS 1.3 connections.
 
-* In case the DTLS connection is removed and no useable DTLS Key Context exist
+* In case the TLS connection is removed and no useable TLS Key Context exist
 for key-management DTLS 1.3 negotiation, the Association SHALL be
 ABORTED.
 
 It is up to the implementation to guarantee that a DTLS Key Context exists
-all the time, for avoiding that undesired DTLS connection closure causes
+all the time, for avoiding that undesired TLS connection closure causes
 the Association abortion.
 
 ## DTLS Key Update
 
-DTLS Key Update MUST NOT be used.  DTLS Key Context replacement MUST
-be used instead, by means of creating a new DTLS connection as specified
+TLS Key Update MUST NOT be used.  DTLS Key Context replacement MUST
+be used instead, by means of creating a new TLS connection as specified
 in {{parallel-dtls}}, deriving the new Primary DTLS Key Context, the
-new Restart DTLS Key Context and then closing the old DTLS connection.
+new Restart DTLS Key Context and then closing the old TLS connection.
 
 ## Error Cases
 
-As DTLS has its own error reporting mechanism by exchanging DTLS alert
-messages no new DTLS related cause codes are defined to use the error
+As TLS has its own error reporting mechanism by exchanging TLS alert
+messages no new TLS related cause codes are defined to use the error
 handling defined in {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
-When the handshake of DTLS connection encounters an error it may report that
-issue using DTLS alert message to its peer by putting the created DTLS
+When the handshake of TLS connection encounters an error it may report that
+issue using TLS alert message to its peer by putting the created TLS
 record in a SCTP user message (see {{dtls-user-message}}) with the
 Handshake PPID. This is independent of what to do in relation to the
 SCTP association.  Depending on the severity of the error different
 decisions can be taken.
 
-However, as it is not expected that the key-management DTLS
+However, as it is not expected that the key-management TLS
 connection will have any activity at all between completing the
-handshake, and the DTLS connection closing, it is unlikely
+handshake, and the TLS connection closing, it is unlikely
 that any error will occur.
 
 
-# DTLS Considerations
+# TLS Considerations
 
-## Version of DTLS
+## Version of TLS
 
-   This document defines the usage of DTLS 1.3 {{RFC9147}}.
-   Earlier versions of DTLS MUST NOT be used
-   (see {{RFC8996}}). It is expected that DTLS in SCTP as described in
-   this document will work with future versions of DTLS.
+   This document defines the usage of TLS 1.3 {{RFC8446}}.
+   Earlier versions of TLS MUST NOT be used. It is expected
+   that TLS for DTLS in SCTP as described in
+   this document will work with future versions of TLS.
 
-   Only one version of DTLS MUST be used during the lifetime of an
-   SCTP Association, meaning that the procedure for replacing the DTLS
+   Only one version of TLS MUST be used during the lifetime of an
+   SCTP Association, meaning that the procedure for replacing the TLS
    version in use requires the existing SCTP Association to be
-   terminated and a new SCTP Association with the desired DTLS version
+   terminated and a new SCTP Association with the desired TLS version
    to be instantiated.
 
 ## Configuration of Key-Management DTLS
@@ -687,7 +677,7 @@ that any error will occur.
    confidentiality MUST NOT be supported. Cipher suites and parameters
    that do not provide ephemeral key-exchange MUST NOT be supported.
 
-   The Cipher suites negotiated in the Key-Management DTLS Connection
+   The Cipher suites negotiated in the Key-Management TLS Connection
    SHALL only include those supported by the DTLS Chunk. The DTLS
    Chunk is expected to have an API capability to determine the Cipher
    Suit Capabilities, see Abstract API in Section 10.1 of
@@ -725,7 +715,7 @@ destination IP addresses.
 
 ### New Connections {#new-connections}
 
-Implementations MUST set up a new DTLS connection using a full handshake
+Implementations MUST set up a new TLS connection using a full handshake
 before any of the certificates expire.
 It is RECOMMENDED that all negotiated and
 exchanged parameters are the same except for the timestamps in the
@@ -759,17 +749,17 @@ shorter than many expected SCTP associations protected by DTLS in
 SCTP.
 
 
-### DTLS 1.3
+### TLS 1.3
 
-DTLS 1.3 is used instead of DTLS 1.2 being a newer protocol that
+TLS 1.3 is used instead of TLS 1.2 being a newer protocol that
 addresses known vulnerabilities and only defines strong algorithms
 without known major weaknesses at the time of publication.
 
-DTLS 1.3 requires rekeying before algorithm specific AEAD limits have
-been reached. Implementations setup a new DTLS connection to handle
+TLS 1.3 requires rekeying before algorithm specific AEAD limits have
+been reached. Implementations setup a new TLS connection to handle
 the need for new keys, alternatively terminate the SCTP Assocation.
 
-In DTLS 1.3 any number of tickets can be issued in a connection and
+In TLS 1.3 any number of tickets can be issued in a connection and
 the tickets can be used for resumption as long as they are valid,
 which is up to seven days. The nodes in a resumed connection have the
 same roles (client or server) as in the connection where the ticket
@@ -784,23 +774,23 @@ provide ephemeral key exchange.
 # Establishing DTLS in SCTP
 
    This section specifies how DTLS in SCTP is established using
-   Key-Management DTLS Connections and the DTLS Chunk
+   Key-Management TLS Connections and the DTLS Chunk
    {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
-   A DTLS in SCTP Association is built up with a Key-Management DTLS
-   connection, from that DTLS connection Primary DTLS Key Context and
+   A DTLS in SCTP Association is built up with a Key-Management TLS
+   connection, from that TLS connection Primary DTLS Key Context and
    Restart DTLS Key Context are derived and the configures
    the DTLS Context.
 
-   The Key-Management DTLS connection is established as part of extra
-   procedures for the DTLS chunk initial handshake (see
+   The Key-Management TLS connection is established as part of extra
+   procedures for the TLS chunk initial handshake (see
    {{initial_dtls_connection}}).
 
 
 ## DTLS Key Context derivation {#dtls-key-derivation}
 
   This section describes how DTLS Key Contexts are derived from the
-  DTLS handshake using the TLS Exporter as defined by {{RFC9147}}. The
+  TLS handshake using the TLS Exporter as defined by {{RFC9147}}. The
   TLS exporter label specifications below is following {{RFC5705}}.
 
   There are two sets of keys one for the Primary DTLS key context and
@@ -808,7 +798,7 @@ provide ephemeral key exchange.
   client and one server side write key. In addition each key needs an
   Initilization Vector (IV) that is used by the record processing in
   TLS to create the nonce, See Section 5.3 of {{RFC8446}}. The client
-  and server roles are here in relation to key-management DTLS session
+  and server roles are here in relation to key-management TLS session
   roles. So the DTLS Client will install the key derived using the
   EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY label as its write key for
   the Primary DTLScontext, and use the
@@ -864,10 +854,10 @@ Initiator                                     Responder
     |<----------------[COOKIE ACK]----------------+   |
     |                                             | -'
     |                                             | -.
-    +----------[DATA(DTLS Client Hello)]--------->|   |
-    |<--[DATA(DTLS Server Hello ... Finished)]----+   | DTLS
-    +---[DATA(DTLS Certificate ... Finished)]---->|   +-----
-    |<-------------[DATA(DTLS ACK)]---------------+   |
+    +-----------[DATA(TLS Client Hello)]--------->|   |
+    |<---[DATA(TLS Server Hello ... Finished)]----+   | DTLS
+    +----[DATA(TLS Certificate ... Finished)]---->|   +-----
+    |<--------------[DATA(TLS ACK)]---------------+   |
     |                                             | -'
     |                                             | -.
     +-------[DTLS CHUNK(DATA(APP DATA))]--------->|   | APP DATA
@@ -905,7 +895,7 @@ Initiator                                            Responder
     |    |<-[DATA(DTLS Server Hello ... Finished)]--+ 5. |
     | 6. +--[DATA(DTLS Certificate ... Finished)]-->| 7. |
     |                                                    | -.
-10. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
+ 8. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+   +---------
     |                         ...                        |   |
     |                         ...                        |   |
@@ -954,27 +944,17 @@ Initiator                                            Responder
    7. The responder's Chunk Protection Operator will receive the SCTP
       packets containing the DTLS chunk protected DTLS messages,
       concluding the main process of the DTLS handshake.
-
-   8. The responder exports the remaining keys and IVs and installs all
+      The responder exports the remaining keys and IVs and installs all
       Primary and Restart Server Write Key and IV, as well as restart
       client write key and IV. After that it requires all future SCTP
       Packets to be protected by DTLS Chunk. If any DTLS ACK message
       is to be sent, it SHOULD be sent next.
-
-   9. Having received the Protection Valid Message, the initiator's
+      The initiator's and the reposnder's
       key-management can now inform the ULP that the SCTP association
-      is protected and verified. It shall also send a Protection Validation
-      Message to the responder.
-      Upon successful reception of the Protection Valid Message the
-      Initiator's Key-Management configure the DTLS Chunk to
-      only accept DTLS Chunk Protected SCTP packets.
-      Upon successful reception of the Protection Valid Message the
-      Responder's Key-Management informs the SCTP stack that
-      the Association is Validated and traffic can be sent.
+      is protected and verified and traffic can be sent.
 
-  10. The Initiator's ULP is notified that the SCTP association is
+   8. The Initiator's ULP is notified that the SCTP association is
       Established and protected and it may generate user messages.
-
 
    If the DTLS handshake fails the SCTP association SHALL be aborted
    and an ERROR chunk with the Error in Protection error cause, with
@@ -986,11 +966,11 @@ Initiator                                            Responder
 ### Handshake of further DTLS connections {#further_dtls_connection}
 
    When the SCTP Association has entered the PROTECTED state, each of
-   the endpoint can initiate a DTLS handshake for Key-Management when
+   the endpoint can initiate a TLS handshake for Key-Management when
    necessary.
 
-   The DTLS Key-Management will act as a User of SCTP, identified
-   with the Key-Management PPID 4242. DTLS handshake
+   The TLS Key-Management will act as a User of SCTP, identified
+   with the Key-Management PPID 4242. TLS handshake
    is sent as a SCTP user message according to {{dtls-user-message}}.
 
    The DTLS instance SHOULD NOT use DTLS retransmission to repair any
@@ -1007,17 +987,17 @@ Initiator                                            Responder
 ~~~~~~~~~~~ aasvg
 Initiator                                               Responder
     |                                                       |
-    +--------[DTLS CHUNK(DATA(DTLS Client Hello))]--------->|
-    +<--[DTLS CHUNK(DATA(DTLS Server Hello ... Finished))]--+
-    +---[DTLS CHUNK(DATA(DTLS Certificate ... Finished))]-->|
-    +<------------[DTLS CHUNK(DATA(DTLS ACK))]--------------+
+    +---------[DTLS CHUNK(DATA(TLS Client Hello))]--------->|
+    +<---[DTLS CHUNK(DATA(TLS Server Hello ... Finished))]--+
+    +----[DTLS CHUNK(DATA(TLS Certificate ... Finished))]-->|
+    +<-------------[DTLS CHUNK(DATA(TLS ACK))]--------------+
     |                                                       |
 ~~~~~~~~~~~
-{: #sctp-DTLS-further-dtls-connection title="Handshake of further DTLS connection" artwork-align="center"}
+{: #sctp-TLS-further-dtls-connection title="Handshake of further TLS connection" artwork-align="center"}
 
-The {{sctp-DTLS-further-dtls-connection}} shows a successful
-handshake of a further DTLS connection. Such connections can
-be initiated by any of the peers. Here DTLS handshake messages
+The {{sctp-TLS-further-dtls-connection}} shows a successful
+handshake of a further TLS connection. Such connections can
+be initiated by any of the peers. Here TLS handshake messages
 are transported by means of DATA chunks with the DTLS Chunk
 Key-Management Messages PPID inside DTLS Chunks.
 
@@ -1051,10 +1031,10 @@ values for the epoch=3.
 
 ### Installation of Restart DTLS Key Context for further DTLS Connections
 
-As each subsequent Key-Management DTLS connection completes the DTLS handshake
+As each subsequent Key-Management TLS connection completes the TLS handshake
 and the Primary DTLS Key context has been derived and installed also
 the Restart DTLS Key context SHALL be installed. The closing of the previous
-DTLS connection SHALL NOT be initiated or completed until the Restart
+TLS connection SHALL NOT be initiated or completed until the Restart
 DTLS Key Context is in place.
 
 
@@ -1084,10 +1064,10 @@ Initiator                                     Responder
     |                                             | -'
     |                                             |
     |                                             | -.
-    +----------[DATA(DTLS Client Hello)]--------->|   |
-    |<--[DATA(DTLS Server Hello ... Finished)]----+   | New DTLS
-    +---[DATA(DTLS Certificate ... Finished)]---->|   | Connection
-    |<-------------[DATA(DTLS ACK)]---------------+   +-----------
+    +-----------[DATA(TLS Client Hello)]--------->|   |
+    |<---[DATA(TLS Server Hello ... Finished)]----+   | New TLS
+    +----[DATA(TLS Certificate ... Finished)]---->|   | Connection
+    |<--------------[DATA(TLS ACK)]---------------+   +-----------
     |                                             | -'
     |                    ...                      | -.
     |                    ...                      |   | Derive new
@@ -1120,7 +1100,7 @@ From procedure viewpoint the sequence is the following:
 - Responder replies with COOKIE-ACK using DTLS CHUNK encrypted with
   the Restart DTLS Key Context
 
-- Initiator and Responder handshake a new DTLS connection
+- Initiator and Responder handshake a new TLS connection
 
 - The ULP can resume communication protected
   using the Restart DTLS Key Context.
@@ -1144,12 +1124,12 @@ COOKIE-ECHO/COOKIE-ACK handshake, the reason is that the
 validation has already been performed prior to the restart DTLS Key Context was
 created.
 
-# Parallel DTLS Rekeying {#parallel-dtls}
+# Parallel TLS Rekeying {#parallel-dtls}
 
-Rekeying in this specification is implemented by replacing the DTLS
-connection getting old with a new one by first creating the new DTLS
+Rekeying in this specification is implemented by replacing the TLS
+connection getting old with a new one by first creating the new TLS
 connection, derive the new DTLS Key contexts, start using them,
-then closing the old DTLS connection and revoking the old DTLS Key contexts.
+then closing the old TLS connection and revoking the old DTLS Key contexts.
 
 ## Criteria for Rekeying
 
@@ -1170,38 +1150,38 @@ new DTLS connection are:
 
 ## Procedure for Rekeying
 
-This specification allows up to 2 DTLS connection to be active at the same
+This specification allows up to 2 TLS connection to be active at the same
 time for the current SCTP Association.
 The following state machine applies.
 
 ~~~~~~~~~~~ aasvg
            +---------+
 +--------->|  YOUNG  |  There's only one
-|          +----+----+  DTLS connection until
+|          +----+----+  TLS connection until
 |               |       aging criteria are met
 |               |
 |        AGING  |  REMOTE AGING
 |               V
 |          +---------+
-|          |  AGED   |  When in AGED state a new DTLS connection is
+|          |  AGED   |  When in AGED state a new TLS connection is
 |          +----+----+  added and deriving new Primary DTLS Key
 |               |       Context as well as a new Restart DTLS Key
-|      NEW DTLS |       Context
+|       NEW TLS |       Context
 |               |
 |               |
 |               V
 |          +---------+
-|          |   OLD   |  In OLD state there are 2 active DTLS
+|          |   OLD   |  In OLD state there are 2 active TLS
 |          +----+----+  connections Traffic is switched to the new
 |               |       Primary DTLS Key Context
 |      SWITCH   |
 |               V
 |          +---------+
-|          |  DRAIN  |  The aged DTLS connection
+|          |  DRAIN  |  The aged TLS connection
 |          +----+----+  is drained before being ready
 |               |       to be closed
 |               |
-|       DRAINED | DTLS close_notify
+|       DRAINED | TLS close_notify
 |               V
 |          +---------+
 |          |  DEAD   |  In DEAD state the aged
@@ -1214,16 +1194,16 @@ The following state machine applies.
 {: #dtls-rekeying-state-diagram title="State Diagram for Rekeying"}
 
 Trigger for rekeying can either be a local AGING event, triggered by
-the DTLS connection meeting the criteria for rekeying, or a REMOTE
+the TLS connection meeting the criteria for rekeying, or a REMOTE
 AGING event, triggered by receiving a DTLS Connection handshake on the
-DTLS Connection Index (next value) that would be used for new DTLS
-connection.  In such case a new DTLS connection shall be added
+TLS Connection Index (next value) that would be used for new TLS
+connection.  In such case a new TLS connection shall be added
 according to {{add-dtls-connection}}.
 
-As soon as the new DTLS connection completes handshaking, and the
+As soon as the new TLS connection completes handshaking, and the
 Primary and Restart DTLS Key Contexts have been derived and installed,
 the protection of the SCTP packets is moved from the old Primary DTLS
-Key Context, then the procedure for closing the old DTLS connection is
+Key Context, then the procedure for closing the old TLS connection is
 initiated, see {{remove-dtls-connection}}.
 
 
@@ -1231,7 +1211,7 @@ initiated, see {{remove-dtls-connection}}.
 ## Race Condition in Rekeying
 
 A race condition may happen when both peers experience local AGING event at
-the same time and start creation of a new DTLS connection.
+the same time and start creation of a new TLS connection.
 
 The race condition is solved as specified in {{add-dtls-connection}}.
 
@@ -1253,18 +1233,18 @@ Although DTLS in SCTP provides privacy for the actual user message as
 well as almost all chunks, some fields are not confidentiality
 protected.  In addition to the DTLS record header, the SCTP common
 header and the DTLS chunk header are not confidentiality
-protected. An attacker can correlate DTLS connections over the same
+protected. An attacker can correlate TLS connections over the same
 SCTP association using the SCTP common header.
 
 To provide identity protection it is RECOMMENDED that DTLS in SCTP is
-used with certificate-based authentication in DTLS 1.3 {{RFC9147}} and
-to not reuse tickets.  DTLS 1.3 with external PSK
+used with certificate-based authentication in TLS 1.3 {{RFC9147}} and
+to not reuse tickets.  TLS 1.3 with external PSK
 authentication does not provide identity protection.
 
 By mandating ephemeral key exchange and cipher suites with
 confidentiality DTLS in SCTP effectively mitigate many forms of
 passive pervasive monitoring.  By recommending implementations to
-frequently set up new DTLS connections with (EC)DHE force attackers to
+frequently set up new TLS connections with (EC)DHE force attackers to
 do dynamic key exfiltration and limits the amount of compromised data
 due to key compromise.
 
