@@ -1122,6 +1122,8 @@ Rekeying in this specification is implemented by replacing the DTLS Key contexts
 getting old with a new one by first creating a new TLS
 connection, derive the new DTLS Key contexts, start using them,
 then closing the TLS connection and revoking the old DTLS Key contexts.
+The epoch of the new DTLS Key context will be equal to the epoch
+of the old DTLS Key context + 1.
 
 ## Criteria for Rekeying
 
