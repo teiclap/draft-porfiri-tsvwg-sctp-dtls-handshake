@@ -107,6 +107,14 @@ defined features or implementation support beyond core TLS 1.3. This
 is intended as a replacement to using DTLS/SCTP (RFC6083) and
 SCTP-AUTH (RFC4895).
 
+This document defines how Transport Layer Security (TLS) 1.3
+is used to establish keys for securing SCTP using the DTLS Chunk mechanism.
+It specifies how a TLS handshake is used to establish the initial security
+context for an SCTP association and describes procedures for key updates and
+post-handshake authentication. The goal is to enable authenticated,
+and confidential communication over SCTP using the DTLS Chunk,
+leveraging standardized TLS features for key management and rekeying.
+
 --- middle
 
 # Introduction {#introduction}
