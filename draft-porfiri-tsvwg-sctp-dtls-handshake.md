@@ -418,6 +418,75 @@ below:
    been completed in this solution.
 
 
+The following figure shows when the key exporter is used to get
+key material from the DTLS connection.
+Then keys are derived from that and the diagram also shows when these keys
+are configured for the DTLS chunk and also when the SCTP stack is
+instructed to discard received SCTP packets, when they are unprotected.
+
+~~~~~~~~~~~ aasvg
+
+Client                                             Server
+------                                             ------
+
+ Record 0
+ ClientHello                -------->
+ (epoch=0)
+                                                     Record 0
+                            <--------             ServerHello
+                                                    (epoch=0)
+                                        {EncryptedExtensions}
+                                                    (epoch=2)
+                                                {Certificate}
+                                                    (epoch=2)
+                                          {CertificateVerify}
+                                                    (epoch=2)
+                                                   {Finished}
+                                                    (epoch=2)
+ Record 1
+ {Certificate}              -------->
+ (epoch=2)
+ {CertificateVerify}
+ (epoch=2)
+ {Finished}
+ (epoch=2)
++---------------+ 
+| SET RECV KEYS |
++---------------+                                +---------------+
+                                                 | SET RECV KEYS |
+                                                 +---------------+
+                                                 +---------------+
+                                                 | SET SEND KEYS |
+                                                 +---------------+
+                                                     Record 1
+                            <--------                   [ACK]
+                                                    (epoch=3)
++--------------------+
+| ENFORCE PROTECTION |
++--------------------+
++--------------------+
+|   SET SEND KEYS    |
++--------------------+
+                                                    on sender dry event
+                                                            or
+                                                    on reception of
+                                                    protected packet
+                                                 +--------------------+
+                                                 | ENFORCE PROTECTION |
+                                                 +--------------------+
+
+~~~~~~~~~~~
+{: #setting-keys-initially title="Setting the Keys initially"}
+
+The key derivation takes into account which protection solution identifiers
+have been sent and received. This way the communication is protected against
+downgrade attacks against the SCTP handshake.
+
+TBD: Take the message flow into account which was presented by Magnus.
+
+TBD: Provide formulas for deriving the keys and improve the message sequence
+diagram.
+
 
 ## Properties of DTLS in SCTP
 
