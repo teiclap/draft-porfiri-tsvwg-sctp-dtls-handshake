@@ -93,20 +93,6 @@ normative:
 
 --- abstract
 
-This document defines a key-management solution based on
-Transport Layer Security 1.3 (TLS) to protect the content of Stream
-Control Transmission Protocol (SCTP) packets using the packet
-protection framework provided by the SCTP DTLS chunk. The combination
-provides encryption, source authentication, integrity and replay
-protection for the SCTP association with in-band TLS based
-key-management and mutual authentication of the peers. The
-specification is enabling very long-lived sessions of weeks and months
-and supports mutual re-authentication and rekeying with ephemeral key
-exchange. The key-management solution does not require any additional
-defined features or implementation support beyond core TLS 1.3. This
-is intended as a replacement to using DTLS/SCTP (RFC6083) and
-SCTP-AUTH (RFC4895).
-
 This document defines how Transport Layer Security (TLS) 1.3
 is used to establish keys for securing SCTP using the DTLS Chunk mechanism.
 It specifies how a TLS handshake is used to establish the initial security
@@ -141,8 +127,6 @@ alternative to {{RFC6083}} for securing SCTP by encapsulating
 it over DTLS 1.3, establishing a secure channel between
 SCTP endpoints.
 
-## Overview
-
 This document describes the usage of the Transport Layer
 Security version 1.3 (TLS) {{RFC8446}} protocol for key-management
 of the SCTP DTLS Chunk packet protection
@@ -161,46 +145,11 @@ This document describes:
 
 * How  multiple TLS 1.3 handshakes are used for key updates and post-handshake authentication, for supporting long-lived secure sessions.
 
-## Charactesistics
 
-TLS for DTLS in SCTP provides mutual authentication of endpoints, data
-confidentiality, data origin authentication, data integrity
-protection, and data replay protection of SCTP packets. Ensuring
-these security services to the application and its upper layer
-protocol over SCTP.  Thus, it allows client/server applications to
-communicate in a way that is designed with communications privacy
-and preventing eavesdropping and detect tampering or message
-forgery.
 
-Applications using TLS for DTLS in SCTP can use all currently existing
-transport features provided by SCTP and its extensions, in some
-cases with some limitations, as specified in
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. TLS for DTLS in SCTP supports:
+## Conventions
 
-* preservation of message boundaries.
-
-* no limitation on number of unidirectional and bidirectional streams.
-
-* ordered and unordered delivery of SCTP user messages.
-
-* the partial reliability extension as defined in {{RFC3758}}.
-
-* multi-homing of the SCTP association per {{RFC9260}}.
-
-* the dynamic address reconfiguration extension as defined in
-      {{RFC5061}} (Limitations apply).
-
-* User messages of any size.
-
-* SCTP Packets with a protected set of chunks up to a size of
-     2<sup>14</sup> (16384) bytes.
-
-The main benefit of this key-management solution over the solution
-proposed by the WG is that this does not require any extensions to
-TLS 1.3 to be implemented. It solely relies on the core TLS
-handshake to do mutual authentication, creates a main secret, and
-then relies on the TLS exporter to export necessary secrets for the
-DTLS Chunk.
+{::boilerplate bcp14}
 
 
 ## Terminology
@@ -264,11 +213,54 @@ DTLS Chunk.
    : Upper Layer Protocol
 
 
+# Charactesistics
+
+TLS for DTLS in SCTP provides mutual authentication of endpoints, data
+confidentiality, data origin authentication, data integrity
+protection, and data replay protection of SCTP packets. Ensuring
+these security services to the application and its upper layer
+protocol over SCTP.  Thus, it allows client/server applications to
+communicate in a way that is designed with communications privacy
+and preventing eavesdropping and detect tampering or message
+forgery.
+
+Applications using TLS for DTLS in SCTP can use all currently existing
+transport features provided by SCTP and its extensions, in some
+cases with some limitations, as specified in
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. TLS for DTLS in SCTP supports:
+
+* preservation of message boundaries.
+
+* no limitation on number of unidirectional and bidirectional streams.
+
+* ordered and unordered delivery of SCTP user messages.
+
+* the partial reliability extension as defined in {{RFC3758}}.
+
+* multi-homing of the SCTP association per {{RFC9260}}.
+
+* the dynamic address reconfiguration extension as defined in
+      {{RFC5061}} (Limitations apply).
+
+* User messages of any size.
+
+* SCTP Packets with a protected set of chunks up to a size of
+     2<sup>14</sup> (16384) bytes.
+
+The main benefit of this key-management solution over the solution
+proposed by the WG is that this does not require any extensions to
+TLS 1.3 to be implemented. It solely relies on the core TLS
+handshake to do mutual authentication, creates a main secret, and
+then relies on the TLS exporter to export necessary secrets for the
+DTLS Chunk.
+
+
+
 # Architecture {#architecture}
 
 This document describes how Datagram Transport Layer Security (TLS) 1.3 is
 used to establish keys for securing SCTP using the DTLS Chunk as defined in
-{{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 This approach combines the performance and encryption flexibility of
 DTLS Chunks with the integrated key management capabilities of TLS
 and the multiple TLS connection approach.
@@ -450,11 +442,12 @@ Client                                             Server
  (epoch=2)
  {Finished}
  (epoch=2)
-+---------------+ 
++---------------+
 | SET RECV KEYS |
 +---------------+                                +---------------+
                                                  | SET RECV KEYS |
                                                  +---------------+
+
                                                  +---------------+
                                                  | SET SEND KEYS |
                                                  +---------------+
@@ -464,6 +457,7 @@ Client                                             Server
 +--------------------+
 | ENFORCE PROTECTION |
 +--------------------+
+
 +--------------------+
 |   SET SEND KEYS    |
 +--------------------+
@@ -482,111 +476,35 @@ The key derivation takes into account which protection solution identifiers
 have been sent and received. This way the communication is protected against
 downgrade attacks against the SCTP handshake.
 
+## Initiator/Responder conflict
+
+In order to get the same perspective in respect of the key derivation,
+it's assumed that a set of rules are given so that Initiator and Responder
+are uniquely identified. The information about Client/Responder role
+is provided to the Key exporter together with the whole sequence of
+DTLS Key Management Id values parameters being transported by either peers
+in INIT/INIT-ACK handshake. This will allow each peer to know it's own
+role as Initiator or Responder and the list of parameters used by the
+Initiator and by the Responder.
+
+## Selection of rules for Key Derivation
+In oder to get the rules for Proper Key Derivation at the Initiator
+and at the responder, the following algorithm will be used:
+
+* Input : Role of the node, own sequence of DTLS Key Management methods in preference order, remote sequence of DTLS Key Management methods in preference order.
+
+* Select the chosen DTLS Key Management method starting from the Responder's in preferred order
+matching the Initiator's method
+
+* Create a key derivation list by using the full list from the Initiator plus the selected DTLS Key Management method
+
+The key derivation list will be used for the lifetime of the Association.
+
 TBD: Take the message flow into account which was presented by Magnus.
 
 TBD: Provide formulas for deriving the keys and improve the message sequence
 diagram.
 
-
-## Properties of DTLS in SCTP
-
-   TLS for DTLS in SCTP (as the combination of the DTLS chunk and the in-band
-   authentication and key-management using TLS handshakes defined in
-   this document) has a number of properties that are attractive.
-
-   * Provides confidentiality, integrity protection, and source
-     authentication for each SCTP packet.
-
-   * Provides replay protection on SCTP packet level preventing
-     malicious replay attacks on SCTP, both protecting the data as well
-     as the SCTP functions themselves.
-
-   * Provides mutual authentication of the endpoints based on any
-     authentication mechanism supported by TLS 1.3.
-
-   * Uses TLS 1.3 connections to enable mutual re-authentication
-     and rekeying with ephemeral key-exchange. Thus, enabling SCTP
-     association lifetimes without known limitations and without
-     needing to drain the SCTP association.
-
-   * Uses core of TLS as it is and updates and fixes to TLS security
-     properties; can be implemented without further changes to this
-     specification.
-
-   * No reliance on TLS implementation used for key-management having
-     to support any features beyond core TLS specification and the
-     TLS exporter.
-
-   * Secures all SCTP packets exchanged after SCTP association has
-     reached the established state and the initial key-exchange has
-     completed. Making targeted attacks against the SCTP protocol and
-     implementation much harder.
-
-   * DTLS in SCTP results in no limitations on user message
-     transmission or message sizes, those properties are the same as
-     for an unprotected SCTP association.
-
-   * Limited overhead on a per packet basis, with 4 bytes for the
-     DTLS chunk plus the DTLS record overhead. The DTLS
-     overhead is dependent on the DTLS version and cipher suit.
-
-   * Support of SCTP packet plain text payload sizes up to
-     2<sup>14</sup> bytes.
-
-
-
-## Conventions
-
-{::boilerplate bcp14}
-
-# DTLS usage of DTLS Chunk
-
-   TLS for DTLS in SCTP uses the DTLS chunk as specified in
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. The chunk if just
-   repeated here for the reader's convenience.
-
-~~~~~~~~~~~ aasvg
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Type = 0x4x   | reserved| P |R|         Chunk Length          |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|        Pre-Padding            |                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
-|                                                               |
-|                            Payload                            |
-|                                                               |
-|                               +-------------------------------+
-|                               |       Post-Padding            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-~~~~~~~~~~~
-{: #sctp-dtls-chunk-structure title="DTLS Chunk Structure"}
-
-Type: 8 bits
-: The Chunk Type indicate that this is the DTLS chunk.
-
-reserved: 7 bits
-: Reserved bits for future use. Sender MUST set these bits to 0 and
-  MUST be ignored on reception.
-
-R: 1 bit (boolean)
-: Restart indicator. If this bit is set this DTLS chunk is protected
-  with by a Restart DTLS Key context.
-
-P: 2 bit (0-3)
-
-: Payload Pre-Padding indicator. It indicates how many bytes
-are inserted for padding before the DTLSCiphertext.
-This allows the encrypted data to be 32 bit aligned.
-
-Chunk Length: 16 bits (unsigned integer)
-: This value holds the length of the Payload in bytes plus 4.
-
-Payload: variable length
-: This holds the DTLSCiphertext as specified in DTLS 1.3 {{RFC9147}}.
-
-Post-Padding: 0, 8, 16, or 24 bits
-: To ensure the Chunk is whole 32-bit words long.
 
 # TLS messages over SCTP User Messages  {#tls-user-message}
 
