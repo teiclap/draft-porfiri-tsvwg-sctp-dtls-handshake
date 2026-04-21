@@ -167,27 +167,24 @@ This document describes:
 
    DTLS Key context:
    : Keys, derived from a TLS 1.3 connection, and all relevant data that needs
-   to be provided to the SCTP DTLS Chunk.
-   Each DTLS key context is associated with a four value
-   tuple identifying the context, consisting of SCTP Association, the
-   restart indicator, the DTLS Connection ID (if used), and the DTLS
-   epoch
+   to be provided to the SCTP DTLS Chunk.  Each DTLS key context is associated
+   with a three value tuple identifying the context, consisting of SCTP
+   Association, the restart indicator, and the DTLS epoch.
 
-  Primary DTLS Key context:
-   : A DTLS Key context used to
-    protect the regular SCTP traffic, i.e. not a restart DTLS Key context.
+   Primary DTLS Key context:
+   : A DTLS Key context used to protect the regular SCTP traffic, i.e. not a
+    restart DTLS Key context.
 
-  Restart DTLS Key context:
-  : A DTLS Key context to be
-    used for an SCTP Association Restart
+   Restart DTLS Key context:
+   : A DTLS Key context to be used for an SCTP Association Restart
 
-  Stream:
+   Stream:
    : A unidirectional stream of an SCTP association.  It is
    uniquely identified by a stream identifier.
 
-  Traffic:
-  : The stream of DATA and Control chunks being sent on any stream between
-  SCTP Endpoints in the scope of an Association
+   Traffic:
+   : The stream of DATA and Control chunks being sent on any stream between SCTP
+   Endpoints in the scope of an Association
 
 ## Abbreviations
 
@@ -285,8 +282,7 @@ Operator for DTLS encryption and decryption.  DTLS Key context
 includes Keys for sending and receiving, replay window, and last used
 sequence number. Each DTLS key context is associated with a four
 value tuple identifying the context, consisting of SCTP
-Association, the restart indicator, the DTLS Connection ID (if
-used), and the DTLS epoch.
+Association, the restart indicator, and the DTLS epoch.
 
 Application data (except the messages for initial post handshake authentication)
 is never transmitted in DTLS record-layer application_data records.
@@ -707,23 +703,9 @@ that any error will occur.
    terminated and a new SCTP Association with the desired TLS version
    to be instantiated.
 
-## Configuration of Key-Management DTLS
+## Configuration of Key-Management TLS
 
 ### General
-
-   The DTLS Connection ID SHOULD NOT be used in the Key-Management
-   avoiding overhead and addition implementation
-   requirements on DTLS implementation.
-
-   The DTLS record length field is normally not needed as the DTLS
-   Chunk provides a length field unless multiple records are put in
-   same DTLS chunk payload or user message.
-   Note that bundling is NOT PERMITED and only one DTLS Chunk can
-   be transmitted in a SCTP Packet.
-
-   DTLS record replay detection MUST be used.
-
-   Sequence number size can be adapted based on how quickly it wraps.
 
    Many of the TLS registries have a "Recommended" column. Parameters
    not marked as "Y" are NOT RECOMMENDED to support.
