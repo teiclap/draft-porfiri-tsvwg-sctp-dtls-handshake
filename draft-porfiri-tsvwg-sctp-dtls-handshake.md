@@ -537,6 +537,13 @@ Client                                             Server
                                                      Record 1
                             <--------                   [ACK]
                                                     (epoch=3)
+
+
+Wait 2 min
+
++---------------------+                   +---------------------+
+| Remove KEYS Epoch=N |                   | Remove KEYS Epoch=N |
++---------------------+                   +---------------------+
 ~~~~~~~~~~~
 {: #setting-keys-rekey title="Setting the Keys for rekeying"}
 
