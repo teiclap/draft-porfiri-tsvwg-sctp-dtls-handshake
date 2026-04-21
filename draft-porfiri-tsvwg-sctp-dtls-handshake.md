@@ -422,6 +422,9 @@ Client                                             Server
  Record 0
  ClientHello                -------->
  (epoch=0)
+                                             +---------------+
+                                             | SET RECV KEYS |
+                                             +---------------+
                                                      Record 0
                             <--------             ServerHello
                                                     (epoch=0)
@@ -433,6 +436,12 @@ Client                                             Server
                                                     (epoch=2)
                                                    {Finished}
                                                     (epoch=2)
+			
++---------------+
+| SET RECV KEYS |
++---------------+
+| SET SEND KEYS |
++---------------+
  Record 1
  {Certificate}              -------->
  (epoch=2)
@@ -440,32 +449,15 @@ Client                                             Server
  (epoch=2)
  {Finished}
  (epoch=2)
-+---------------+
-| SET RECV KEYS |
-+---------------+                                +---------------+
-                                                 | SET RECV KEYS |
-                                                 +---------------+
-
-                                                 +---------------+
-                                                 | SET SEND KEYS |
-                                                 +---------------+
+                                             +---------------+
+                                             | SET SEND KEYS |
+                                             +---------------+
                                                      Record 1
                             <--------                   [ACK]
                                                     (epoch=3)
-+--------------------+
-| ENFORCE PROTECTION |
-+--------------------+
-
-+--------------------+
-|   SET SEND KEYS    |
-+--------------------+
-                                                    on sender dry event
-                                                            or
-                                                    on reception of
-                                                    protected packet
-                                                 +--------------------+
-                                                 | ENFORCE PROTECTION |
-                                                 +--------------------+
++--------------------+                  +--------------------+
+| ENFORCE PROTECTION |                  | ENFORCE PROTECTION |
++--------------------+                  +--------------------+
 
 ~~~~~~~~~~~
 {: #setting-keys-initially title="Setting the Keys initially"}
@@ -533,16 +525,16 @@ Client                                             Server
 +-------------------+
 | SET RECV KEYS N+1 |
 +-------------------+
- Record 1
+| SET SEND KEYS N+1 |
++-------------------+
+
+Record 1
  {Certificate}              -------->
  (epoch=2)
  {CertificateVerify}
  (epoch=2)
  {Finished}
  (epoch=2)
-+--------------------+
-| SET SEND KEYS N+1  |
-+--------------------+
 
                                             +-------------------+
                                             | SET SEND KEYS N+1 |
@@ -611,7 +603,7 @@ MTU it MAY be used as SCTP provides reliability and fragmentation.
 
 DTLS Message: variable length
 
-: One or more DTLS records. In cases more
+: One or more TLS records. In cases more
    than one DTLS record is included all DTLS records except the last
    MUST include a length field. Note that this matches what is
    specified in DTLS 1.3 {{RFC9147}} will always include the length
