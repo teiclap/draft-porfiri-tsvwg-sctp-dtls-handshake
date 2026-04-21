@@ -305,16 +305,16 @@ the consumer of SCTP's transport services.  The ULP may interface
 directly with the SCTP stack or operate through the TLS 1.3
 key-management library.
 
-Following the initial SCTP association setup, a TLS 1.3 handshake
-is performed to mutually authenticate the endpoints and to derive keying
-material for the DTLS Chunk Protection Operator.
-The TLS exporter, as defined in Section 7.5 of {{RFC8446}}, is
-used to derive this keying material, i.e. the initial DTLS Key Context.
-It leverages the same cryptographic algorithms that were negotiated during the
-TLS handshake for use with the DTLS Record Layer, thereby eliminating the
-need for separate algorithm negotiation for the DTLS Chunk.
-However, this approach requires that only algorithm suites compatible with
-both TLS 1.3 and the DTLS Chunk be configured and supported in TLS session.
+Following the initial SCTP association setup, a TLS 1.3 handshake is
+performed to mutually authenticate the endpoints and to derive keying
+material for the DTLS Chunk Protection Operator.  The TLS exporter, as
+defined in Section 7.5 of {{RFC8446}}, is used to derive this keying
+material, i.e. the initial DTLS Key Context.  It leverages the same
+cryptographic algorithms that were negotiated during the TLS handshake
+for use with the DTLS Record Layer, thereby eliminating the need for
+separate algorithm negotiation for the DTLS Chunk.  However, this
+approach requires that only algorithm suites compatible with both TLS
+1.3 and the DTLS Chunk be configured and supported in TLS session.
 
 ~~~~~~~~~~~ aasvg
 +---------------+ +-------------------------------+
@@ -367,16 +367,18 @@ below:
 
 * The process starts with a SCTP association where DTLS 1.3 Chunk
    usage has been negotiated and this key-management method has been
-   agreed in the SCTP INIT and INIT-ACK. To initialize and authenticate
-   the peer the TLS handshake is exchanged as SCTP user messages with
-   the DTLS Chunk Key-Management Messages PPID (see section 10.6 of
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an initial TLS
-   connection has been established.  If the TLS handshake fails, the
-   SCTP association is aborted. With successful handshake and
-   authentication of the peer the key material is exported from the TLS
-   connection and configured for the DTLS 1.3 chunk. From that point
-   until SCTP association termination the DTLS chunk will protect the
-   SCTP packets.
+   agreed in the SCTP INIT and INIT-ACK. The negotiation is done using
+   the DTLS Key Managment Parameter, see Section 4.1 of
+   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. To initialize and
+   authenticate the peer the TLS handshake is exchanged as SCTP user
+   messages with the DTLS Chunk Key-Management Messages PPID (see
+   section 10.6 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an
+   initial TLS connection has been established.  If the TLS handshake
+   fails, the SCTP association is aborted. With successful handshake
+   and authentication of the peer the key material is exported from
+   the TLS connection and configured for the DTLS 1.3 chunk. From that
+   point until SCTP association termination the DTLS chunk will
+   protect the SCTP packets.
 
 * The DTLS Chunk specifies that in the receiving SCTP endpoint each
    incoming SCTP packet on any of its interfaces and ports are matched
@@ -390,38 +392,14 @@ below:
    association along with associated per-packet meta data such as path
    received on, original packet size, and ECN bits.
 
-* When mutual re-authentication or rekeying is needed or desired by
-   either endpoint a new TLS connection handshake is performed
-   between the SCTP endpoints and new DTLS Key contexts are
-   created. When the handshake is completed, the DTLS in SCTP
-   implementation can simply switch to use the new DTLS Key contexts
-   in the DTLS chunk.  All rekeying MUST be using ephemeral key
-   exchange and MUST NOT use the TLS Key-Update mechanism to avoid
-   confusion about the properties of the DTLS Key Contexts for the
-   DTLS chunk. After a short while (no longer than 2 min) to enable
-   any outstanding packets to drain from the network path between the
-   endpoints, the old key context can be deleted from
-   the DTLS chunk's key store.
 
-* The lifetime of the TLS 1.3 connections used for deriving the
-   Key Context should be limited to the time strictly needed
-   for completing the key derivation, to ensure that at most
-   one TLS 1.3 connection exists at a time.
-
-* The TLS 1.3 connection may send alerts, handshake messages, or
-   other non-application data to its peer at any point in time.
-   All TLS message will be sent by means of SCTP user messages
-   with the DTLS Chunk Key-Management Messages PPID as specified in
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. However, only the
-   TLS close_notify is expected to be used after the handshake has
-   been completed in this solution.
-
-
-The following figure shows when the key exporter is used to get
-key material from the DTLS connection.
-Then keys are derived from that and the diagram also shows when these keys
-are configured for the DTLS chunk and also when the SCTP stack is
-instructed to discard received SCTP packets, when they are unprotected.
+The following figure shows when the key exporter is used to get key
+material from the TLS connection.  Then keys are derived from that and
+the diagram also shows when these keys are configured for the DTLS
+chunk and also when the SCTP stack is instructed to discard received
+SCTP packets, when they are unprotected. This procedure needs to be
+followed to avoid deadlocking the establishment of the protected
+SCTP assocation.
 
 ~~~~~~~~~~~ aasvg
 
@@ -479,38 +457,100 @@ Client                                             Server
 ~~~~~~~~~~~
 {: #setting-keys-initially title="Setting the Keys initially"}
 
+Note that the epoch noted in {{setting-keys-initially}} are the TLS session's
+epochs, not the epoch used for the DTLS Chunk. The DTLS chunk's initial key
+context will use epoch=3.
+
 The key derivation takes into account which protection solution identifiers
 have been sent and received. This way the communication is protected against
 downgrade attacks against the SCTP handshake.
 
-## Initiator/Responder conflict
+## Key Management Role Determination
 
-In order to get the same perspective in respect of the key derivation,
-it's assumed that a set of rules are given so that Initiator and Responder
-are uniquely identified. The information about Client/Responder role
-is provided to the Key exporter together with the whole sequence of
-DTLS Key Management Id values parameters being transported by either peers
-in INIT/INIT-ACK handshake. This will allow each peer to know it's own
-role as Initiator or Responder and the list of parameters used by the
-Initiator and by the Responder.
+This key management method supports also SCTP association that was
+simultanously opened by both peers. Based on the procedures in
+{{RFC9260}} both endpoints may initiate opening an SCTP association
+to each other and this resulting in a single SCTP association.
 
-## Selection of rules for Key Derivation
-In oder to get the rules for Proper Key Derivation at the Initiator
-and at the responder, the following algorithm will be used:
+To enable the key-management procedure to work correctly in such cases
+where an endpoint can act both as an initiator (client) and as a
+responder (server) the DTLS Key Management Parameter provides
+information such that the key management role is determined. This
+procedures is defined in {{role-determination}}.
 
-* Input : Role of the node, own sequence of DTLS Key Management methods in preference order, remote sequence of DTLS Key Management methods in preference order.
+With the role determined and this Key Management method selected, the
+above TLS handshake procedure, and associated configuration of the
+DTLS chunk, is initiated by the one that got the Initiator Role. Thus
+also the input to Key Management Downgrade protection is determined.
 
-* Select the chosen DTLS Key Management method starting from the Responder's in preferred order
-matching the Initiator's method
 
-* Create a key derivation list by using the full list from the Initiator plus the selected DTLS Key Management method
+## Rekeying and Key-Life Time
 
-The key derivation list will be used for the lifetime of the Association.
+When mutual re-authentication or rekeying is needed or desired by
+either endpoint a new TLS handshake is exchanged performed between the
+SCTP endpoints to establish a new TLS connection. New DTLS Key
+contexts are created for the next DTLS chunk epoch for this SCTP
+assocation from this new TLS connection. As the new (Epoch=N+1) and
+old (Epoch=N) DTLS key context can coexist a simplified procedure for
+enabling the new DTLS key context is used as shown below
+{{setting-keys-rekey}}.
 
-TBD: Take the message flow into account which was presented by Magnus.
+~~~~~~~~~~~ aasvg
 
-TBD: Provide formulas for deriving the keys and improve the message sequence
-diagram.
+Client                                             Server
+------                                             ------
+
+ Record 0
+ ClientHello                -------->
+ (epoch=0)
+                                                     Record 0
+                            <--------             ServerHello
+                                                    (epoch=0)
+                                        {EncryptedExtensions}
+                                                    (epoch=2)
+                                                {Certificate}
+                                                    (epoch=2)
+                                          {CertificateVerify}
+                                                    (epoch=2)
+                                                   {Finished}
+                                                    (epoch=2)
+				             +-------------------+
+                                             | SET RECV KEYS N+1 |
+                                             +-------------------+
++-------------------+
+| SET RECV KEYS N+1 |
++-------------------+
+ Record 1
+ {Certificate}              -------->
+ (epoch=2)
+ {CertificateVerify}
+ (epoch=2)
+ {Finished}
+ (epoch=2)
++--------------------+
+| SET SEND KEYS N+1  |
++--------------------+
+
+                                            +-------------------+
+                                            | SET SEND KEYS N+1 |
+                                            +-------------------+
+                                                     Record 1
+                            <--------                   [ACK]
+                                                    (epoch=3)
+~~~~~~~~~~~
+{: #setting-keys-rekey title="Setting the Keys for rekeying"}
+
+All rekeying MUST be using ephemeral key exchange and MUST NOT use the
+TLS Key-Update mechanism to avoid confusion about the properties of
+the DTLS Key Contexts for the DTLS chunk. After a short while (no
+longer than 2 min) to enable any outstanding packets to drain from the
+network path between the endpoints, the old key context can be deleted
+from the DTLS chunk's key store.
+
+The lifetime of the TLS 1.3 connections used for deriving the DTLS Key
+Context should be limited to the time strictly needed for completing
+the key derivation, to ensure that at most one TLS 1.3 connection
+exists at a time.
 
 
 # TLS messages over SCTP User Messages  {#tls-user-message}
@@ -829,6 +869,28 @@ provide ephemeral key exchange.
    The Key-Management TLS connection is established as part of extra
    procedures for the TLS chunk initial handshake (see
    {{initial_tls_connection}}).
+
+
+## Key Management Role Determination {#role-determination}
+
+In order to get the rules for Proper Key Derivation at the Initiator
+and at the responder, the following algorithm will be used:
+
+* Input : Role of the node, own sequence of DTLS Key Management methods in preference order, remote sequence of DTLS Key Management methods in preference order.
+
+* Select the chosen DTLS Key Management method starting from the Responder's in preferred order
+matching the Initiator's method
+
+* Create a key derivation list by using the full list from the Initiator plus the selected DTLS Key Management method
+
+The key derivation list will be used for the lifetime of the Association.
+
+TBD: Take the message flow into account which was presented by Magnus.
+
+TBD: Provide formulas for deriving the keys and improve the message sequence
+diagram.
+
+
 
 
 ## DTLS Key Context derivation {#dtls-key-derivation}
