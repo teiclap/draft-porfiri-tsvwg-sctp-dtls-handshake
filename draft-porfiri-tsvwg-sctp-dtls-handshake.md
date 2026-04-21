@@ -253,64 +253,68 @@ proposed by the WG is two fold:
 * First, that this solution do not require any extensions to
   (D)TLS 1.3 to be implemented to enable long lived sessions.
 
-* Secondly, that it is TLS 1.3 based rather than DTLS 1.3. The availability of
-  DTLS 1.3 even just with minimal core functionality is extremely limited.
-  Thus, having a solution based on TLS where there a multiple available
-  implementations, and no need to await additional implementation work is
-  a significant benefit.
+* Secondly, that it is TLS 1.3 based rather than DTLS 1.3. The
+  availability of DTLS 1.3 even just with minimal core functionality
+  is extremely limited.  Thus, having a solution based on TLS where
+  there a multiple available implementations, and no need to await
+  additional implementation work is a significant benefit.
 
 
 # Architecture {#architecture}
 
-This document describes how Datagram Transport Layer Security (TLS) 1.3 is
-used to establish keys for securing SCTP using the DTLS Chunk as defined in
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
-This approach combines the performance and encryption flexibility of
-DTLS Chunks with the integrated key management capabilities of TLS
-and the multiple TLS connection approach.
+This document describes how Transport Layer Security (TLS) 1.3 is used
+to establish keys for securing SCTP using the DTLS Chunk as defined in
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.  This approach combines the
+performance and encryption flexibility of DTLS Chunks with the
+integrated key management capabilities of TLS and the multiple TLS
+connection approach.
 
 The key characteristics of the solution are as follows:
 
 * Application data is protected using DTLS Chunks.
 
-* The TLS handshake is used to establish keying material, algorithms, and parameters for use with DTLS Chunks.
+* The TLS handshake is used to establish keying material, algorithms,
+  and parameters for use with DTLS Chunks as well as authenticate the
+  peer.
 
-* TLS and relevant extensions are used to negotiate cryptographic algorithms and parameters, enable larger record sizes, and support post-handshake authentication.
+* Rekeying and re-authentication is achieved by opening a new TLS
+  connection over the secured SCTP assocation. Thus mutual
+  authentication and a new ephemeral key exchange is performed,
+  enabling deriving a new DTLS Key Context with forward secrecy for
+  the next DTLS Chunk epoch.
 
-* All other DTLS record-layer content types are protected using standard DTLS record framing.
+In this document we use the terms DTLS Key context for indicating the
+pair of keys and the initilization vector (IV), derived from a TLS1.3
+connection, and all relevant data that needs to be provided to the
+SCTP DTLS Chunk to enable DTLS encryption, decryption and
+authentication. A complete bi-directional DTLS Key context includes
+Keys for sending and receiving, replay window, and last used sequence
+number. Each DTLS key context is associated with a three value tuple
+identifying the context, consisting of SCTP Association, the restart
+indicator, and the DTLS epoch.
 
-In this document we use the terms DTLS Key context for indicating
-the pair of keys, derived from a TLS1.3 connection, and all relevant
-data that needs to be provided to the SCTP DTLS Chunk Protection
-Operator for DTLS encryption and decryption.  DTLS Key context
-includes Keys for sending and receiving, replay window, and last used
-sequence number. Each DTLS key context is associated with a four
-value tuple identifying the context, consisting of SCTP
-Association, the restart indicator, and the DTLS epoch.
+The Upper Layer Protocol's Application data is never transmitted in
+TLS record-layer application_data records.  Instead, application data
+is sent via SCTP DATA chunks which are protected by the DTLS Chunk
+Protection Operator.  This operator encapsulates all SCTP chunks into
+a DTLS Chunk, applying the negotiacted DTLS cipher suit's protection.
 
-Application data (except the messages for initial post handshake authentication)
-is never transmitted in DTLS record-layer application_data records.
-Instead, application data is sent via SCTP DATA chunks which are protected by
-the DTLS Chunk Protection Operator.
-This operator encapsulates all SCTP chunks into a DTLS Chunk, applying
-appropriate protection.
-
-The figure {{overview-layering}} illustrates the architecture, highlighting the
-role of the upper-layer protocol (ULP), which acts as the consumer of
-SCTP's transport services.
-The ULP may interface directly with the SCTP stack or operate through the
-DTLS 1.3 stack.
+The figure {{overview-layering}} illustrates the architecture,
+highlighting the role of the upper-layer protocol (ULP), which acts as
+the consumer of SCTP's transport services.  The ULP may interface
+directly with the SCTP stack or operate through the TLS 1.3
+key-management library.
 
 Following the initial SCTP association setup, a TLS 1.3 handshake
 is performed to mutually authenticate the endpoints and to derive keying
 material for the DTLS Chunk Protection Operator.
 The TLS exporter, as defined in Section 7.5 of {{RFC8446}}, is
-used to derive this keying material, i.e. the initial Key Context.
+used to derive this keying material, i.e. the initial DTLS Key Context.
 It leverages the same cryptographic algorithms that were negotiated during the
 TLS handshake for use with the DTLS Record Layer, thereby eliminating the
 need for separate algorithm negotiation for the DTLS Chunk.
 However, this approach requires that only algorithm suites compatible with
-both TLS 1.3 and DTLS Chunks be configured and supported.
+both TLS 1.3 and the DTLS Chunk be configured and supported in TLS session.
 
 ~~~~~~~~~~~ aasvg
 +---------------+ +-------------------------------+
@@ -337,7 +341,7 @@ both TLS 1.3 and DTLS Chunks be configured and supported.
 |               | | |       +-----+---...       | |
 |               | | | ContentType |             | |
 |               | | |  +----------+----------+  | |
-|               | | +->|   DTLS Record       |  | |
+|               | | +->|    TLS Record       |  | |
 |               | |    | Protection Operator |  | |
 +               | |    +----------+----------+  | |
 +-------+-------+ +-----------------------------+-+
