@@ -113,19 +113,19 @@ In many deployments, particularly those telecommunication networks and WebRTC
 data channels, it is essential to provide confidentiality, integrity, and peer
 authentication for SCTP traffic.
 
-{{RFC6083}} defines a mechanism for securing SCTP by
-encapsulating it over DTLS 1.0/1.2, establishing a secure channel between
-SCTP endpoints.
+{{RFC6083}} defines a mechanism for securing SCTP by encapsulating application
+payload in DTLS 1.0/1.2, establishing a secure channel between SCTP endpoints
+and relying on SCTP-AUTH {{RFC4895}} to prevent attacks on the SCTP protocol
+itself.
 
 However, with the introduction of DTLS 1.3 {{RFC9147}}, the
 protocol underwent significant changes, including removal of renegotiation,
 a new key schedule, and support for post-handshake operations.
 Without additional description, RFC 6083 cannot be used with DTLS 1.3.
 
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} defines an mechanism
-alternative to {{RFC6083}} for securing SCTP by encapsulating
-it over DTLS 1.3, establishing a secure channel between
-SCTP endpoints.
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} defines an mechanism alternative to
+{{RFC6083}} for securing Application Payload and SCTP by encapsulating SCTP's
+chunks in DTLS 1.3, establishing a secure channel between SCTP endpoints.
 
 This document describes the usage of the Transport Layer
 Security version 1.3 (TLS) {{RFC8446}} protocol for key-management
@@ -139,11 +139,14 @@ refer to as TLS for DTLS in SCTP.
 
 This document describes:
 
-* How the TLS 1.3 handshake establishes the initial security context between SCTP endpoints.
+* How the TLS 1.3 handshake establishes the initial security context between
+  SCTP endpoints.
 
-* How keying material is derived and associated with the SCTP association.
+* How keying material for the DTLS chunk is derived and associated with the SCTP
+  association.
 
-* How  multiple TLS 1.3 handshakes are used for key updates and post-handshake authentication, for supporting long-lived secure sessions.
+* How multiple TLS 1.3 handshakes are used for key updates and post-handshake
+  authentication, for supporting long-lived secure sessions.
 
 
 
