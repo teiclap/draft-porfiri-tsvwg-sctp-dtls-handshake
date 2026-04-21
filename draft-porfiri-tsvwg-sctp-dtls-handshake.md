@@ -311,30 +311,18 @@ both TLS 1.3 and DTLS Chunks be configured and supported.
 
 ~~~~~~~~~~~ aasvg
 +---------------+ +-------------------------------+
-|      ULP      | |            TLS 1.3            |
+|      ULP      | |            DTLS 1.3           |
 |               | |    +---------------------+    |
 |               | | +->+    Key Exporter     +--+ |
 |               | | |  +---------------------+  | |
 |               | | |                           | |
 |               | | |  +---------------------+  | |
 |               | | +--+    Key Management   +  | |
-|               | | |  +---------------------+  | |
-|               | | |     +---+ +---+           | |
-|               | | |     | H | |   |           | |
-|               | | |     | a | |   |           | |
-|               | | | k   | n | | A |         k | |
-|               | | | e   | d | | l |         e | |
-|               | | | y   | s | | e |    ...  y | |
-|               | | | s   | h | | r |         s | |
-|               | | |     | a | | t |           | |
-|               | | |     | k | |   |           | |
-|               | | |     | e | |   |           | |
-|               | | |     +-+-+ +-+-+           | |
-|               | | |       |     |             | |
-|               | | |       +-----+---...       | |
+|               | | |  +----------+----------+  | |
+|               | | |             |             | |
 |               | | | ContentType |             | |
 |               | | |  +----------+----------+  | |
-|               | | +->|   DTLS Record       |  | |
+|               | | +->|    TLS Record       |  | |
 |               | |    | Protection Operator |  | |
 +               | |    +----------+----------+  | |
 +-------+-------+ +-----------------------------+-+
@@ -360,16 +348,43 @@ below:
 
 * The process starts with a SCTP association where DTLS 1.3 Chunk
    usage has been negotiated and this key-management method has been
-   agreed in the SCTP INIT and INIT-ACK. To initialize and authenticate
-   the peer the TLS handshake is exchanged as SCTP user messages with
-   the DTLS Chunk Key-Management Messages PPID (see section 10.6 of
+   agreed in the SCTP INIT and INIT-ACK. Here we assume that the
+   management method is the one described in this document.
+
+* After initial handshake, a mechanism in SCTP takes the decision
+   about the role of the peer with respect of TLS. One of the peers
+   will be decided to be Initiator and the other to be Responder.
+   The information about the role of the current node is communicated
+   from SCTP to the Key Management function via API so that Key Management
+   has knowledge of its own role and the lists of the Initiator's
+   Key Management methods offered by the Initiator and the list of the
+   Key Management methods offered by the Responder.
+
+* To initialize and authenticate the peers the TLS handshake is
+   initiated at the Initiator peer, the TLS handshake messages are
+   exchanged as SCTP user messages with the DTLS Chunk Key-Management
+   Messages PPID (see section 10.6 of
    {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an initial TLS
-   connection has been established.  If the TLS handshake fails, the
-   SCTP association is aborted. With successful handshake and
-   authentication of the peer the key material is exported from the TLS
-   connection and configured for the DTLS 1.3 chunk. From that point
-   until SCTP association termination the DTLS chunk will protect the
-   SCTP packets.
+   connection has been established. If the TLS handshake fails, the
+   SCTP association is aborted.
+
+* With successful handshake and authentication of the peer the Key
+   Management will use a Key Exporter as defined in section 7.5 of
+   {{RFC8446}}, using the label defined in {{iana-export-label}}
+   and a context built as an array of bytes sequenced as follows:
+
+   1 byte : direction
+
+   1 byte : traffic or reset key
+
+   variable length : the list of the Key Management Methods from Initiator
+
+   2 bytes : the Key Management Method selected by the Responder
+
+* The Key exporter will be used for creating 4 DTLS Key Contexts,
+   one DTLS Key Context per direction for Traffic Cases and one
+   DTLS Key Context per direction for Restart Cases.
+
 
 * The DTLS Chunk specifies that in the receiving SCTP endpoint each
    incoming SCTP packet on any of its interfaces and ports are matched
@@ -1312,7 +1327,7 @@ identify the key-management defined in this document.
 | 4096 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
 {: #iana-psi title="SCTP Protection Solution Indicators" cols="r l l l"}
 
-## TLS Exporter Labels
+## TLS Exporter Labels {#iana-export-label}
 
 IANA is requested to register the following values in the TLS Exporter
 Label Registry {{RFC5705}} with Reference RFC-TO-BE and empty Comment. The registry was at the time of writing located
