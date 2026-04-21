@@ -256,7 +256,8 @@ proposed by the WG is two fold:
 * Secondly, that it is TLS 1.3 based rather than DTLS 1.3. The availability of
   DTLS 1.3 even just with minimal core functionality is extremely limited.
   Thus, having a solution based on TLS where there a multiple available
-  implementations, and no need to await additional implementation
+  implementations, and no need to await additional implementation work is
+  a significant benefit.
 
 
 # Architecture {#architecture}
