@@ -248,12 +248,15 @@ cases with some limitations, as specified in
      2<sup>14</sup> (16384) bytes.
 
 The main benefit of this key-management solution over the solution
-proposed by the WG is that this does not require any extensions to
-TLS 1.3 to be implemented. It solely relies on the core TLS
-handshake to do mutual authentication, creates a main secret, and
-then relies on the TLS exporter to export necessary secrets for the
-DTLS Chunk.
+proposed by the WG is two fold:
 
+* First, that this solution do not require any extensions to
+  (D)TLS 1.3 to be implemented to enable long lived sessions.
+
+* Secondly, that it is TLS 1.3 based rather than DTLS 1.3. The availability of
+  DTLS 1.3 even just with minimal core functionality is extremely limited.
+  Thus, having a solution based on TLS where there a multiple available
+  implementations, and no need to await additional implementation
 
 
 # Architecture {#architecture}
