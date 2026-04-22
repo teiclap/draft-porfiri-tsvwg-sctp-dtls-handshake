@@ -567,47 +567,42 @@ exists at a time.
 
 # TLS messages over SCTP User Messages  {#tls-user-message}
 
-When DTLS in SCTP has completed the initialization,
-TLS messages for the Handshake TLS connection, i.e. that are not
-DTLS records containing protected SCTP chunk payloads, will be sent as
-SCTP user messages using the format defined in {{sctp-dtls-user-message}}.
-A TLS handshake
-message may be fragmented by DTLS to a set of DTLS records of a
-maximum configured fragment size. Each TLS message fragment is sent
-as a SCTP user message on the same stream where each message is
-configured for reliable and in-order delivery with the PPID set to
-DTLS Chunk Key-Management Messages
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}. These user messages MAY
-contain one or more DTLS records. The SCTP stream ID used MAY be any
-stream ID that the ULP already uses, and if not known Stream 0. Note
-that all fragments of a handshake message MUST be sent with the same
-stream ID to ensure the in-order delivery.
+The key-management TLS sessions have their TLS message (individual TLS
+records) sent as SCTP user messages using reliable in-order delivery
+on stream 0 using the DTLS Chunk Key-Managment Messages PPID (4242)
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.  To ensure clear indication
+of the usage of the TLS session one or more complete TLS record is
+prefaced by a single byte indicating the epoch of the DTLS key context
+being created. With these transport requirements of TLS records
+between the key-managmeent function in each endpoint it is possible to
+ensure that each TLS session is receiving its records in order, a
+requirement for TLS.
 
-If the TLS
-implementation supports configuring a MTU larger than the actual IP
-MTU it MAY be used as SCTP provides reliability and fragmentation.
-
+TLS messages (records) for any Handshake TLS connection, i.e. that are
+not DTLS records containing protected SCTP chunk payloads, will be
+sent as SCTP user messages using the format defined in
+{{sctp-dtls-user-message}}.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                            DTLS Message                       |
+|     Epcoh     |                                               |
++---------------+            TLS Message                        |
 |                                                               |
 |                               +-------------------------------+
 |                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-dtls-user-message title="DTLS User Message Structure"}
+{: #sctp-dtls-user-message title="TLS User Message Structure"}
 
-DTLS Message: variable length
 
-: One or more TLS records. In cases more
-   than one DTLS record is included all DTLS records except the last
-   MUST include a length field. Note that this matches what is
-   specified in DTLS 1.3 {{RFC9147}} will always include the length
-   field in each record.
+ Epoch: 8 bits
+ : The 8 lowest bits of the full epoch counter (64-bits) of
+ DTLS key context whose keys are exported from this TLS session.
+
+ TLS Message: variable length
+ : One or more TLS records.
 
 # DTLS Chunk Integration
 
