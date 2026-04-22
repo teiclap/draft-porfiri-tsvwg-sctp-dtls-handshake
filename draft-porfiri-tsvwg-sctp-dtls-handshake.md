@@ -885,24 +885,24 @@ provide ephemeral key exchange.
 
 # Establishing TLS for DTLS in SCTP
 
-   This section specifies how TLS for DTLS in SCTP is established using
-   Key-Management TLS Connections and the DTLS Chunk
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
+This section specifies how TLS for DTLS in SCTP is established using
+Key-Management TLS Connections and the DTLS Chunk
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
-   A TLS for DTLS in SCTP Association is built up with a Key-Management TLS
-   connection, from that TLS connection Primary DTLS Key Context and
-   Restart DTLS Key Context are derived and the configures
-   the DTLS Context.
+A TLS for DTLS in SCTP Association is built up with a Key-Management TLS
+connection, from that TLS connection Primary DTLS Key Contexts and
+Restart DTLS Key Contexts are derived and used to setup
+the DTLS Chunk Protection Operator(see {{overview-layering}}).
 
-   The Key-Management TLS connection is established as part of extra
-   procedures for the TLS chunk initial handshake (see
-   {{initial_tls_connection}}).
+The Key-Management TLS connection is established as part of extra
+procedures for the DTLS chunk initial handshake (see
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}).
 
 
 ## Key Management Role Determination {#role-determination}
 
 In order to get the rules for Proper Key Derivation at the Initiator
-and at the responder, the following algorithm will be used:
+and at the Responder, the following algorithm will be used:
 
 * Input : Role of the node, own sequence of DTLS Key Management methods in preference order, remote sequence of DTLS Key Management methods in preference order.
 
@@ -919,19 +919,66 @@ TBD: Provide formulas for deriving the keys and improve the message sequence
 diagram.
 
 
-
-
 ## DTLS Key Context derivation {#dtls-key-derivation}
 
-  This section describes how DTLS Key Contexts are derived from the
-  TLS handshake using the TLS Exporter as defined by {{RFC9147}}. The
-  TLS exporter label specifications below is following {{RFC5705}}.
+This section describes how DTLS Key Contexts are derived from the
+TLS handshake using the TLS Exporter as defined by {{RFC8446}}.
+The TLS exporter requires Context and Label parameters.
 
-  There are two sets of keys one for the Primary DTLS key context and
-  one for the Restart DTLS Key Context. Each set consists of one
+### The Context
+
+The context for TLS Exporter is an arbitrary long array of bytes.
+TLS for DTLS in SCTP requires the contexts to be using the following rules:
+
+* The sequence of bytes MUST follow the order
+
+1 byte : direction (Client/Server)
+
+1 byte : traffic or reset key
+
+variable length : the list of the Key Management Methods from Initiator
+
+2 bytes : the Key Management Method selected by the Responder
+
+* The list of Key Management Methods from Initiator MUST follow
+exactly the order of bytes provided in the INIT/INIT-ACK
+DTLS Key Management Parameter, as an example in the following
+{{key-management-parameter}} the list of Key Management Methods
+will use the sequence of bytes starting from the 5th up to the
+10th.
+
+* The Key Management Method selected by the Responder will follow
+the same rule. If the selected Management Method in {{key-management-parameter}}
+is DTLS Key Management Id 2, the sequence of the 2 bytes will
+be the 7th and the 8th.
+
+~~~~~~~~~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|    Parameter Type = 0x8006    |       Parameter Length        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  DTLS Key Management Id #1    |  DTLS Key Management Id #2    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| DTLS Key Management Id #3     | Padding                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
+{: #key-management-parameter title="DTLS Key Management Parameter" artwork-align="center"}
+
+
+### The Label
+  TLS exporter label specifications below is following {{RFC5705}}
+  using the label defined in {{iana-export-label}}.
+
+  There are two sets of keys: one for the Primary DTLS key context and
+  one for the Restart DTLS Key Context.
+
+  Each set consists of one
   client and one server side write key. In addition each key needs an
   Initilization Vector (IV) that is used by the record processing in
-  TLS to create the nonce, See Section 5.3 of {{RFC8446}}. The client
+  TLS to create the nonce, See Section 5.3 of {{RFC8446}}.
+
+  The client
   and server roles are here in relation to key-management TLS session
   roles. So the DTLS Client will install the key derived using the
   EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY label as its write key for
