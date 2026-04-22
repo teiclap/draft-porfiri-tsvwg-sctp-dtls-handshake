@@ -171,9 +171,15 @@ This document describes:
    with a three value tuple identifying the context, consisting of SCTP
    Association, the restart indicator, and the DTLS epoch.
 
+   Initiator:
+   : the endpoint that is agreed to be the client in the SCTP Association Establishment.
+
    Primary DTLS Key context:
    : A DTLS Key context used to protect the regular SCTP traffic, i.e. not a
     restart DTLS Key context.
+
+   Responder:
+   : the endpoint that is agreed to be the server in the SCTP Association Establishment.
 
    Restart DTLS Key context:
    : A DTLS Key context to be used for an SCTP Association Restart
@@ -906,8 +912,7 @@ and at the Responder, the following algorithm will be used:
 
 * Input : Role of the node, own sequence of DTLS Key Management methods in preference order, remote sequence of DTLS Key Management methods in preference order.
 
-* Select the chosen DTLS Key Management method starting from the Responder's in preferred order
-matching the Initiator's method
+* Select the DTLS key management method by iterating over the Responder’s preferred methods and choosing the first one that matches a method supported by the Initiator.
 
 * Create a key derivation list by using the full list from the Initiator plus the selected DTLS Key Management method
 
@@ -924,8 +929,22 @@ diagram.
 This section describes how DTLS Key Contexts are derived from the
 TLS handshake using the TLS Exporter as defined by {{RFC8446}}.
 The TLS exporter requires Context and Label parameters.
+The length of the exported key or IV material depends on the need for the
+negotiatated cipher suit for the protection.
 
 ### The Context
+
+To ensure that downgrade attack on the protection solution offered
+is not possible the context used will be the full sequence of
+Protection Solution Identifiers as include in the DTLS 1.3 Chunk
+Protected Association (Section 4.1 of
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) sent by the SCTP
+assocation initiator.
+
+Thanks to that, any downgrade attack on this will result
+in a mismatch in produced keys as the initiator will use what it
+actually offered and the responder a truncated or modified sequence.
+
 
 The context for TLS Exporter is an arbitrary long array of bytes.
 TLS for DTLS in SCTP requires the contexts to be using the following rules:
@@ -960,39 +979,41 @@ be the 7th and the 8th.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |  DTLS Key Management Id #1    |  DTLS Key Management Id #2    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| DTLS Key Management Id #3     | Padding                       |
+|  DTLS Key Management Id #3    | Padding                       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #key-management-parameter title="DTLS Key Management Parameter" artwork-align="center"}
+{: #key-management-parameter title="Use of DTLS Key Management Parameter for Context" artwork-align="center"}
 
 
 ### The Label
-  TLS exporter label specifications below is following {{RFC5705}}
-  using the label defined in {{iana-export-label}}.
 
-  There are two sets of keys: one for the Primary DTLS key context and
-  one for the Restart DTLS Key Context.
+TLS exporter label specifications below is following {{RFC5705}}
+using the label defined in {{iana-export-label}}.
 
-  Each set consists of one
-  client and one server side write key. In addition each key needs an
-  Initilization Vector (IV) that is used by the record processing in
-  TLS to create the nonce, See Section 5.3 of {{RFC8446}}.
+There are two sets of keys: one for the Primary DTLS key context and
+one for the Restart DTLS Key Context.
 
-  The client
-  and server roles are here in relation to key-management TLS session
-  roles. So the DTLS Client will install the key derived using the
-  EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY label as its write key for
-  the Primary DTLScontext, and use the
-  EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY as its Primary DTLS context
-  read key. Correspondlingly the
-  EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY is used to export the key
-  used by the endpoint that acted as DTLS Client as write key for the
-  restart DTLS key context. And the
-  EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY as the DTLS client's read
-  key for the restart DTLS Key Context. Correspondligy the IV values
-  needs to be exported using the corresponding _IV label.
+Each set consists of one client and one server side write key.
+In addition each key needs an Initialization Vector (IV) that
+is used by the record processing in TLS to create the nonce,
+See Section 5.3 of {{RFC8446}}.
 
-  The following labels are defined:
+The client and server roles are here in relation to key-management
+TLS session roles. The DTLS Client will install the key derived using the
+EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY label as its write key for
+the Primary DTLScontext, and use the EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY
+as its Primary DTLS context read key.
+
+Correspondlingly the EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY
+is used to export the key used by the endpoint that acted as
+DTLS Client as write key for the restart DTLS key context, and the
+EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY as the DTLS client's read
+key for the restart DTLS Key Context.
+
+The IV values also needs to be exported using
+the corresponding _IV label and following the same rules.
+
+The following labels are defined:
 
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_IV
@@ -1003,17 +1024,6 @@ be the 7th and the 8th.
   * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_IV
 
-  To ensure that downgrade attack on the protection solution offered
-  is not possible the context used will be the full sequence of
-  Protection Solution Identifiers as include in the DTLS 1.3 Chunk
-  Protected Association (Section 4.1 of
-  {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) sent by the SCTP
-  assocation initiator. Thus, any downgrade attack on this will result
-  in a mismatch in produced keys as the initiator will use what it
-  actually offered and the responder a truncated or modified sequence.
-
-  The length of the exported key or IV material depends on the need for the
-  negotiatated cipher suit for the protection.
 
 
 ## TLS Handshake {#tls-handshake}
