@@ -182,6 +182,9 @@ This document describes:
    : A unidirectional stream of an SCTP association.  It is
    uniquely identified by a stream identifier.
 
+   TLS for DTLS in SCTP:
+   : The set of data, process and procedures described in this document.
+
    Traffic:
    : The stream of DATA and Control chunks being sent on any stream between SCTP
    Endpoints in the scope of an Association
@@ -305,17 +308,6 @@ the consumer of SCTP's transport services.  The ULP may interface
 directly with the SCTP stack or operate through the TLS 1.3
 key-management library.
 
-Following the initial SCTP association setup, a TLS 1.3 handshake is
-performed to mutually authenticate the endpoints and to derive keying
-material for the DTLS Chunk Protection Operator.  The TLS exporter, as
-defined in Section 7.5 of {{RFC8446}}, is used to derive this keying
-material, i.e. the initial DTLS Key Context.  It leverages the same
-cryptographic algorithms that were negotiated during the TLS handshake
-for use with the DTLS Record Layer, thereby eliminating the need for
-separate algorithm negotiation for the DTLS Chunk.  However, this
-approach requires that only algorithm suites compatible with both TLS
-1.3 and the DTLS Chunk be configured and supported in TLS session.
-
 ~~~~~~~~~~~ aasvg
 +---------------+ +-------------------------------+
 |      ULP      | |            DTLS 1.3           |
@@ -347,6 +339,35 @@ approach requires that only algorithm suites compatible with both TLS
 ~~~~~~~~~~~
 {: #overview-layering title="Architecture"}
 
+## TLS for DTLS in SCTP
+
+TLS for DTLS in SCTP starts with a SCTP association where DTLS 1.3 Chunk
+usage has been negotiated and this key-management method has been
+agreed in the SCTP INIT and INIT-ACK.
+
+Following the initial SCTP association setup, a TLS 1.3 handshake is
+performed to mutually authenticate the endpoints and to derive keying
+material for the DTLS Chunk Protection Operator.  The TLS exporter, as
+defined in Section 7.5 of {{RFC8446}}, is used to derive this keying
+material, i.e. the initial DTLS Key Contexts.  It leverages the same
+cryptographic algorithms that were negotiated during the TLS handshake
+for use with the DTLS Record Layer, thereby eliminating the need for
+separate algorithm negotiation for the DTLS Chunk.  However, this
+approach requires that only algorithm suites compatible with both TLS
+1.3 and the DTLS Chunk be configured and supported in TLS session.
+Once the DTLS Key Contexts have been derived, the TLS1.3 connection
+is closed.
+
+Whenever either peers need to re-key, the peer asking for re-keying
+will initiate a new TLS 1.3 handshake to mutually authenticate the
+endpoints and to derive keying material for the DTLS Chunk Protection
+Operator. Once again the TLS exporter, as defined in Section 7.5 of
+{{RFC8446}}, is used to derive this keying material, and from that
+material the new DTLS Key Contexts. Once the DTLS Key Contexts have
+been derived, the TLS1.3 connection is closed.
+
+The new DTLS Key Contexts will be used for replacing the aged DTLS
+Key Contexts as specified in {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
 ## Setting the Keys Initially
 
