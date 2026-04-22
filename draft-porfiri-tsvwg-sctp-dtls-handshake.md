@@ -1060,33 +1060,33 @@ Initiator                                     Responder
 {: #sctp-TLS-initial-dtls-connection title="Handshake of initial TLS connection" artwork-align="center"}
 
 
-   SCTP Handshake is strictly compliant to {{RFC9260}}. The DTLS 1.3
-   Chunk Protected Association parameter (Section 4.1 of
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) is included containing
-   the Protection Solution identifier (See {{sec-iana-psi}}) for this
-   documents key-management at a suitable preference position
-   depending on local policy. And in case this key-management solution
-   is the most preferred then the process continues as stated below
-   and depiceted in {{sctp-protection-initilization}}.
+SCTP Handshake is strictly compliant to {{RFC9260}}. The DTLS 1.3
+Chunk Protected Association parameter (Section 4.1 of
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) is included containing
+the Protection Solution identifier (See {{sec-iana-psi}}) for this
+documents key-management at a suitable preference position
+depending on local policy. And in case this key-management solution
+is the most preferred then the process continues as stated below
+and depiceted in {{sctp-protection-initilization}}.
 
 ~~~~~~~~~~~ aasvg
 
 Initiator                                            Responder
     |                                                    |
- 0. +------------------------[INIT]--------------------->|
+ 1. +------------------------[INIT]--------------------->|
     |<---------------------[INIT-ACK]--------------------+
-    +--------------------[COOKIE ECHO]------------------>| 1.
- 2. |<--------------------[COOKIE ACK]-------------------+
+    +--------------------[COOKIE ECHO]------------------>| 2.
+ 3. |<--------------------[COOKIE ACK]-------------------+
     |                                                    |
     |  Key Manager                           Key Manager |
     |    |                                          |    |
- 3. +--->| CRYPTO UP                      CRYPTO UP |<---+
+ 4. +--->| CRYPTO UP                      CRYPTO UP |<---+
     |    |                                          |    |
-    |    +---------[DATA(DTLS Client Hello)]------->| 4. |
-    |    |<-[DATA(DTLS Server Hello ... Finished)]--+ 5. |
-    | 6. +--[DATA(DTLS Certificate ... Finished)]-->| 7. |
+    |    +---------[DATA(DTLS Client Hello)]------->| 5. |
+    |    |<-[DATA(DTLS Server Hello ... Finished)]--+ 6. |
+    | 7. +--[DATA(DTLS Certificate ... Finished)]-->| 8. |
     |                                                    | -.
- 8. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
+ 9. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+   +---------
     |                         ...                        |   |
     |                         ...                        |   |
@@ -1095,36 +1095,40 @@ Initiator                                            Responder
 {: #sctp-protection-initilization title="The steps of Interaction between Key-Management and DTLS Chunk API" artwork-align="center"}
 
 
-   0. The Initiator initiates an SCTP Association and provides the
+   1. The Initiator initiates an SCTP Association and provides the
       DTLS 1.3 Chunk Protected Association parameter preference
       ordered list of supporter Protection Solutions. The offered
-      parameter list is remembered by the Key-Management.
+      parameter list is recorded by the Key-Management.
 
-   1. The Responder peer enter SCTP Established, and the
+   2. The Responder peer enter SCTP Established, and its
       Key-Management is provided with the full ordered list of
       Protection Solutions offered in the INIT Chunk.
 
-   2. The Initiator enters SCTP Assocationa Established and the
+   3. The Initiator enters SCTP Assocationa Established and the
       Key-Management is triggered to perform the next step.
+      Initiator and Responder solve the race-condition, if exists,
+      and agree on the respective roles. From now on both peers
+      have a common view on the Initiator and Responder.
 
-   3. Key-Management initiated a TLS 1.3 handshake with the the supported
-      configuration. Taking supported Cipher-suits in the DTLS Chunk
-      implementation into account when creating its TLS Client-Hello
-      mesage. The TLS messages are sent per {{tls-user-message}}
+   4. The Initiator's Key-Management initiates a TLS 1.3 handshake
+      with the the supported configuration.
+      Taking supported Cipher-suits in the DTLS Chunk implementation
+      into account when creating its TLS Client-Hello
+      message. The TLS messages are sent per {{tls-user-message}}
 
-   4. Responder receives TLS Client-Hello and generates
+   5. Responder receives TLS Client-Hello and generates
       the TLS Server Hello, etc response message(s) for the TLS handshake.
       In case the TLS server in the responder requires the use of the
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 5.
 
-   5. Responder uses its the TLS Exporter on the DTLS Connection's
+   6. Responder uses its the TLS Exporter on the DTLS Connection's
       state to derive the primary client write key and IV
-      {{dtls-key-derivation}} and install them into the Chunk
+      {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
       Then it sends the TLS Server's response message(s).
 
-   6. The TLS client receives the TLS server's messages (Server
+   7. The TLS client receives the TLS server's messages (Server
       Hello etc.)  and can now export both the client and server write
       key for the Primary and Restart Key Contexts, however their usage
       is not yet required and SCTP packets without DTLS chunks are still
@@ -1132,7 +1136,7 @@ Initiator                                            Responder
       This message MUST be protected by the DTLS Chunk using the Primary
       key Context (Client Write key and IV).
 
-   7. The responder's Chunk Protection Operator will receive the SCTP
+   8. The responder's Chunk Protection Operator will receive the SCTP
       packets containing the DTLS chunk protected DTLS messages,
       concluding the main process of the TLS handshake.
       The responder exports the remaining keys and IVs and installs all
@@ -1140,12 +1144,11 @@ Initiator                                            Responder
       client write key and IV. After that it requires all future SCTP
       Packets to be protected by DTLS Chunk. If any TLS ACK message
       is to be sent, it SHOULD be sent next.
-      The initiator's and the reposnder's
-      key-management can now inform the ULP that the SCTP association
+
+   9. The Initiator's and the Responder's
+      key-management inform the ULP that the SCTP association
       is protected and verified and traffic can be sent.
 
-   8. The Initiator's ULP is notified that the SCTP association is
-      Established and protected and it may generate user messages.
 
    If the TLS handshake fails the SCTP association MUST be aborted
    and an ERROR chunk with the Error in Protection error cause, with
