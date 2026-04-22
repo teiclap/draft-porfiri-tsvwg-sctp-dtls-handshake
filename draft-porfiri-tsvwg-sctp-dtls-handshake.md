@@ -1120,7 +1120,7 @@ Initiator                                            Responder
       the TLS Server Hello, etc response message(s) for the TLS handshake.
       In case the TLS server in the responder requires the use of the
       retry message an additional message exchange between TLS Client
-      and TLS server is needed before one can progress to 5.
+      and TLS server is needed before one can progress to 6.
 
    6. Responder uses its the TLS Exporter on the DTLS Connection's
       state to derive the primary client write key and IV
@@ -1167,9 +1167,8 @@ Initiator                                            Responder
    with the Key-Management PPID 4242. TLS handshake
    is sent as a SCTP user message according to {{tls-user-message}}.
 
-   If the TLS
-   implementation support configuring a MTU larger than the actual IP
-   MTU it could be used as SCTP provides reliability and
+   If the TLS implementation supports configuring a MTU larger
+   than the actual IP MTU, it can be used as SCTP provides reliability and
    fragmentation.
 
    If the TLS handshake fails the SCTP association MUST generate
@@ -1190,8 +1189,84 @@ Initiator                                               Responder
 The {{sctp-TLS-further-connection}} shows a successful
 handshake of a further TLS connection. Such connections can
 be initiated by any of the peers. Here TLS handshake messages
-are transported by means of DATA chunks with the DTLS Chunk
-Key-Management Messages PPID inside DTLS Chunks.
+are transported as SCTP user messages according to
+{{tls-user-message}}.
+
+~~~~~~~~~~~ aasvg
+
+Initiator                                            Responder
+    |                                                    |
+    |                                                    | -.
+ 1. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
+    +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+   +---------
+    |                         ...                        |   |
+    |                                                    | -'
+    |                                                    |
+    |  Key Manager                           Key Manager |
+    |    |                                          |    |
+ 2. +--->| CRYPTO UP                      CRYPTO UP |<---+
+    |    |                                          |    |
+    |    +---------[DATA(DTLS Client Hello)]------->| 3. |
+    |    |<-[DATA(DTLS Server Hello ... Finished)]--+ 4. |
+    | 5. +--[DATA(DTLS Certificate ... Finished)]-->| 6. |
+    |                                                    | -.
+ 7. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
+    +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+   +---------
+    |                         ...                        |   |
+    |                         ...                        |   |
+
+~~~~~~~~~~~
+{: #sctp-TLS-rekey-connection title="Re-keying Interaction between Key-Management and DTLS Chunk API" artwork-align="center"}
+
+The {{sctp-TLS-rekey-connection}} shows a case where the Initiator
+requires re-keying, the same procedure applies when the request
+comes from the Responder. The steps related to {{sctp-TLS-rekey-connection}}
+are described as follows:
+
+   1. The peers are successfully sending and receiving DTLS
+      protected data using DTLS Chunks and the existing DTLS
+      Key Contexts. The traffic continues with no disturbances
+      during the whole re-keying procedure.
+
+   2. The Initiator's Key-Management initiates a TLS 1.3 handshake
+      with the the supported configuration.
+      Taking supported Cipher-suits in the DTLS Chunk implementation
+      into account when creating its TLS Client-Hello
+      message. The TLS messages are sent per {{tls-user-message}}
+
+   3. Responder receives TLS Client-Hello and generates
+      the TLS Server Hello, etc response message(s) for the TLS handshake.
+      In case the TLS server in the responder requires the use of the
+      retry message an additional message exchange between TLS Client
+      and TLS server is needed before one can progress to 4.
+
+   4. Responder uses its the TLS Exporter on the DTLS Connection's
+      state to derive the primary client write key and IV
+      {{dtls-key-derivation}} and install them into the DTLS Chunk
+      Protection Operator's Primary Key Context.
+      Then it sends the TLS Server's response message(s).
+
+   5. The TLS client receives the TLS server's messages (Server
+      Hello etc.)  and can now export both the client and server write
+      key for the Primary and Restart Key Contexts, however their usage
+      is not yet required and SCTP packets using previous DTLS Key
+      Contexts for DTLS chunks are still accepted.
+      Then the TLS Client next handshake message is sent.
+
+   6. The responder's Chunk Protection Operator will receive the SCTP
+      packets containing the DTLS chunk protected DTLS messages,
+      concluding the main process of the TLS handshake.
+      The responder exports the remaining keys and IVs and installs all
+      Primary and Restart Server Write Key and IV, as well as restart
+      client write key and IV. If any TLS ACK message
+      is to be sent, it SHOULD be sent next.
+
+   7. The Initiator's and the Responder's
+      key-management set the  the DTLS Chunk
+      Protection Operator so that the SCTP association
+      is protected with the new DTLS Key Contexts.
+      The previous DTLS Key Contexts can be remoed after
+      that all traffic protected with them will be ended.
 
 ## SCTP Association Restart {#sctp-restart}
 
