@@ -614,7 +614,7 @@ sent as SCTP user messages using the format defined in
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Epcoh     |                                               |
+|     Epoch     |                                               |
 +---------------+            TLS Message                        |
 |                                                               |
 |                               +-------------------------------+
@@ -1126,6 +1126,9 @@ Initiator                                            Responder
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
+      It also derives the Restart client write key and IV
+      {{dtls-key-derivation}} and install them into the DTLS Chunk
+      Protection Operator's Restart Key Context.
       Then it sends the TLS Server's response message(s).
 
    7. The TLS client receives the TLS server's messages (Server
@@ -1244,6 +1247,9 @@ are described as follows:
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
+      It also derives the Restart client write key and IV
+      {{dtls-key-derivation}} and install them into the DTLS Chunk
+      Protection Operator's Restart Key Context.
       Then it sends the TLS Server's response message(s).
 
    5. The TLS client receives the TLS server's messages (Server
@@ -1328,37 +1334,30 @@ DTLS Key Context during the Restart procedure.
 
 ~~~~~~~~~~~ aasvg
 
-Initiator                                     Responder
-    |                                             | -.
-    |                                             |   +-------
-    +--------------------(INIT)------------------>|   | Plain
-    |<-----------------(INIT-ACK)-----------------+   +-------
-    |                                             | -'
-    |                                             | -.
-    |                                             |   +-------
-    +---------[DTLS CHUNK(COOKIE ECHO)]---------->|   | Protected
-    |<--------[DTLS CHUNK(COOKIE ACK)]------------+   +-------
-    |                                             | -'
-    |                                             |
-    |                                             | -.
-    +-----------[DATA(TLS Client Hello)]--------->|   |
-    |<---[DATA(TLS Server Hello ... Finished)]----+   | New TLS
-    +----[DATA(TLS Certificate ... Finished)]---->|   | Connection
-    |<--------------[DATA(TLS ACK)]---------------+   +-----------
-    |                                             | -'
-    |                    ...                      | -.
-    |                    ...                      |   | Derive new
-    |                    ...                      |   | Traffic and
-    |                    ...                      |   | Restart
-    |                    ...                      |   | DTLS Key
-    |                    ...                      |   | Contexts
-    |                    ...                      |   +------------
-    |                    ...                      | -'
-    |                                             | -.
-    +-------[DTLS CHUNK(DATA(APP DATA))]--------->|   | APP DATA
-    +<-------[DTLS CHUNK(DATA(APP DATA))]---------+   +---------
-    |                    ...                      |   |
-    |                    ...                      |   |
+Initiator                                            Responder
+    |                                                    | -.
+    |                                                    |   |
+ 1. +------------------------(INIT)--------------------->|   | Plain
+    |<---------------------(INIT-ACK)--------------------+   +-------
+    |                                                    | -'
+    |                                                    | -.
+    |                                                    |   |
+ 2. +-------------[DTLS CHUNK(COOKIE ECHO)]------------->|   | Protected
+ 3. |<------------[DTLS CHUNK(COOKIE ACK)]---------------+   +----------
+    |                                                    | -'
+    |                                                    |
+    |  Key Manager                           Key Manager |
+    |    |                                          |    |
+ 4. +--->| CRYPTO UP                      CRYPTO UP |<---+
+    |    |                                          |    |
+    |    +---------[DATA(DTLS Client Hello)]------->| 5. |
+    |    |<-[DATA(DTLS Server Hello ... Finished)]--+ 6. |
+    | 7. +--[DATA(DTLS Certificate ... Finished)]-->| 8. |
+    |                                                    | -.
+ 9. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
+    +<----------[DTLS CHUNK(DATA(APP DATA))]-------------+   +---------
+    |                        ...                         |   |
+    |                        ...                         |   |
 
 ~~~~~~~~~~~
 {: #sctp-assoc-restart-sequence title="SCTP Restart sequence for DTLS in SCTP" artwork-align="center"}
@@ -1368,30 +1367,63 @@ SCTP Association Restart.
 
 From procedure viewpoint the sequence is the following:
 
-- Initiator sends INIT (VTag=0), Responder replies INIT-ACK
-  in Plain Text as specified in {{RFC9260}}
+   1. Initiator sends INIT (VTag=0), Responder replies INIT-ACK
+      in Plain Text as specified in {{RFC9260}}
 
-- Initiator sends COOKIE-ECHO using DTLS CHUNK encrypted with the Key
-  tied to the Restart DTLS Key Context
+   2. Initiator sends COOKIE-ECHO using DTLS CHUNK encrypted with the Key
+      tied to the Restart DTLS Key Context
 
-- Responder replies with COOKIE-ACK using DTLS CHUNK encrypted with
-  the Restart DTLS Key Context
+   3. Responder replies with COOKIE-ACK using DTLS CHUNK encrypted with
+      the Restart DTLS Key Context. The ULP can resume communication protected
+      using the Restart DTLS Key Context.
 
-- Initiator and Responder handshake a new TLS connection
+   4. The Initiator's Key-Management initiates a TLS 1.3 handshake
+      with the the supported configuration.
+      Taking supported Cipher-suits in the DTLS Chunk implementation
+      into account when creating its TLS Client-Hello
+      message. The TLS messages are sent per {{tls-user-message}}
 
-- The ULP can resume communication protected
-  using the Restart DTLS Key Context.
+   5. Responder receives TLS Client-Hello and generates
+      the TLS Server Hello, etc response message(s) for the TLS handshake.
+      In case the TLS server in the responder requires the use of the
+      retry message an additional message exchange between TLS Client
+      and TLS server is needed before one can progress to 6.
 
-- New Primary and Restart DTLS Key Context is derived and
-  installed using Epoch=3. The new Traffic
-  DTLS Key Context is being used for traffic.
-  When Primary DTLS Key Context has been installed
-  the new Restart DTLS Key Context for epoch=3 is installed.
+   6. Responder uses its the TLS Exporter on the DTLS Connection's
+      state to derive the primary client write key and IV
+      {{dtls-key-derivation}} and install them into the DTLS Chunk
+      Protection Operator's Primary Key Context.
+      It also derives the Restart client write key and IV
+      {{dtls-key-derivation}} and install them into the DTLS Chunk
+      Protection Operator's Restart Key Context.
+      Then it sends the TLS Server's response message(s).
 
-User Data for any ULP traffic MAY be initiated immediately after
-COOKIE-ECHO/COOKIE-ACK handshake using the current Restart DTLS Key Context, that
-is even before a new Primary DTLS Key Context or a Restart DTLS Key Context have been
-derived.  If a problem occurs before the new Restart DTLS Key Context has been
+   7. The TLS client receives the TLS server's messages (Server
+      Hello etc.)  and can now export both the client and server write
+      key for the Primary and Restart Key Contexts, however their usage
+      is not yet required and SCTP packets without DTLS chunks are still
+      accepted. Then the TLS Client next handshake message is sent.
+      This message MUST be protected by the DTLS Chunk using the Primary
+      key Context (Client Write key and IV).
+
+   8. The responder's Chunk Protection Operator will receive the SCTP
+      packets containing the DTLS chunk protected DTLS messages,
+      concluding the main process of the TLS handshake.
+      The responder exports the remaining keys and IVs and installs all
+      Primary and Restart Server Write Key and IV, as well as restart
+      client write key and IV. After that it requires all future SCTP
+      Packets to be protected by DTLS Chunk. If any TLS ACK message
+      is to be sent, it SHOULD be sent next.
+
+   9. The ULP can resume communication protected
+      using the new Primary DTLS Key Context.
+
+
+As described in step 3, User Data for any ULP traffic MAY be initiated
+immediately after COOKIE-ECHO/COOKIE-ACK handshake using the current
+Restart DTLS Key Context, that is even before a new Primary DTLS Key
+Context or a Restart DTLS Key Context have been derived.
+If a problem occurs before the new Restart DTLS Key Context has been
 installed, the Association cannot be Restarted, thus it's RECOMMENDED
 the new Restart DTLS Key Context to be installed as early as possible.
 
