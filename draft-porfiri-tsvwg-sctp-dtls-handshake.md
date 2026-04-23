@@ -1271,18 +1271,28 @@ are described as follows:
 ## SCTP Association Restart {#sctp-restart}
 
 In order to achieve an Association Restart as described in
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}, a Restart DTLS Key Context
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}, Restart DTLS Key Contexts
 dedicated to Restart MUST exist and be available.  Furthermore, both
-peers MUST have safely stored both the current Restart DTLS Key Context.
-Here we assume that Restart DTLS Key Context is maintained across
+peers MUST have safely stored the current Restart DTLS Key Contexts.
+Prerequisite is that Restart DTLS Key Contexts are maintained across
 the events leading to SCTP Restart request.
 
 ### Installation of initial Restart DTLS Key Context {#init-dtls-restart-context}
 
 As soon as the Association has reached the ESTABLISHED state
-and before the Primary DTLS Key context have been installed a
-Restart DTLS Key Context MUST be derived and then installed.
+and before the Primary DTLS Key context have been installed,
+Restart DTLS Key Contexts MUST be derived and installed.
+With reference to {{sctp-protection-initilization}}, that means
+Responder's Restart DTLS Key Contexts are derived and installed at step 6
+and Initiator's Restart DTLS Key Contexts are derived and installed
+at step 8.
 
+Once installed, no traffic will be sent over the Restart DTLS Key Context
+so that both endpoints will have a known DTLS context state, i.e. the
+Sequence number and replay window are both just initialized to default
+values for the epoch=3.
+
+#### This Race condition cannot exist!!!
 It MAY exist a short time gap where the Association has already
 been validated state but no Restart DTLS Key Context has been installed
 yet. If a SCTP Restart procedure will be initiated during that time,
@@ -1291,16 +1301,16 @@ unlikely as the Restart Init will be sent multiple times following a
 exponential back-off timer and in that time the Restart DTLS Key Context is
 expected to be in place.
 
-Once installed, no traffic will be sent over the Restart DTLS Key Context
-so that both endpoints will have a known DTLS context state, i.e. the
-Sequence number and replay window are both just initialized to default
-values for the epoch=3.
-
 ### Installation of Restart DTLS Key Context for further TLS Connections
 
 As each subsequent Key-Management TLS connection completes the TLS handshake
 and the Primary DTLS Key context has been derived and installed also
-the Restart DTLS Key context MUST be installed. The closing of the previous
+the Restart DTLS Key context MUST be installed.
+With reference to {{sctp-TLS-rekey-connection}}, that means
+Responder's Restart DTLS Key Contexts are derived and installed at step 4
+and Initiator's Restart DTLS Key Contexts are derived and installed
+at step 6.
+The closing of the previous
 TLS connection MUST NOT be initiated or completed until the Restart
 DTLS Key Context is in place.
 
