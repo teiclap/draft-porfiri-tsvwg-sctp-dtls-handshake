@@ -1464,14 +1464,14 @@ new TLS connection are:
 
 ## Procedure for Rekeying
 
-This specification allows up to 2 DTLS Key Context to be active at the same
-time for the current SCTP Association.
+This specification allows up to 2 Primary DTLS Key Context to be active
+at the same time for the current SCTP Association.
 The following state machine applies.
 
 ~~~~~~~~~~~ aasvg
            +---------+
 +--------->|  YOUNG  |  There's only one
-|          +----+----+  DTLS Key Context until
+|          +----+----+  Primary DTLS Key Context until
 |               |       aging criteria are met
 |               |
 |        AGING  |  REMOTE AGING
@@ -1479,13 +1479,13 @@ The following state machine applies.
 |          +---------+
 |          |  AGED   |  When in AGED state a new TLS connection is
 |          +----+----+  added and deriving new Primary DTLS Key
-|               |       Context as well as a new Restart DTLS Key
-|       NEW TLS |       Context
+|               |       Context and a new Restart DTLS Key Context
+|       NEW TLS |
 |               |
 |               |
 |               V
 |          +---------+
-|          |   OLD   |  In OLD state there are 2 active DTLS
+|          |   OLD   |  In OLD state there are 2 Primary DTLS
 |          +----+----+  Key Context. Traffic is switched to the new
 |               |       Primary DTLS Key Context
 |      SWITCH   |
@@ -1493,13 +1493,13 @@ The following state machine applies.
 |          +---------+
 |          |  DRAIN  |  The aged DTLS Key Context
 |          +----+----+  is drained before being ready
-|               |       to be closed.
+|               |       to be removed.
 |               |
 |       DRAINED | TLS close_notify
 |               V
 |          +---------+
 |          |  DEAD   |  In DEAD state the aged
-|          +----+----+  DTLS Key Context is closed
+|          +----+----+  Primary DTLS Key Context is removed.
 |               |
 |      REMOVED  |
 +---------------+
@@ -1519,7 +1519,7 @@ the protection of the SCTP packets is moved from the old Primary DTLS
 Key Context, then the procedure for closing the old TLS Primary DTLS Key Context
 is initiated, see {{remove-tls-connection}}.
 When Traffic has been moved to the new DTLS Key Context, the TLS connection
-is released.
+is closed.
 
 
 ## Race Condition in Rekeying
