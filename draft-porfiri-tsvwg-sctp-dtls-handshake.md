@@ -169,7 +169,8 @@ This document describes:
    : Keys, derived from a TLS 1.3 connection, and all relevant data that needs
    to be provided to the SCTP DTLS Chunk.  Each DTLS key context is associated
    with a three value tuple identifying the context, consisting of SCTP
-   Association, the restart indicator, and the DTLS epoch.
+   Association, the restart indicator, and the DTLS epoch. The DTLS Key Context
+   contains keying material for both directions.
 
    Initiator:
    : the endpoint that is agreed to be the client in the SCTP Association Establishment.
@@ -293,7 +294,7 @@ The key characteristics of the solution are as follows:
   the next DTLS Chunk epoch.
 
 In this document we use the terms DTLS Key context for indicating the
-pair of keys and the initilization vector (IV), derived from a TLS1.3
+pair of keys and the initilization vectors (IV), derived from a TLS1.3
 connection, and all relevant data that needs to be provided to the
 SCTP DTLS Chunk to enable DTLS encryption, decryption and
 authentication. A complete bi-directional DTLS Key context includes
@@ -415,9 +416,9 @@ below:
 
    2 bytes : the Key Management Method selected by the Responder
 
-* The Key exporter will be used for creating 4 DTLS Key Contexts,
-   one DTLS Key Context per direction for Traffic Cases and one
-   DTLS Key Context per direction for Restart Cases.
+* The Key exporter will be used for creating 2 DTLS Key Contexts,
+   one DTLS Key Context for Traffic Cases and one
+   DTLS Key Context for Restart Cases.
 
 
 * The DTLS Chunk specifies that in the receiving SCTP endpoint each
@@ -583,11 +584,11 @@ All rekeying MUST be using ephemeral key exchange and MUST NOT use the
 TLS Key-Update mechanism to avoid confusion about the properties of
 the DTLS Key Contexts for the DTLS chunk. After a short while (no
 longer than 2 min) to enable any outstanding packets to drain from the
-network path between the endpoints, the old key context can be deleted
+network path between the endpoints, the old DTLS Key contexts can be deleted
 from the DTLS chunk's key store.
 
 The lifetime of the TLS 1.3 connections used for deriving the DTLS Key
-Context should be limited to the time strictly needed for completing
+Contexts should be limited to the time strictly needed for completing
 the key derivation, to ensure that at most one TLS 1.3 connection
 exists at a time.
 
@@ -689,7 +690,7 @@ transmissions.
 ## TLS Connection Handling {#dtls-connection-handling}
 
 It's up to TLS key-management function to manage the TLS
-connections and their related DTLS Key context in the Chunk
+connections and their related DTLS Key contexts in the Chunk
 Protection Operator.
 
 ### Add a New TLS Connection {#add-tls-connection}
@@ -707,24 +708,25 @@ other dropped.
 
 When the handshake has been completed successfully, the new DTLS Key
 contexts are established by exporting keys and installing them in the
-Chunk Protection Operator, and the new DTLS Key context are
+Chunk Protection Operator, and the new DTLS Key contexts are
 immediately started to be used.
 If the handshake is not completed successfully, a new TLS
 handshake attempt will be tried.
 
 ### Remove an existing TLS Connection {#remove-tls-connection}
 
-A TLS connection is removed when the derived DTLS Key Context is in use.
+A TLS connection is removed when the derived DTLS Key Contexts is in use.
 It is RECOMMENDED to not initiate
-removal until at least one SCTP packet protected by the new DTLS Key Context
+removal until at least one SCTP packet protected by the new DTLS Key Contexts
 has been received, and any transmitted packets protected
-using the new DTLS Key Context has been acknowledged, alternatively
+using the new DTLS Key Contexts has been acknowledged, alternatively
 waiting for one Maximum Segment Lifetime (120 seconds) has elapsed
-since the last SCTP packet protected by the old DTLS Key Context was
+since the last SCTP packet protected by the old DTLS Key Contexts was
 transmitted.
 
 Either peers can initiate the removal of a TLS connection from the
-current SCTP association when needed when a new DTLS Key Context has been established.
+current SCTP association when needed when new DTLS Key Contexts
+have been established.
 Closing the TLS connection when the SCTP association is in
 PROTECTED and ESTABLISHED state is done by having the TLS connection
 sending a TLS close_notify.
@@ -746,7 +748,7 @@ the Association abortion.
 
 ## DTLS Key Update
 
-TLS Key Update MUST NOT be used.  DTLS Key Context replacement MUST
+TLS Key Update MUST NOT be used.  DTLS Key Contexts replacement MUST
 be used instead, by means of creating a new TLS connection as specified
 in {{parallel-dtls}}, deriving the new Primary DTLS Key Context, the
 new Restart DTLS Key Context and then closing the TLS connection.
@@ -946,8 +948,9 @@ in a mismatch in produced keys as the initiator will use what it
 actually offered and the responder a truncated or modified sequence.
 
 
-The context for TLS Exporter is an arbitrary long array of bytes.
-TLS for DTLS in SCTP requires the contexts to be using the following rules:
+Context for TLS Exporter is an arbitrary long array of bytes.
+TLS for DTLS in SCTP requires the context to be created
+using the following rules:
 
 * The sequence of bytes MUST follow the order
 
@@ -1001,14 +1004,14 @@ See Section 5.3 of {{RFC8446}}.
 The client and server roles are here in relation to key-management
 TLS session roles. The DTLS Client will install the key derived using the
 EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY label as its write key for
-the Primary DTLScontext, and use the EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY
+the Primary DTLS context, and use the EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY
 as its Primary DTLS context read key.
 
 Correspondlingly the EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY
 is used to export the key used by the endpoint that acted as
-DTLS Client as write key for the restart DTLS key context, and the
+DTLS Client as write key for the Restart DTLS key context, and the
 EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY as the DTLS client's read
-key for the restart DTLS Key Context.
+key for the Restart DTLS Key Context.
 
 The IV values also needs to be exported using
 the corresponding _IV label and following the same rules.
@@ -1271,14 +1274,14 @@ are described as follows:
       key-management set the  the DTLS Chunk
       Protection Operator so that the SCTP association
       is protected with the new DTLS Key Contexts.
-      The previous DTLS Key Contexts can be remoed after
-      that all traffic protected with them will be ended.
+      The previous DTLS Key Contexts can be removed after
+      that all traffic protected with these DKCs will be ended.
 
 ## SCTP Association Restart {#sctp-restart}
 
 In order to achieve an Association Restart as described in
 {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}, Restart DTLS Key Contexts
-dedicated to Restart MUST exist and be available.  Furthermore, both
+MUST exist and be available at both peers. Furthermore, both
 peers MUST have safely stored the current Restart DTLS Key Contexts.
 Prerequisite is that Restart DTLS Key Contexts are maintained across
 the events leading to SCTP Restart request.
@@ -1286,11 +1289,11 @@ the events leading to SCTP Restart request.
 ### Installation of initial Restart DTLS Key Context {#init-dtls-restart-context}
 
 As soon as the Association has reached the ESTABLISHED state
-and before the Primary DTLS Key context have been installed,
+and before the Primary DTLS Key contexts have been installed,
 Restart DTLS Key Contexts MUST be derived and installed.
 With reference to {{sctp-protection-initilization}}, that means
-Responder's Restart DTLS Key Contexts are derived and installed at step 6
-and Initiator's Restart DTLS Key Contexts are derived and installed
+Responder's Restart DTLS Key Context is derived and installed at step 6
+and Initiator's Restart DTLS Key Context is derived and installed
 at step 8.
 
 Once installed, no traffic will be sent over the Restart DTLS Key Context
@@ -1313,8 +1316,8 @@ As each subsequent Key-Management TLS connection completes the TLS handshake
 and the Primary DTLS Key context has been derived and installed also
 the Restart DTLS Key context MUST be installed.
 With reference to {{sctp-TLS-rekey-connection}}, that means
-Responder's Restart DTLS Key Contexts are derived and installed at step 4
-and Initiator's Restart DTLS Key Contexts are derived and installed
+Responder's Restart DTLS Key Context is derived and installed at step 4
+and Initiator's Restart DTLS Key Context is derived and installed
 at step 6.
 The closing of the previous
 TLS connection MUST NOT be initiated or completed until the Restart
