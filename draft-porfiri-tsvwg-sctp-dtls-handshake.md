@@ -412,9 +412,8 @@ below:
 
    1 byte : traffic or reset key
 
-   variable length : the list of the Key Management Methods from Initiator
-
-   2 bytes : the Key Management Method selected by the Responder
+variable length : the Key Management Parameter from Initiator followed by
+   the Key Management Parameter from Responder without padding.
 
 * The Key exporter will be used for creating 2 DTLS Key Contexts,
    one DTLS Key Context for Traffic Cases and one
