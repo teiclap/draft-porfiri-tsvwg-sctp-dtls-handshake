@@ -958,21 +958,12 @@ using the following rules:
 
 1 byte : traffic or reset key
 
-variable length : the list of the Key Management Methods from Initiator
+variable length : the Key Management Parameter from Initiator followed by
+   the Key Management Parameter from Responder without padding.
 
-2 bytes : the Key Management Method selected by the Responder
-
-* The list of Key Management Methods from Initiator MUST follow
+* The Key Management Parameter from Initiator and Responder MUST follow
 exactly the order of bytes provided in the INIT/INIT-ACK
-DTLS Key Management Parameter, as an example in the following
-{{key-management-parameter}} the list of Key Management Methods
-will use the sequence of bytes starting from the 5th up to the
-10th.
-
-* The Key Management Method selected by the Responder will follow
-the same rule. If the selected Management Method in {{key-management-parameter}}
-is DTLS Key Management Id 2, the sequence of the 2 bytes will
-be the 7th and the 8th.
+DTLS Key Management Parameter.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -980,9 +971,13 @@ be the 7th and the 8th.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |    Parameter Type = 0x8006    |       Parameter Length        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  DTLS Key Management Id #1    |  DTLS Key Management Id #2    |
+|                          Tie Breaker                          |
++---------------------------------------------------------------+
+|Reserved |R|S|C| DTLS KMId #1  | DTLS KMId #2  | DTLS KMId #3  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  DTLS Key Management Id #3    | Padding                       |
+:                                                               :
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| DTLS KMId #N  |                    Padding                    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
 {: #key-management-parameter title="Use of DTLS Key Management Parameter for Context" artwork-align="center"}
