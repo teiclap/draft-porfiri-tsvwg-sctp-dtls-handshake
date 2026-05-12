@@ -712,6 +712,15 @@ immediately started to be used.
 If the handshake is not completed successfully, a new TLS
 handshake attempt will be tried.
 
+Since peers can add a new TLS 1.3 connection to the SCTP association at
+any time, it may happen that at the time of installing the newly
+exported DTLS Key context there are still two DTLS Key Contexts
+in the Chunk Protection Operator, as Maximum Segment Lifetime
+has not expired yet. For preventing the possibility that
+more than 2 DTLS Key Contexts exist in the Chunk Protection Operator
+at the same time, this condition will be checked and the oldest
+DTLS Key Context will be removed before installing the new one.
+
 ### Remove an existing TLS Connection {#remove-tls-connection}
 
 A TLS connection is removed when the derived DTLS Key Contexts is in use.
