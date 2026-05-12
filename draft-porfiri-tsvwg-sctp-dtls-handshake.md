@@ -614,7 +614,7 @@ sent as SCTP user messages using the format defined in
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Epoch     |                                               |
+|R|   Epoch     |                                               |
 +---------------+            TLS Message                        |
 |                                                               |
 |                               +-------------------------------+
@@ -623,9 +623,11 @@ sent as SCTP user messages using the format defined in
 ~~~~~~~~~~~
 {: #sctp-dtls-user-message title="TLS User Message Structure"}
 
+R bit: 1 bit
+: The (R)estart bit.
 
- Epoch: 8 bits
- : The 8 lowest bits of the full epoch counter (64-bits) of
+ Epoch: 7 bits
+ : The 7 lowest bits of the full epoch counter (64-bits) of
  DTLS key context whose keys are exported from this TLS session.
 
  TLS Message: variable length
