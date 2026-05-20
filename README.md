@@ -1,6 +1,8 @@
-# Datagram Transport Layer Security (DTLS) in the Stream Control Transmission Protocol (SCTP) DTLS Chunk
+<!-- regenerate: on (set to off if you edit this file) -->
 
-This is the working area for the individual Internet-Draft, "Datagram Transport Layer Security (DTLS) in the Stream Control Transmission Protocol (SCTP) DTLS Chunk".
+# Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
+
+This is the working area for the individual Internet-Draft, "Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk".
 
 * [Editor's Copy](https://teiclap.github.io/draft-porfiri-tsvwg-sctp-dtls-handshake/#go.draft-porfiri-tsvwg-sctp-dtls-handshake.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-porfiri-tsvwg-sctp-dtls-handshake)
@@ -13,9 +15,8 @@ This is the working area for the individual Internet-Draft, "Datagram Transport 
 See the
 [guidelines for contributions](https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/blob/main/CONTRIBUTING.md).
 
-Contributions can be made by creating pull requests.
-The GitHub interface supports creating pull requests using the Edit (✏) button.
-
+The contributing file also has tips on how to make contributions, if you
+don't already know how to do that.
 
 ## Command Line Usage
 
