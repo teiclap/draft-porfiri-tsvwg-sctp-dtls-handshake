@@ -614,7 +614,7 @@ sent as SCTP user messages using the format defined in
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|R|   Epoch     |                                               |
+|     Epoch     |                                               |
 +---------------+            TLS Message                        |
 |                                                               |
 |                               +-------------------------------+
@@ -623,15 +623,25 @@ sent as SCTP user messages using the format defined in
 ~~~~~~~~~~~
 {: #sctp-dtls-user-message title="TLS User Message Structure"}
 
-R bit: 1 bit
-: The (R)estart bit.
-
- Epoch: 7 bits
- : The 7 lowest bits of the full epoch counter (64-bits) of
+ Epoch: 8 bits
+ : The 8 lowest bits of the full epoch counter (64-bits) of
  DTLS key context whose keys are exported from this TLS session.
 
  TLS Message: variable length
  : One or more TLS records.
+
+## Meaning of the Epoch in the KM message
+
+The epoch byte in the Key Management message prefix indicates the target
+DTLS Key Context epoch that will be created upon successful
+completion of this TLS handshake. It is NOT the epoch used for encrypting
+the SCTP packet carrying this message (which is indicated by the
+EE bits in the DTLS chunk's record header).
+The epoch byte is used by the receiver to route the TLS data to the correct
+in-progress handshake session (relevant if multiple rekey
+attempts could theoretically overlap)
+It MUST NOT be interpreted as a key selection indicator for
+encryption/decryption of the carrying packet
 
 # DTLS Chunk Integration
 
