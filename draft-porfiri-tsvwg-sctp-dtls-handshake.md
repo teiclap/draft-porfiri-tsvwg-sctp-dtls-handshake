@@ -1276,6 +1276,9 @@ are described as follows:
       is not yet required and SCTP packets using previous DTLS Key
       Contexts for DTLS chunks are still accepted.
       Then the TLS Client next handshake message is sent.
+      The server MUST activate its send keys for epoch N+1 no later
+      than upon successfully decrypting the first SCTP packet protected
+      with epoch N+1 keys from the client.
 
    6. The responder's Chunk Protection Operator will receive the SCTP
       packets containing the DTLS chunk protected DTLS messages,
