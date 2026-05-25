@@ -1525,20 +1525,31 @@ The following state machine applies.
 ~~~~~~~~~~~
 {: #dtls-rekeying-state-diagram title="State Diagram for Rekeying"}
 
+At Association establishment the initial state is YOUNG, but no aging
+supervision is started yet. Aging supervision (i.e. time or data) starts
+as soon as the DKC has been successfully installed.
+
 Trigger for rekeying can either be a local AGING event, triggered by
 meeting the criteria for rekeying, or a REMOTE
 AGING event, triggered by receiving a TLS Connection handshake.
 In such case a new TLS connection shall be added
 according to {{add-tls-connection}}.
 
+If the a local aging event comes when a remote aging event has been
+started, the local aging event is ignored.
+
+
 As soon as the new TLS connection completes handshaking, and the
 Primary and Restart DTLS Key Contexts have been derived and installed,
 the protection of the SCTP packets is moved from the old Primary DTLS
 Key Context, then the procedure for closing the old TLS Primary DTLS Key Context
 is initiated, see {{remove-tls-connection}}.
+
+The first packet being encrypted with the new DKC will make the state
+machine to mode into DRAIN, where both peers shall use the new DKC.
+
 When Traffic has been moved to the new DTLS Key Context, the TLS connection
 is closed.
-
 
 ## Race Condition in Rekeying
 
