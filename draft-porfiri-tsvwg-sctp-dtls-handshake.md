@@ -1487,76 +1487,119 @@ at the same time for the current SCTP Association.
 The following state machine applies.
 
 ~~~~~~~~~~~ aasvg
+
+
            +---------+
-+--------->|  YOUNG  |  There's only one
-|          +----+----+  Primary DTLS Key Context until
-|               |       aging criteria are met
-|               |
-|        AGING  |  REMOTE AGING
-|               V
-|          +---------+
-|          |  AGED   |  When in AGED state a new TLS connection is
-|          +----+----+  added and deriving new Primary DTLS Key
-|               |       Context and a new Restart DTLS Key Context
-|       NEW TLS |
-|               |
-|               |
-|               V
-|          +---------+
-|          |   OLD   |  In OLD state there are 2 Primary DTLS
-|          +----+----+  Key Context. Traffic is switched to the new
-|               |       Primary DTLS Key Context
-|      SWITCH   |
-|               V
-|          +---------+
-|          |  DRAIN  |  The aged DTLS Key Context
-|          +----+----+  is drained before being ready
-|               |       to be removed.
-|               |
-|       DRAINED | TLS close_notify
-|               V
-|          +---------+
-|          |  DEAD   |  In DEAD state the aged
-|          +----+----+  Primary DTLS Key Context is removed.
-|               |
-|      REMOVED  |
-+---------------+
+           |  INIT   |  Association started
+           +----+----+  No TLS H/S yet
+                |
+                | 1. TLS initial H/S
+                |    completed
+                |
+                V
+           +---------+
++--------->|  YOUNG  |
++ +------->|         +--------------------+
+| |        +----+----+                    |
+| |             |                         |
+| |             | 2. Client Hello         | 3. Aging event
+| |             |                         |
+| |             V                         V
+| |        +---------+  4. Client H +---------+  5. TLS H/S
+| |        | REMOTE  |    tie-break |  LOCAL  |    Timeout
+| |        |  OLD    |<-------------+  AGED   +-----+
+| |        +----+----+              +----+----+     |
+| | 7. Flush    |                        |          |
+| +-------------+                        |          |
+|                     6. Server Hello    |          |
+|               +------------------------+          |
+|               |                                   |
+|               V                                   V
+|          +---------+                         +---------+
+|          |  LOCAL  |                         |  ABORT  |
+|          |   OLD   |                         |         |
+|          +-----+---+                         +---------+
+|   8. Flush     |
++----------------+
 
 ~~~~~~~~~~~
 {: #dtls-rekeying-state-diagram title="State Diagram for Rekeying"}
 
-At Association establishment the initial state is YOUNG, but no aging
-supervision is started yet. Aging supervision (i.e. time or data) starts
-as soon as the DKC has been successfully installed.
+Here details of the states and the state transictions is given in details
 
-Trigger for rekeying can either be a local AGING event, triggered by
-meeting the criteria for rekeying, or a REMOTE
-AGING event, triggered by receiving a TLS Connection handshake.
-In such case a new TLS connection shall be added
-according to {{add-tls-connection}}.
+### INIT
 
-If the a local aging event comes when a remote aging event has been
-started, the local aging event is ignored.
+At Association establishment the initial state is INIT.
+When in INIT state, the only handled event is the TLS
+handshake completed, that is 1 in the {{dtls-rekeying-state-diagram}}.
+Event 1 makes the state to become YOUNG.
+At exiting INIT, the Current DKC is populated, the Old DKC is empty,
+the aging criteria are reset.
+Any other event arriving when state is INIT will be silently discarded.
 
 
-As soon as the new TLS connection completes handshaking, and the
-Primary and Restart DTLS Key Contexts have been derived and installed,
-the protection of the SCTP packets is moved from the old Primary DTLS
-Key Context, then the procedure for closing the old TLS Primary DTLS Key Context
-is initiated, see {{remove-tls-connection}}.
+### YOUNG
+In YOUNG state, only the Current DKC is populated.
+During YOUNG state, two events are triggering state change:
 
-The first packet being encrypted with the new DKC will make the state
-machine to mode into DRAIN, where both peers shall use the new DKC.
+- arrival of Client Hello from remote Endpoint, the local Endpoint replies to
+the remote Endpoint with a Server Hello, moves the Current DKC
+to become Old DKC and it populates the Current DKC with new keys and epoch.
+Old DKC is used for encrypting the outgoing traffic.
+When all the above has been completed, the state changes to REMOTE OLD
+and Flushing Timer is started.
 
-When Traffic has been moved to the new DTLS Key Context, the TLS connection
-is closed.
+- arrival of an Aging event, such as a timer or a counter, the Endpoint
+will send a Client Hello to the remote Endpoint and will start a supervision
+for handshake completion. That changes the
+state to LOCAL AGED (see {{dtls-rekeying-state-diagram}}).
+Any other event arriving when state is YOUNG will be silently discarded.
 
-## Race Condition in Rekeying
+### LOCAL AGED
+In LOCAL AGED state, only the Current DKC is populated.
+A supervision timer is running for handshake supervision.
+If the supervision timer expires (event 5 in {{dtls-rekeying-state-diagram}}),
+the Association is ABORTED as it's impossible to renew the key material
+and the current is aged.
+If a Client Hello arrives (event 4 in {{dtls-rekeying-state-diagram}}),
+tie-breaker is ran and if the role of the Endpoint was set as Server, the
+state is changed to REMOTE AGED and the supervision timer is canceled,
+otherwise the Client Hello message is silently discarded.
+If a Server Hello message arrives (event 6 in {{dtls-rekeying-state-diagram}}),
+the Local Endpoint will move the Current DKC to become Old DKC and will
+populate the Current DKC, then Current DKC is used for encrypting the
+outgoing traffic. The state will change to LOCAL OLD
+and Flushing Timer is started.
+Any other event arriving when state is LOCAL AGED will be silently discarded.
 
-A race condition may happen when both peers experience local AGING event at
-the same time and start creation of a new TLS connection.
+### REMOTE OLD
 
-The race condition is solved as specified in {{add-tls-connection}}.
+In REMOTE OLD, both Old DKC and Current DKC are populated.
+Old DKC is used for encryoting the outgoing messages until the first message
+comes from the remote Endpoint being encrypted with Current DKC, from that point
+on the Current DKC will be used for outgoing traffic.
+When in REMOTE OLD, the following events can happen:
+- Flushing Timer expires, then the Old DKC is cleared and the state
+is changed to YOUNG.
+- Client Hello, then Flushing Timer is cleared
+and the behavior is identical as in YOUNG state.
+- Aging event, then Flushing Timer is cleared
+and the behavior is identical as in YOUNG state.
+Any other event arriving when state is REMOTE OLD will be silently discarded.
+
+
+### LOCAL OLD
+
+In LOCAL OLD, both Old DKC and Current DKC are populated.
+Current DKC is used for encryoting the outgoing messages.
+When in LOCAL OLD, the following events can happen:
+- Flushing Timer expires, then the Old DKC is cleared and the state
+is changed to YOUNG.
+- Client Hello, then Flushing Timer is cleared
+and the behavior is identical as in YOUNG state.
+- Aging event, then Flushing Timer is cleared
+and the behavior is identical as in YOUNG state.
+Any other event arriving when state is LOCAL OLD will be silently discarded.
 
 
 # Security Considerations
