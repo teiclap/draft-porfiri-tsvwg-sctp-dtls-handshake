@@ -1487,14 +1487,12 @@ at the same time for the current SCTP Association.
 The following state machine applies.
 
 ~~~~~~~~~~~ aasvg
-
-
            +---------+
            |  INIT   |  Association started
            +----+----+  No TLS H/S yet
                 |
                 | 1. TLS initial H/S
-                |    completed
+                |    completed or Restart case.
                 |
                 V
            +---------+
@@ -1527,8 +1525,12 @@ The following state machine applies.
 
 Here details of the states and the state transictions is given in details
 
-### INIT
+### Endpoint initial state
+And Endpoint that is willing to initiate an Association has initial
+state = INIT; an Endpoint that wants to try an Association Restart
+has initial state = YOUNG.
 
+### INIT
 At Association establishment the initial state is INIT.
 When in INIT state, the only handled event is the TLS
 handshake completed, that is 1 in the {{dtls-rekeying-state-diagram}}.
@@ -1540,6 +1542,8 @@ Any other event arriving when state is INIT will be silently discarded.
 
 ### YOUNG
 In YOUNG state, only the Current DKC is populated.
+In case the Endpoint is willing to try an Association restart
+only R DKC is populated.
 During YOUNG state, two events are triggering state change:
 
 - arrival of Client Hello from remote Endpoint, the local Endpoint replies to
@@ -1547,12 +1551,18 @@ the remote Endpoint with a Server Hello, moves the Current DKC
 to become Old DKC and it populates the Current DKC with new keys and epoch.
 Old DKC is used for encrypting the outgoing traffic.
 When all the above has been completed, the state changes to REMOTE OLD
-and Flushing Timer is started.
+and Flushing Timer is started. In case of Association
+Restart, the ClientHello will come with R DKC, thus ServerHello must
+be sent with Old R DKC.
 
 - arrival of an Aging event, such as a timer or a counter, the Endpoint
 will send a Client Hello to the remote Endpoint and will start a supervision
 for handshake completion. That changes the
 state to LOCAL AGED (see {{dtls-rekeying-state-diagram}}).
+Aging event is also considered the arrival or the sending of a COOKIE-ACK
+encrypted with R DKC, meaning that the case is Association Restart,
+in that case the ClientHello will be sent with R DKC.
+
 Any other event arriving when state is YOUNG will be silently discarded.
 
 ### LOCAL AGED
@@ -1562,22 +1572,28 @@ If the supervision timer expires (event 5 in {{dtls-rekeying-state-diagram}}),
 the Association is ABORTED as it's impossible to renew the key material
 and the current is aged.
 If a Client Hello arrives (event 4 in {{dtls-rekeying-state-diagram}}),
-tie-breaker is ran and if the role of the Endpoint was set as Server, the
-state is changed to REMOTE AGED and the supervision timer is canceled,
-otherwise the Client Hello message is silently discarded.
+tie-breaker is ran and if the role of the Endpoint was set as Server, a
+ServerHello is sent, the Current DKC to become Old DKC and Current DKC
+is populatedwith new keys and epoch, the the state becomes REMOTE OLD,
+and the supervision timer is canceled, otherwise the Client Hello message
+is silently discarded.
+Old DKC is used for encrypting the outgoing traffic.
+If in Association Restart mode, old R DKC is used for ougoing traffic.
+
 If a Server Hello message arrives (event 6 in {{dtls-rekeying-state-diagram}}),
 the Local Endpoint will move the Current DKC to become Old DKC and will
-populate the Current DKC, then Current DKC is used for encrypting the
-outgoing traffic. The state will change to LOCAL OLD
-and Flushing Timer is started.
+populate the Current DKC, then Current Traffic DKC is used for encrypting the
+outgoing traffic even if the casewas Association Restart. The state will change
+to LOCAL OLD and Flushing Timer is started.
 Any other event arriving when state is LOCAL AGED will be silently discarded.
 
 ### REMOTE OLD
 
 In REMOTE OLD, both Old DKC and Current DKC are populated.
-Old DKC is used for encryoting the outgoing messages until the first message
+Old DKC, or Old R DKC in Association Restart case, is used for encryoting the
+outgoing messages until the first message
 comes from the remote Endpoint being encrypted with Current DKC, from that point
-on the Current DKC will be used for outgoing traffic.
+on the Current DKC, and not anymore any R DKC,  will be used for outgoing traffic.
 When in REMOTE OLD, the following events can happen:
 - Flushing Timer expires, then the Old DKC is cleared and the state
 is changed to YOUNG.
@@ -1591,7 +1607,7 @@ Any other event arriving when state is REMOTE OLD will be silently discarded.
 ### LOCAL OLD
 
 In LOCAL OLD, both Old DKC and Current DKC are populated.
-Current DKC is used for encryoting the outgoing messages.
+Current DKC, and not any R DKC, is used for encryoting the outgoing messages.
 When in LOCAL OLD, the following events can happen:
 - Flushing Timer expires, then the Old DKC is cleared and the state
 is changed to YOUNG.
