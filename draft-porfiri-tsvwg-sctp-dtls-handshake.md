@@ -1660,7 +1660,7 @@ IANA is requested to assign one SCTP Protection Solution Identifier to
 identify the key-management defined in this document.
 
 | Identifier | Solution Name | Reference | Contact |
-| 4096 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
+| 2 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
 {: #iana-psi title="SCTP Protection Solution Indicators" cols="r l l l"}
 
 ## TLS Exporter Labels {#iana-export-label}
