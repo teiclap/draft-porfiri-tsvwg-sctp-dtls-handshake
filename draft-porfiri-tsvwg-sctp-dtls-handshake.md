@@ -37,6 +37,7 @@ informative:
   RFC5061:
   RFC5705:
   RFC6083:
+  RFC6347:
   RFC9525:
   I-D.ietf-tls-rfc8446bis:
   I-D.ietf-uta-rfc6125bis:
@@ -63,7 +64,6 @@ informative:
     date: October 2024
 
 normative:
-  RFC6347:
   RFC8446:
   RFC8996:
   RFC9147:
@@ -173,14 +173,18 @@ This document describes:
    contains keying material for both directions.
 
    Initiator:
-   : the endpoint that is agreed to be the client in the SCTP Association Establishment.
+   : the endpoint that is agreed to be the client in the SCTP Association
+   Establishment. This corresponds to the "client" role (C bit) in the
+   DTLS Key Management Parameter of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
    Primary DTLS Key context:
    : A DTLS Key context used to protect the regular SCTP traffic, i.e. not a
     restart DTLS Key context.
 
    Responder:
-   : the endpoint that is agreed to be the server in the SCTP Association Establishment.
+   : the endpoint that is agreed to be the server in the SCTP Association
+   Establishment. This corresponds to the "server" role (S bit) in the
+   DTLS Key Management Parameter of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
    Restart DTLS Key context:
    : A DTLS Key context to be used for an SCTP Association Restart
@@ -408,9 +412,9 @@ below:
    {{RFC8446}}, using the label defined in {{iana-export-label}}
    and a context built as an array of bytes sequenced as follows:
 
-   1 byte : direction
+   1 byte : direction (0x00 = Client, 0x01 = Server)
 
-   1 byte : traffic or reset key
+   1 byte : key type (0x00 = primary/traffic, 0x01 = restart)
 
 variable length : the Key Management Parameter from Initiator followed by
    the Key Management Parameter from Responder without padding.
@@ -748,8 +752,8 @@ Either peers can initiate the removal of a TLS connection from the
 current SCTP association when needed when new DTLS Key Contexts
 have been established.
 Closing the TLS connection when the SCTP association is in
-PROTECTED and ESTABLISHED state is done by having the TLS connection
-sending a TLS close_notify.
+ESTABLISHED state with DTLS chunk protection enforced is done by
+having the TLS connection sending a TLS close_notify.
 
 ### Considerations about removal of TLS Connections {#removal_tls_consideration}
 
@@ -781,10 +785,10 @@ handling defined in {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
 When the handshake of TLS connection encounters an error it may report that
 issue using TLS alert message to its peer by putting the created TLS
-record in a SCTP user message (see {{tls-user-message}}) with the
-Handshake PPID. This is independent of what to do in relation to the
-SCTP association.  Depending on the severity of the error different
-decisions can be taken.
+record in an SCTP user message (see {{tls-user-message}}) with the
+DTLS Key Management Messages PPID (4242). This is independent of what to do
+in relation to the SCTP association.  Depending on the severity of the error
+different decisions can be taken.
 
 However, as it is not expected that the key-management TLS
 connection will have any activity at all between completing the
@@ -974,9 +978,9 @@ using the following rules:
 
 * The sequence of bytes MUST follow the order
 
-1 byte : direction (Client/Server)
+1 byte : direction (0x00 = Client, 0x01 = Server)
 
-1 byte : traffic or reset key
+1 byte : key type (0x00 = primary/traffic, 0x01 = restart)
 
 variable length : the Key Management Parameter from Initiator followed by
    the Key Management Parameter from Responder without padding.
@@ -1179,18 +1183,14 @@ Initiator                                            Responder
       is protected and verified and traffic can be sent.
 
 
-   If the TLS handshake fails the SCTP association MUST be aborted
-   and an ERROR chunk with the Error in Protection error cause, with
-   the appropriate extra error causes is generated, the right
-   selection of "Error During Protection Handshake" or "Timeout During
-   Protection Handshake or Validation".
+   If the TLS handshake fails the SCTP association MUST be aborted.
 
 
 ### Handshake of further TLS connections {#further_tls_connection}
 
-   When the SCTP Association has entered the PROTECTED state, each of
-   the endpoint can initiate a TLS handshake for Key-Management when
-   necessary.
+   When the SCTP Association is in ESTABLISHED state with DTLS chunk
+   protection enforced, each of the endpoints can initiate a TLS
+   handshake for Key-Management when necessary.
 
    The TLS Key-Management will act as a User of SCTP, identified
    with the Key-Management PPID 4242. TLS handshake
@@ -1200,9 +1200,7 @@ Initiator                                            Responder
    than the actual IP MTU, it can be used as SCTP provides reliability and
    fragmentation.
 
-   If the TLS handshake fails the SCTP association MUST generate
-   an ERROR chunk with the Error in Protection error cause, with
-   extra error causes "Error During Protection Handshake".
+   If the TLS handshake fails the SCTP association MUST be aborted.
 
 ~~~~~~~~~~~ aasvg
 Initiator                                               Responder
@@ -1327,14 +1325,13 @@ so that both endpoints will have a known DTLS context state, i.e. the
 Sequence number and replay window are both just initialized to default
 values for the epoch=3.
 
-#### This Race condition cannot exist!!!
-It MAY exist a short time gap where the Association has already
-been validated state but no Restart DTLS Key Context has been installed
-yet. If a SCTP Restart procedure will be initiated during that time,
-it will fail and the Association will also fail. However, this is
-unlikely as the Restart Init will be sent multiple times following a
-exponential back-off timer and in that time the Restart DTLS Key Context is
-expected to be in place.
+Note: There MAY exist a short time gap where the Association is in
+ESTABLISHED state but no Restart DTLS Key Context has been installed
+yet. If an SCTP Restart procedure is initiated during that time,
+it will fail. However, this is unlikely as the restarting endpoint
+will send INIT multiple times following an exponential back-off timer,
+and the Restart DTLS Key Context is expected to be in place before
+the timer expires.
 
 ### Installation of Restart DTLS Key Context for further TLS Connections
 
