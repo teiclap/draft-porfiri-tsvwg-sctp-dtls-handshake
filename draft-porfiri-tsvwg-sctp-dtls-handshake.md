@@ -398,8 +398,8 @@ below:
 * To initialize and authenticate the peers the TLS handshake is
    initiated at the Initiator peer, the TLS handshake messages are
    exchanged as SCTP user messages with the DTLS Chunk Key-Management
-   Messages PPID (see section 10.6 of
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an initial TLS
+   Messages PPID (see Section 9.5 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   until an initial TLS
    connection has been established. If the TLS handshake fails, the
    SCTP association is aborted.
 
@@ -493,7 +493,7 @@ Note that the epoch noted in {{setting-keys-initially}} are the TLS session's
 epochs, not the epoch used for the DTLS Chunk. The DTLS chunk's initial key
 context will use epoch=3.
 
-The key derivation takes into account which protection solution identifiers
+The key derivation takes into account which DTLS Key Management Identifiers
 have been sent and received. This way the communication is protected against
 downgrade attacks against the SCTP handshake.
 
@@ -958,8 +958,8 @@ negotiatated cipher suit for the protection.
 
 To ensure that downgrade attack on the protection solution offered
 is not possible the context used will be the full sequence of
-Protection Solution Identifiers as include in the DTLS 1.3 Chunk
-Protected Association (Section 4.1 of
+DTLS Key Management Identifiers as included in the DTLS Key
+Management Parameter (Section 4.1 of
 {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) sent by the SCTP
 assocation initiator.
 
@@ -1014,7 +1014,9 @@ one for the Restart DTLS Key Context.
 Each set consists of one client and one server side write key.
 In addition each key needs an Initialization Vector (IV) that
 is used by the record processing in TLS to create the nonce,
-See Section 5.3 of {{RFC8446}}.
+See Section 5.3 of {{RFC8446}}. Each direction also requires a
+Sequence Number (SN) Key used for encrypting the DTLS record
+sequence number as specified in {{Section 4.2.3 of RFC9147}}.
 
 The client and server roles are here in relation to key-management
 TLS session roles. The DTLS Client will install the key derived using the
@@ -1030,17 +1032,23 @@ key for the Restart DTLS Key Context.
 
 The IV values also needs to be exported using
 the corresponding _IV label and following the same rules.
+Similarly, the Sequence Number Key values are exported using
+the corresponding _SN_KEY label.
 
 The following labels are defined:
 
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_IV
+  * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_SN_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_IV
+  * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_SN_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_IV
+  * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_SN_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_IV
+  * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_SN_KEY
 
 
 
@@ -1078,10 +1086,10 @@ Initiator                                     Responder
 {: #sctp-TLS-initial-dtls-connection title="Handshake of initial TLS connection" artwork-align="center"}
 
 
-SCTP Handshake is strictly compliant to {{RFC9260}}. The DTLS 1.3
-Chunk Protected Association parameter (Section 4.1 of
+SCTP Handshake is strictly compliant to {{RFC9260}}. The DTLS Key
+Management Parameter (Section 4.1 of
 {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) is included containing
-the Protection Solution identifier (See {{sec-iana-psi}}) for this
+the DTLS Key Management Identifier (See {{sec-iana-psi}}) for this
 documents key-management at a suitable preference position
 depending on local policy. And in case this key-management solution
 is the most preferred then the process continues as stated below
@@ -1114,13 +1122,13 @@ Initiator                                            Responder
 
 
    1. The Initiator initiates an SCTP Association and provides the
-      DTLS 1.3 Chunk Protected Association parameter preference
-      ordered list of supporter Protection Solutions. The offered
+      DTLS Key Management Parameter with a preference-ordered list of
+      supported DTLS Key Management Identifiers. The offered
       parameter list is recorded by the Key-Management.
 
    2. The Responder peer enter SCTP Established, and its
       Key-Management is provided with the full ordered list of
-      Protection Solutions offered in the INIT Chunk.
+      DTLS Key Management Identifiers offered in the INIT Chunk.
 
    3. The Initiator enters SCTP Assocationa Established and the
       Key-Management is triggered to perform the next step.
@@ -1140,7 +1148,7 @@ Initiator                                            Responder
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 6.
 
-   6. Responder uses its the TLS Exporter on the DTLS Connection's
+   6. Responder uses the TLS Exporter on the TLS connection's
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
@@ -1261,7 +1269,7 @@ are described as follows:
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 4.
 
-   4. Responder uses its the TLS Exporter on the DTLS Connection's
+   4. Responder uses the TLS Exporter on the TLS connection's
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
@@ -1410,7 +1418,7 @@ From procedure viewpoint the sequence is the following:
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 6.
 
-   6. Responder uses its the TLS Exporter on the DTLS Connection's
+   6. Responder uses the TLS Exporter on the TLS connection's
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
@@ -1638,14 +1646,14 @@ due to key compromise.
 
 This document requests the following registration.
 
-## SCTP Protection Solution Identifier  {#sec-iana-psi}
+## SCTP DTLS Key Management Method Identifier  {#sec-iana-psi}
 
-IANA is requested to assign one SCTP Protection Solution Identifier to
+IANA is requested to assign one DTLS Key Management Method Identifier to
 identify the key-management defined in this document.
 
 | Identifier | Solution Name | Reference | Contact |
-| 4096 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
-{: #iana-psi title="SCTP Protection Solution Indicators" cols="r l l l"}
+| 192 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
+{: #iana-psi title="DTLS Key Management Method Identifiers" cols="r l l l"}
 
 ## TLS Exporter Labels {#iana-export-label}
 
