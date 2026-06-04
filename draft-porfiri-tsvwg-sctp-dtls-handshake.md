@@ -138,6 +138,8 @@ The key advantages of this approach are:
 
 {::boilerplate bcp14}
 
+In this document, \|\| denotes concatenation of byte sequences.
+
 ## Terminology {#terminology}
 
 This document uses the following terms:
@@ -359,40 +361,32 @@ TLS Message: variable length
 
 ## Role Determination {#role-determination}
 
-Role determination follows the procedure defined in
-Section 5.1 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.  The
-endpoint assigned the client role becomes the Initiator; the endpoint
-assigned the server role becomes the Responder.
-
-Once roles are determined, the DTLS Key Management Method is selected
-by iterating over the Responder's preferred methods and choosing the
-first one also supported by the Initiator.
+Role determination and method selection follow the procedure defined
+in Section 5.1 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.  After
+the SCTP association is established, the key-management function
+retrieves from the SCTP stack's DTLS chunk API the assigned role
+(Initiator/client or Responder/server), the selected DTLS Key
+Management Method, and the downgrade prevention data (both endpoints'
+DTLS Key Management Parameters) used as input to key derivation.
 
 ## Exporter Context {#exporter-context}
 
 DTLS Key Contexts are derived using the TLS Exporter as defined in
 Section 7.5 of {{RFC8446}}.  The exporter context is constructed as
-follows:
+the concatenation of the following fields:
 
-~~~~~~~~~~~ aasvg
-+--------+--------+----------------------------------+
-| 1 byte | 1 byte |         variable length          |
-+--------+--------+----------------------------------+
-|  dir   |  type  | KM Param (Initiator) ||          |
-|        |        | KM Param (Responder)             |
-+--------+--------+----------------------------------+
-~~~~~~~~~~~
+| Field | Length | Value |
+|-------|--------|-------|
+| Direction | 1 byte | 0x00 = Client, 0x01 = Server |
+| Key role | 1 byte | 0x00 = primary/traffic, 0x01 = restart |
+| Key type | 1 byte | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
+| Initiator KM Param | variable | DTLS Key Management Parameter sent by the Initiator |
+| Responder KM Param | variable | DTLS Key Management Parameter sent by the Responder |
 
-Where:
-
-* dir (direction): 0x00 = Client, 0x01 = Server
-* type (key type): 0x00 = primary/traffic, 0x01 = restart
-* KM Param: The DTLS Key Management Parameter
-  (Section 4.1 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) from
-  each endpoint, including the parameter header and excluding
-  padding, in network byte order as sent on the wire.  The
-  Initiator's parameter is concatenated first, followed by the
-  Responder's parameter.
+Each DTLS Key Management Parameter (Section 4.1 of
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) is included as the
+sequence of bytes sent on the wire, including the parameter header
+and excluding padding.
 
 This construction ensures that any modification to the DTLS Key
 Management Parameter during the SCTP handshake (a downgrade attack)
@@ -400,26 +394,19 @@ results in mismatched keys and association failure.
 
 ## Exporter Labels {#exporter-labels}
 
-The following TLS Exporter labels are used to derive keying material.
-Each label produces the key, IV, or sequence number key for one
-direction and one context type:
+A single TLS Exporter label is used to derive all keying material:
 
-  * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY
-  * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_IV
-  * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_SN_KEY
-  * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY
-  * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_IV
-  * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_SN_KEY
-  * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY
-  * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_IV
-  * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_SN_KEY
-  * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY
-  * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_IV
-  * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_SN_KEY
+    EXPORTER_TLS_FOR_DTLS_IN_SCTP
 
-The Initiator (TLS client) installs the CLIENT_KEY as its write key
-and the SERVER_KEY as its read key.  The Responder does the reverse.
-The same mapping applies for IV and SN_KEY labels.
+The specific key material (direction, role, and type) is
+differentiated by the exporter context ({{exporter-context}}).  Each
+combination of Direction, Key role, and Key type values produces a
+distinct export, yielding 12 values in total (2 directions × 2 roles
+× 3 types).
+
+The Initiator (TLS client) installs exports with Direction=Client as
+its write keys and Direction=Server as its read keys.  The Responder
+does the reverse.
 
 The length of exported material depends on the negotiated cipher
 suite.
@@ -778,21 +765,10 @@ key-management method defined in this document.
 
 ## TLS Exporter Labels {#iana-export-label}
 
-IANA is requested to register the following values in the TLS
+IANA is requested to register the following value in the TLS
 Exporter Label Registry {{RFC5705}} with Reference RFC-TBD and empty
 Comment.
 
 | Value | DTLS-OK | Recommended |
-| EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_IV | Y | N |
-| EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_SN_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_IV | Y | N |
-| EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_SN_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_IV | Y | N |
-| EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_SN_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY | Y | N |
-| EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_IV | Y | N |
-| EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_SN_KEY | Y | N |
-{: #iana-tls-exporter title="TLS Exporter Labels" cols="l l l"}
+| EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
+{: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
