@@ -37,6 +37,7 @@ informative:
   RFC5061:
   RFC5705:
   RFC6083:
+  RFC6347:
   RFC9525:
   I-D.ietf-tls-rfc8446bis:
   I-D.ietf-uta-rfc6125bis:
@@ -63,7 +64,6 @@ informative:
     date: October 2024
 
 normative:
-  RFC6347:
   RFC8446:
   RFC8996:
   RFC9147:
@@ -173,14 +173,18 @@ This document describes:
    contains keying material for both directions.
 
    Initiator:
-   : the endpoint that is agreed to be the client in the SCTP Association Establishment.
+   : the endpoint that is agreed to be the client in the SCTP Association
+   Establishment. This corresponds to the "client" role (C bit) in the
+   DTLS Key Management Parameter of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
    Primary DTLS Key context:
    : A DTLS Key context used to protect the regular SCTP traffic, i.e. not a
     restart DTLS Key context.
 
    Responder:
-   : the endpoint that is agreed to be the server in the SCTP Association Establishment.
+   : the endpoint that is agreed to be the server in the SCTP Association
+   Establishment. This corresponds to the "server" role (S bit) in the
+   DTLS Key Management Parameter of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
    Restart DTLS Key context:
    : A DTLS Key context to be used for an SCTP Association Restart
@@ -398,8 +402,8 @@ below:
 * To initialize and authenticate the peers the TLS handshake is
    initiated at the Initiator peer, the TLS handshake messages are
    exchanged as SCTP user messages with the DTLS Chunk Key-Management
-   Messages PPID (see section 10.6 of
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) until an initial TLS
+   Messages PPID (see Section 9.5 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   until an initial TLS
    connection has been established. If the TLS handshake fails, the
    SCTP association is aborted.
 
@@ -408,9 +412,9 @@ below:
    {{RFC8446}}, using the label defined in {{iana-export-label}}
    and a context built as an array of bytes sequenced as follows:
 
-   1 byte : direction
+   1 byte : direction (0x00 = Client, 0x01 = Server)
 
-   1 byte : traffic or reset key
+   1 byte : key type (0x00 = primary/traffic, 0x01 = restart)
 
 variable length : the Key Management Parameter from Initiator followed by
    the Key Management Parameter from Responder without padding.
@@ -493,7 +497,7 @@ Note that the epoch noted in {{setting-keys-initially}} are the TLS session's
 epochs, not the epoch used for the DTLS Chunk. The DTLS chunk's initial key
 context will use epoch=3.
 
-The key derivation takes into account which protection solution identifiers
+The key derivation takes into account which DTLS Key Management Identifiers
 have been sent and received. This way the communication is protected against
 downgrade attacks against the SCTP handshake.
 
@@ -748,8 +752,8 @@ Either peers can initiate the removal of a TLS connection from the
 current SCTP association when needed when new DTLS Key Contexts
 have been established.
 Closing the TLS connection when the SCTP association is in
-PROTECTED and ESTABLISHED state is done by having the TLS connection
-sending a TLS close_notify.
+ESTABLISHED state with DTLS chunk protection enforced is done by
+having the TLS connection sending a TLS close_notify.
 
 ### Considerations about removal of TLS Connections {#removal_tls_consideration}
 
@@ -781,10 +785,10 @@ handling defined in {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
 When the handshake of TLS connection encounters an error it may report that
 issue using TLS alert message to its peer by putting the created TLS
-record in a SCTP user message (see {{tls-user-message}}) with the
-Handshake PPID. This is independent of what to do in relation to the
-SCTP association.  Depending on the severity of the error different
-decisions can be taken.
+record in an SCTP user message (see {{tls-user-message}}) with the
+DTLS Key Management Messages PPID (4242). This is independent of what to do
+in relation to the SCTP association.  Depending on the severity of the error
+different decisions can be taken.
 
 However, as it is not expected that the key-management TLS
 connection will have any activity at all between completing the
@@ -958,8 +962,8 @@ negotiatated cipher suit for the protection.
 
 To ensure that downgrade attack on the protection solution offered
 is not possible the context used will be the full sequence of
-Protection Solution Identifiers as include in the DTLS 1.3 Chunk
-Protected Association (Section 4.1 of
+DTLS Key Management Identifiers as included in the DTLS Key
+Management Parameter (Section 4.1 of
 {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) sent by the SCTP
 assocation initiator.
 
@@ -974,9 +978,9 @@ using the following rules:
 
 * The sequence of bytes MUST follow the order
 
-1 byte : direction (Client/Server)
+1 byte : direction (0x00 = Client, 0x01 = Server)
 
-1 byte : traffic or reset key
+1 byte : key type (0x00 = primary/traffic, 0x01 = restart)
 
 variable length : the Key Management Parameter from Initiator followed by
    the Key Management Parameter from Responder without padding.
@@ -1014,7 +1018,9 @@ one for the Restart DTLS Key Context.
 Each set consists of one client and one server side write key.
 In addition each key needs an Initialization Vector (IV) that
 is used by the record processing in TLS to create the nonce,
-See Section 5.3 of {{RFC8446}}.
+See Section 5.3 of {{RFC8446}}. Each direction also requires a
+Sequence Number (SN) Key used for encrypting the DTLS record
+sequence number as specified in {{Section 4.2.3 of RFC9147}}.
 
 The client and server roles are here in relation to key-management
 TLS session roles. The DTLS Client will install the key derived using the
@@ -1030,17 +1036,23 @@ key for the Restart DTLS Key Context.
 
 The IV values also needs to be exported using
 the corresponding _IV label and following the same rules.
+Similarly, the Sequence Number Key values are exported using
+the corresponding _SN_KEY label.
 
 The following labels are defined:
 
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_IV
+  * EXPORTER_DTLS_IN_SCTP_PRIMARY_CLIENT_SN_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_KEY
   * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_IV
+  * EXPORTER_DTLS_IN_SCTP_PRIMARY_SERVER_SN_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_IV
+  * EXPORTER_DTLS_IN_SCTP_RESTART_CLIENT_SN_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_KEY
   * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_IV
+  * EXPORTER_DTLS_IN_SCTP_RESTART_SERVER_SN_KEY
 
 
 
@@ -1078,10 +1090,10 @@ Initiator                                     Responder
 {: #sctp-TLS-initial-dtls-connection title="Handshake of initial TLS connection" artwork-align="center"}
 
 
-SCTP Handshake is strictly compliant to {{RFC9260}}. The DTLS 1.3
-Chunk Protected Association parameter (Section 4.1 of
+SCTP Handshake is strictly compliant to {{RFC9260}}. The DTLS Key
+Management Parameter (Section 4.1 of
 {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) is included containing
-the Protection Solution identifier (See {{sec-iana-psi}}) for this
+the DTLS Key Management Identifier (See {{sec-iana-psi}}) for this
 documents key-management at a suitable preference position
 depending on local policy. And in case this key-management solution
 is the most preferred then the process continues as stated below
@@ -1114,13 +1126,13 @@ Initiator                                            Responder
 
 
    1. The Initiator initiates an SCTP Association and provides the
-      DTLS 1.3 Chunk Protected Association parameter preference
-      ordered list of supporter Protection Solutions. The offered
+      DTLS Key Management Parameter with a preference-ordered list of
+      supported DTLS Key Management Identifiers. The offered
       parameter list is recorded by the Key-Management.
 
    2. The Responder peer enter SCTP Established, and its
       Key-Management is provided with the full ordered list of
-      Protection Solutions offered in the INIT Chunk.
+      DTLS Key Management Identifiers offered in the INIT Chunk.
 
    3. The Initiator enters SCTP Assocationa Established and the
       Key-Management is triggered to perform the next step.
@@ -1140,7 +1152,7 @@ Initiator                                            Responder
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 6.
 
-   6. Responder uses its the TLS Exporter on the DTLS Connection's
+   6. Responder uses the TLS Exporter on the TLS connection's
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
@@ -1171,18 +1183,14 @@ Initiator                                            Responder
       is protected and verified and traffic can be sent.
 
 
-   If the TLS handshake fails the SCTP association MUST be aborted
-   and an ERROR chunk with the Error in Protection error cause, with
-   the appropriate extra error causes is generated, the right
-   selection of "Error During Protection Handshake" or "Timeout During
-   Protection Handshake or Validation".
+   If the TLS handshake fails the SCTP association MUST be aborted.
 
 
 ### Handshake of further TLS connections {#further_tls_connection}
 
-   When the SCTP Association has entered the PROTECTED state, each of
-   the endpoint can initiate a TLS handshake for Key-Management when
-   necessary.
+   When the SCTP Association is in ESTABLISHED state with DTLS chunk
+   protection enforced, each of the endpoints can initiate a TLS
+   handshake for Key-Management when necessary.
 
    The TLS Key-Management will act as a User of SCTP, identified
    with the Key-Management PPID 4242. TLS handshake
@@ -1192,9 +1200,7 @@ Initiator                                            Responder
    than the actual IP MTU, it can be used as SCTP provides reliability and
    fragmentation.
 
-   If the TLS handshake fails the SCTP association MUST generate
-   an ERROR chunk with the Error in Protection error cause, with
-   extra error causes "Error During Protection Handshake".
+   If the TLS handshake fails the SCTP association MUST be aborted.
 
 ~~~~~~~~~~~ aasvg
 Initiator                                               Responder
@@ -1261,7 +1267,7 @@ are described as follows:
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 4.
 
-   4. Responder uses its the TLS Exporter on the DTLS Connection's
+   4. Responder uses the TLS Exporter on the TLS connection's
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
@@ -1319,14 +1325,13 @@ so that both endpoints will have a known DTLS context state, i.e. the
 Sequence number and replay window are both just initialized to default
 values for the epoch=3.
 
-#### This Race condition cannot exist!!!
-It MAY exist a short time gap where the Association has already
-been validated state but no Restart DTLS Key Context has been installed
-yet. If a SCTP Restart procedure will be initiated during that time,
-it will fail and the Association will also fail. However, this is
-unlikely as the Restart Init will be sent multiple times following a
-exponential back-off timer and in that time the Restart DTLS Key Context is
-expected to be in place.
+Note: There MAY exist a short time gap where the Association is in
+ESTABLISHED state but no Restart DTLS Key Context has been installed
+yet. If an SCTP Restart procedure is initiated during that time,
+it will fail. However, this is unlikely as the restarting endpoint
+will send INIT multiple times following an exponential back-off timer,
+and the Restart DTLS Key Context is expected to be in place before
+the timer expires.
 
 ### Installation of Restart DTLS Key Context for further TLS Connections
 
@@ -1410,7 +1415,7 @@ From procedure viewpoint the sequence is the following:
       retry message an additional message exchange between TLS Client
       and TLS server is needed before one can progress to 6.
 
-   6. Responder uses its the TLS Exporter on the DTLS Connection's
+   6. Responder uses the TLS Exporter on the TLS connection's
       state to derive the primary client write key and IV
       {{dtls-key-derivation}} and install them into the DTLS Chunk
       Protection Operator's Primary Key Context.
@@ -1654,14 +1659,14 @@ due to key compromise.
 
 This document requests the following registration.
 
-## SCTP Protection Solution Identifier  {#sec-iana-psi}
+## SCTP DTLS Key Management Method Identifier  {#sec-iana-psi}
 
-IANA is requested to assign one SCTP Protection Solution Identifier to
+IANA is requested to assign one DTLS Key Management Method Identifier to
 identify the key-management defined in this document.
 
 | Identifier | Solution Name | Reference | Contact |
-| 2 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
-{: #iana-psi title="SCTP Protection Solution Indicators" cols="r l l l"}
+| 192 | TLS for DTLS in SCTP Handshake | RFC-TBD | Draft Authors |
+{: #iana-psi title="DTLS Key Management Method Identifiers" cols="r l l l"}
 
 ## TLS Exporter Labels {#iana-export-label}
 

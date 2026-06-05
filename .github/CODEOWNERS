@@ -1,0 +1,3 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-porfiri-tsvwg-sctp-dtls-handshake.md magnus.westerlund@ericsson.com john.mattsson@ericsson.com claudio.porfiri@ericsson.com
