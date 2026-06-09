@@ -463,11 +463,25 @@ The procedure is as follows:
    with this method's identifier (see {{sec-iana-psi}}) in its
    preference-ordered list.
 
-2. The Responder enters ESTABLISHED state and records the DTLS Key
-   Management Parameter from the INIT chunk.
+2. The Responder enters ESTABLISHED state.  It retrieves the agreed
+   DTLS Key Management Method and role from the SCTP stack (e.g.,
+   using the "Get Agreed DTLS Key Management Method and Role" API
+   defined in Section 7.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   and verifies that the selected method matches the one defined in
+   this document (see {{sec-iana-psi}}) and that the assigned role
+   is server (Responder).
 
-3. The Initiator enters ESTABLISHED state.  Both endpoints determine
-   roles per {{role-determination}}.
+3. The Initiator enters ESTABLISHED state.  It retrieves the agreed
+   DTLS Key Management Method and role from the SCTP stack (e.g.,
+   using the "Get Agreed DTLS Key Management Method and Role" API
+   defined in Section 7.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   and verifies that the selected method matches the one defined in
+   this document (see {{sec-iana-psi}}) and that the assigned role
+   is client (Initiator).  Both endpoints determine roles per
+   {{role-determination}}.  Note: if the role assignment differs from
+   the SCTP-level Initiator/Responder (e.g., due to tie-breaking),
+   the endpoint assigned the client role is the one that performs
+   step 4.
 
 4. The Initiator's key manager starts a TLS 1.3 handshake, limiting
    offered cipher suites to those supported by the DTLS Chunk
@@ -478,19 +492,23 @@ The procedure is as follows:
    If a HelloRetryRequest is needed, an additional round-trip occurs
    before proceeding.
 
-6. The Responder uses the TLS Exporter to derive and install the
-   Initiator's (client) write key for both the Primary and Restart
-   DKCs (receive direction), per {{dtls-key-derivation}}.  It then
-   sends its TLS response messages.
+6. The Responder uses the TLS Exporter to derive the client
+   (Initiator) key material for both the Primary and Restart DKCs
+   and installs it as its read (receive) key material, per
+   {{dtls-key-derivation}}.  It then sends its TLS response messages.
 
 7. The Initiator receives the TLS server messages, exports and
-   installs all Primary and Restart DKC keys (both directions).  It
-   then sends its TLS Certificate/CertificateVerify/Finished,
-   protected by the DTLS Chunk using the new Primary DKC.
+   installs all Primary and Restart DKC keys: the client key material
+   as its write (send) key and the server key material as its read
+   (receive) key.  It then sends its TLS
+   Certificate/CertificateVerify/Finished, protected by the DTLS
+   Chunk using the new Primary DKC.
 
 8. The Responder decrypts the DTLS-chunk-protected TLS messages,
-   completes the handshake, exports and installs the remaining keys,
-   and enforces DTLS chunk protection for all future packets.
+   completes the handshake, exports and installs the server key
+   material for both the Primary and Restart DKCs as its write
+   (send) key.  It then enforces DTLS chunk protection for all
+   future packets.
 
 9. Both endpoints inform the ULP that the association is protected.
    Application traffic can begin.
