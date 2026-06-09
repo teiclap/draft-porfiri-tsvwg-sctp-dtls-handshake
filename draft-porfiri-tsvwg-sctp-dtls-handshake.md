@@ -761,16 +761,16 @@ Initiator                                            Responder
    Restart DKC.  ULP traffic MAY begin immediately using the Restart
    DKC.
 
-5. Both endpoints have a new established association.  Each retrieves
-   the agreed DTLS Key Management Method and role from the SCTP stack
-   (e.g., using the "Get Agreed DTLS Key Management Method and Role"
-   API defined in Section 7.2 of
+5. Both endpoints have a new established association.  Each endpoint
+   immediately enforces DTLS chunk protection (using the Restart DKC)
+   and then retrieves the agreed DTLS Key Management Method and role
+   from the SCTP stack (e.g., using the "Get Agreed DTLS Key
+   Management Method and Role" API defined in Section 7.2 of
    {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) and verifies that the
    selected method matches the one defined in this document (see
    {{sec-iana-psi}}) and that the assigned role is as expected.  The
    ULP MAY be informed that the association is protected at this
-   point (using the Restart DKC).  The endpoint with the client role
-   initiates step 6.
+   point.  The endpoint with the client role initiates step 6.
 
 6. The Initiator (client) starts a TLS 1.3 handshake, limiting
    offered cipher suites to those supported by the DTLS Chunk
@@ -835,9 +835,6 @@ If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
 handshake.  If retry is not possible or the current DKC is aged
 beyond policy limits, the association MUST be aborted.
-
-If a TLS connection is closed (e.g., via close_notify) and no usable
-DKC remains, the association MUST be aborted.
 
 
 # Security Considerations {#security-considerations}
