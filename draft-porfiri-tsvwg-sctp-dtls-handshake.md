@@ -519,13 +519,10 @@ The procedure is as follows:
    is server (Responder).
 
 3. The Initiator enters ESTABLISHED state.  It retrieves the agreed
-   DTLS Key Management Method and role from the SCTP stack (e.g.,
-   using the "Get Agreed DTLS Key Management Method and Role" API
-   defined in Section 7.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   DTLS Key Management Method and role from the SCTP stack
    and verifies that the selected method matches the one defined in
    this document (see {{sec-iana-psi}}) and that the assigned role
-   is client (Initiator).  Both endpoints determine roles per
-   {{role-determination}}.  Note: if the role assignment differs from
+   is client (Initiator). Note: if the role assignment differs from
    the SCTP-level Initiator/Responder (e.g., due to tie-breaking),
    the endpoint assigned the client role is the one that performs
    step 4.
@@ -610,7 +607,7 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
 2. The Responder receives and processes the ClientHello.  It exports
    the client key material for both the Primary and Restart DKCs and
    installs it as its read (receive) key.  It then sends its TLS
-   ServerHello through Finished messages to the Initiator.
+   ServerHello message to the Initiator.
 
 3. The Initiator receives the TLS server messages and installs both
    sets of keys: the client key material as its write (send) key and
