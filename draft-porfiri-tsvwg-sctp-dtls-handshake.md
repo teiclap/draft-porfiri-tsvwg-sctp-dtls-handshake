@@ -326,35 +326,80 @@ to one.
 
 # TLS Message Transport {#tls-user-message}
 
-TLS records for key-management are sent as SCTP user messages using
-reliable in-order delivery on stream 0 with the DTLS Key Management
-Messages PPID (4242) {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
+TLS records and control messages for key-management are sent as SCTP
+user messages using reliable in-order delivery on stream 0 with the
+DTLS Key Management Messages PPID (4242)
+{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
 
-Each SCTP user message carrying TLS records uses the format defined
-in {{sctp-dtls-user-message}}.
+Each SCTP user message uses the format defined in
+{{sctp-dtls-user-message}}.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Epoch     |                                               |
-+---------------+            TLS Message                        |
+|T|   Epoch     |                                               |
++-+-+-+-+-+-+-+-+            Payload                            |
 |                                                               |
 |                               +-------------------------------+
 |                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-dtls-user-message title="TLS User Message Structure" artwork-align="center"}
+{: #sctp-dtls-user-message title="Key Management User Message Structure" artwork-align="center"}
 
-Epoch: 8 bits
-: The 8 lowest bits of the DTLS Key Context epoch that this TLS
-  session's messages correspond to — i.e., the DKC that will be
-  created from this handshake, or that already exists when closing
-  the TLS connection.  The receiver uses this byte to associate
-  incoming TLS data with the correct key-management session.
+T (Message Type): 1 bit
+: Indicates the type of payload carried in this user message.
+  A value of 0 indicates that the payload contains TLS records.
+  A value of 1 indicates that the payload is a control message
+  (see {{control-messages}}).
 
-TLS Message: variable length
-: One or more complete TLS records.
+Epoch: 7 bits
+: The 7 lowest bits of the DTLS Key Context epoch that this
+  message corresponds to — i.e., the DKC that will be created from
+  this handshake, or that already exists.  The receiver uses this
+  field to associate incoming data with the correct key-management
+  session.
+
+Payload: variable length
+: When T=0, one or more complete TLS records.  When T=1, a control
+  message as defined in {{control-messages}}.
+
+## Control Messages {#control-messages}
+
+When the T bit is set to 1, the payload of the user message is a
+control message with the following format:
+
+~~~~~~~~~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Ctrl Type    |         Control Data (variable)               |
++-+-+-+-+-+-+-+-+                                               |
+~~~~~~~~~~~
+{: #control-message-format title="Control Message Format" artwork-align="center"}
+
+Ctrl Type: 8 bits
+: Identifies the control message type.
+
+Control Data: variable length
+: Type-specific data.  May be empty.
+
+The following control message type is defined:
+
+| Ctrl Type | Name                    | Description                        |
+|-----------|-------------------------|------------------------------------|
+| 0x01      | Protection Established  | Signals that DTLS chunk protection has been enforced |
+{: #control-message-types title="Control Message Types"}
+
+### Protection Established {#protection-established}
+
+The Protection Established control message (Ctrl Type = 0x01) is sent
+by the Responder to the Initiator after the Responder has installed
+all keys and enforced DTLS chunk protection.  This message carries no
+Control Data (the payload following the Ctrl Type byte is empty).
+
+Upon receiving this message, the Initiator enforces DTLS chunk
+protection and informs the ULP that the association is protected.
 
 
 # Key Derivation {#dtls-key-derivation}
@@ -448,8 +493,10 @@ Initiator                                            Responder
     |    +---------[DATA(TLS Client Hello)]------->| 5. |
     |    |<-[DATA(TLS Server Hello ... Finished)]--+ 6. |
     | 7. +--[DATA(TLS Certificate ... Finished)]-->| 8. |
+    |    |<--[DATA(Protection Established)]--------+    |
+ 9. |    |                                          |    |
     |                                                    | -.
- 9. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
+10. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+   +---------
     |                         ...                        |   |
 
@@ -507,11 +554,16 @@ The procedure is as follows:
 8. The Responder decrypts the DTLS-chunk-protected TLS messages,
    completes the handshake, exports and installs the server key
    material for both the Primary and Restart DKCs as its write
-   (send) key.  It then enforces DTLS chunk protection for all
-   future packets.
+   (send) key.  It enforces DTLS chunk protection for all future
+   packets, informs the ULP that the association is protected, and
+   sends a Protection Established control message
+   ({{protection-established}}) to the Initiator.
 
-9. Both endpoints inform the ULP that the association is protected.
-   Application traffic can begin.
+9. The Initiator receives the Protection Established control message,
+   enforces DTLS chunk protection for all future packets, and
+   informs the ULP that the association is protected.
+
+10. Application traffic can begin.
 
 If the TLS handshake fails, the SCTP association MUST be aborted.
 
@@ -551,7 +603,7 @@ Initiator                                            Responder
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
 Either endpoint may initiate rekeying.  The procedure mirrors
-the initial establishment (steps 4–8 of {{initial-establishment}})
+the initial establishment (steps 4–9 of {{initial-establishment}})
 with the following differences:
 
 * TLS messages are carried inside DTLS chunks (the association is
@@ -564,6 +616,9 @@ with the following differences:
 * The server MUST activate its send keys for epoch N+1 no later than
   upon successfully decrypting the first SCTP packet protected with
   epoch N+1 keys from the client.
+
+* The Protection Established control message signals to the client
+  that the server has completed key installation for the new epoch.
 
 * After no longer than 120 seconds (one Maximum Segment Lifetime),
   the old DKCs MUST be removed.
@@ -676,10 +731,10 @@ Initiator                                            Responder
  3. |<------------[DTLS CHUNK(COOKIE ACK)]---------------+   +----------
     |                                                    | -'
     |                                                    |
-    |  (TLS handshake for new keys, steps 4-8            |
+    |  (TLS handshake for new keys, steps 4-9            |
     |   as in initial establishment)                     |
     |                                                    |
- 9. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
+ 10. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+
     |                                                    |
 
@@ -697,12 +752,12 @@ Initiator                                            Responder
    Restart DKC.  ULP traffic MAY begin immediately using the Restart
    DKC.
 
-4–8. A TLS handshake is performed identically to steps 4–8 of the
+4–9. A TLS handshake is performed identically to steps 4–9 of the
    initial establishment ({{initial-establishment}}) to derive new
    Primary and Restart DKCs.  After restart, the new Primary DKC
    MUST use epoch 3 (epoch resets).
 
-9. ULP traffic transitions to the new Primary DKC.
+10. ULP traffic transitions to the new Primary DKC.
 
 The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
