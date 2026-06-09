@@ -607,7 +607,7 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
 2. The Responder receives and processes the ClientHello.  It exports
    the client key material for both the Primary and Restart DKCs and
    installs it as its read (receive) key.  It then sends its TLS
-   ServerHello message to the Initiator.
+   ServerHello through Finished messages to the Initiator.
 
 3. The Initiator receives the TLS server messages and installs both
    sets of keys: the client key material as its write (send) key and
@@ -716,7 +716,7 @@ For protected SCTP restart to succeed:
 * Both endpoints MUST have a valid Restart DKC.
 * The Restart DKC MUST be stored securely and persistently to
   survive crash events (see
-  Section 10.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}).
+  Section 10.4 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}).
 * Both endpoints MUST have indicated restart support (R bit) in the
   DTLS Key Management Parameter.
 
