@@ -590,9 +590,9 @@ Initiator                                            Responder
     |                                                    |
     |  Key Manager                           Key Manager |
     |    |                                          |    |
-    |    +---------[DATA(TLS Client Hello)]------->|    |
-    |    |<-[DATA(TLS Server Hello ... Finished)]--+    |
-    |    +--[DATA(TLS Certificate ... Finished)]-->|    |
+ 1. |    +---------[DATA(TLS Client Hello)]------->|    |
+ 2. |    |<-[DATA(TLS Server Hello ... Finished)]--+    |
+ 3. |    +--[DATA(TLS Certificate ... Finished)]-->| 4. |
     |                                                    |
     |  (traffic transitions to epoch N+1 DKC)            |
     |                                                    |
@@ -602,26 +602,32 @@ Initiator                                            Responder
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
-Either endpoint may initiate rekeying.  The procedure mirrors
-the initial establishment (steps 4–9 of {{initial-establishment}})
-with the following differences:
+Either endpoint may initiate rekeying.  The procedure is as follows:
 
-* TLS messages are carried inside DTLS chunks (the association is
-  already protected).
+1. The Initiator sends a TLS ClientHello.  TLS messages are carried
+   inside DTLS chunks (the association is already protected).
 
-* The new DKCs use epoch N+1 (where N is the current epoch).
+2. The Responder receives and processes the ClientHello.  It exports
+   the client key material for both the Primary and Restart DKCs and
+   installs it as its read (receive) key.  It then sends its TLS
+   ServerHello through Finished messages to the Initiator.
 
-* Both old (epoch N) and new (epoch N+1) DKCs coexist temporarily.
+3. The Initiator receives the TLS server messages and installs both
+   sets of keys: the client key material as its write (send) key and
+   the server key material as its read (receive) key, for both the
+   Primary and Restart DKCs.  It then sends its TLS
+   Certificate/CertificateVerify/Finished.  The Initiator starts the
+   drain timer to remove the old (epoch N) DKC.
 
-* The server MUST activate its send keys for epoch N+1 no later than
-  upon successfully decrypting the first SCTP packet protected with
-  epoch N+1 keys from the client.
+4. The Responder receives and verifies the Finished message.  It
+   exports and installs the server key material for both the Primary
+   and Restart DKCs as its write (send) key.  The Responder starts
+   the drain timer to remove the old (epoch N) DKC.
 
-* The Protection Established control message signals to the client
-  that the server has completed key installation for the new epoch.
-
-* After no longer than 120 seconds (one Maximum Segment Lifetime),
-  the old DKCs MUST be removed.
+The new DKCs use epoch N+1 (where N is the current epoch).  Both old
+(epoch N) and new (epoch N+1) DKCs coexist temporarily.  After no
+longer than 120 seconds (one Maximum Segment Lifetime), the old DKCs
+MUST be removed.
 
 All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
 NOT be used.
