@@ -374,7 +374,7 @@ control message with the following format:
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |  Ctrl Type    |         Control Data (variable)               |
-+-+-+-+-+-+-+-+-+                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
 {: #control-message-format title="Control Message Format" artwork-align="center"}
 
@@ -490,10 +490,10 @@ Initiator                                            Responder
     |    |                                          |    |
  4. +--->| TLS START                      TLS START |<---+
     |    |                                          |    |
-    |    +---------[DATA(TLS Client Hello)]------->| 5. |
-    |    |<-[DATA(TLS Server Hello ... Finished)]--+ 6. |
-    | 7. +--[DATA(TLS Certificate ... Finished)]-->| 8. |
-    |    |<--[DATA(Protection Established)]--------+    |
+    |    +---------[DATA(TLS Client Hello)]-------->| 5. |
+    |    |<-[DATA(TLS Server Hello ... Finished)]---+ 6. |
+    | 7. +--[DATA(TLS Certificate ... Finished)]--->| 8. |
+    |    |<--[DATA(Protection Established)]---------+    |
  9. |    |                                          |    |
     |                                                    | -.
 10. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   | APP DATA
@@ -585,10 +585,10 @@ Initiator                                            Responder
     |  (traffic continues using epoch N DKC)             |
     |                                                    |
     |  Key Manager                           Key Manager |
-    |    |                                          |    |
- 1. |    +---------[DATA(TLS Client Hello)]------->|    |
- 2. |    |<-[DATA(TLS Server Hello ... Finished)]--+    |
- 3. |    +--[DATA(TLS Certificate ... Finished)]-->| 4. |
+    |    |                                         |     |
+ 1. |    +---------[DATA(TLS Client Hello)]------->|     |
+ 2. |    |<-[DATA(TLS Server Hello ... Finished)]--+     |
+ 3. |    +--[DATA(TLS Certificate ... Finished)]-->| 4.  |
     |                                                    |
     |  (traffic transitions to epoch N+1 DKC)            |
     |                                                    |
