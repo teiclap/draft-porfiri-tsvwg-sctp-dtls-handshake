@@ -768,14 +768,45 @@ Initiator                                            Responder
    {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) and verifies that the
    selected method matches the one defined in this document (see
    {{sec-iana-psi}}) and that the assigned role is as expected.  The
-   endpoint with the client role initiates step 6.
+   ULP MAY be informed that the association is protected at this
+   point (using the Restart DKC).  The endpoint with the client role
+   initiates step 6.
 
-6–11. A TLS handshake is performed identically to steps 4–9 of the
-   initial establishment ({{initial-establishment}}) to derive new
-   Primary and Restart DKCs.  After restart, the new Primary DKC
-   MUST use epoch 3 (epoch resets).
+6. The Initiator (client) starts a TLS 1.3 handshake, limiting
+   offered cipher suites to those supported by the DTLS Chunk
+   Protection Operator.  TLS messages are sent per
+   {{tls-user-message}}, protected by the Restart DKC.
+
+7. The Responder receives the TLS ClientHello and generates its
+   response.  It exports the client key material for the Primary DKC
+   and installs it as its read (receive) key.  It then sends its TLS
+   response messages.
+
+8. The Initiator receives the TLS server messages, exports and
+   installs the Primary DKC keys: the client key material as its
+   write (send) key and the server key material as its read (receive)
+   key.  It then sends its TLS Certificate/CertificateVerify/Finished,
+   protected by the DTLS Chunk using the new Primary DKC.
+
+9. The Responder decrypts the DTLS-chunk-protected TLS messages,
+   completes the handshake, exports and installs the server key
+   material for the Primary DKC as its write (send) key.  It
+   enforces DTLS chunk protection using the new Primary DKC and
+   sends a Protection Established control message
+   ({{protection-established}}) to the Initiator.
+
+10. The Initiator receives the Protection Established control message
+    and enforces DTLS chunk protection using the new Primary DKC.
+
+11. Both endpoints export and install the new Restart DKC key material
+    (both send and receive directions).  The old Restart DKC is then
+    removed and the new Restart DKC is committed to persistent secure
+    storage.
 
 12. ULP traffic transitions to the new Primary DKC.
+
+After restart, the new Primary DKC MUST use epoch 3 (the epoch
+resets).
 
 The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
