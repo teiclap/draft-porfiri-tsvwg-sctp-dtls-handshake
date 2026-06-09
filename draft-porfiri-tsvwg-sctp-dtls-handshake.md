@@ -518,13 +518,12 @@ The procedure is as follows:
    this document (see {{sec-iana-psi}}) and that the assigned role
    is server (Responder).
 
-3. The Initiator enters ESTABLISHED state.  It retrieves the agreed
-   DTLS Key Management Method and role from the SCTP stack
-   and verifies that the selected method matches the one defined in
-   this document (see {{sec-iana-psi}}) and that the assigned role
-   is client (Initiator). Note: if the role assignment differs from
-   the SCTP-level Initiator/Responder (e.g., due to tie-breaking),
-   the endpoint assigned the client role is the one that performs
+3. The Initiator enters ESTABLISHED state.  It performs the same
+   retrieval and verification as the Responder, confirming that the
+   assigned role is client (Initiator).  Note: if the role assignment
+   differs from the SCTP-level Initiator/Responder (e.g., due to
+   tie-breaking), the endpoint assigned the client role is the one
+   that performs
    step 4.
 
 4. The Initiator's key manager starts a TLS 1.3 handshake, limiting
@@ -703,8 +702,8 @@ LOCAL OLD:
 : Both Old and Current DKCs exist.  Current DKC is used for sending.
   Event 8 (flush timer expires) transitions to YOUNG.
 
-In REMOTE OLD and LOCAL OLD, if a new Client Hello or Aging event
-arrives, the Flushing Timer is cleared and behavior is as in YOUNG.
+In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
+arrives, the flushing timer is cleared and behavior is as in YOUNG.
 
 
 ## SCTP Association Restart {#sctp-restart}
@@ -736,8 +735,7 @@ Initiator                                            Responder
  4. |<------------[DTLS CHUNK(COOKIE ACK)]---------------+   +----------
     |                                                    | -'
     |                                                    |
-    |  (TLS handshake for new keys, steps 4-9            |
-    |   as in initial establishment)                     |
+    |  (TLS handshake for new keys, steps 6-11)          |
     |                                                    |
 12. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+
