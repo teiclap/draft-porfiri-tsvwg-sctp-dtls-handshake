@@ -803,8 +803,6 @@ Initiator                                            Responder
     removed and the new Restart DKC is committed to persistent secure
     storage.
 
-12. ULP traffic transitions to the new Primary DKC.
-
 After restart, the new Primary DKC MUST use epoch 3 (the epoch
 resets).
 
