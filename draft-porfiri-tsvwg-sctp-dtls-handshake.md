@@ -739,7 +739,7 @@ Initiator                                            Responder
     |  (TLS handshake for new keys, steps 4-9            |
     |   as in initial establishment)                     |
     |                                                    |
-11. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
+12. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+
     |                                                    |
 
@@ -761,12 +761,21 @@ Initiator                                            Responder
    Restart DKC.  ULP traffic MAY begin immediately using the Restart
    DKC.
 
-5–10. A TLS handshake is performed identically to steps 4–9 of the
+5. Both endpoints have a new established association.  Each retrieves
+   the agreed DTLS Key Management Method and role from the SCTP stack
+   (e.g., using the "Get Agreed DTLS Key Management Method and Role"
+   API defined in Section 7.2 of
+   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) and verifies that the
+   selected method matches the one defined in this document (see
+   {{sec-iana-psi}}) and that the assigned role is as expected.  The
+   endpoint with the client role initiates step 6.
+
+6–11. A TLS handshake is performed identically to steps 4–9 of the
    initial establishment ({{initial-establishment}}) to derive new
    Primary and Restart DKCs.  After restart, the new Primary DKC
    MUST use epoch 3 (epoch resets).
 
-11. ULP traffic transitions to the new Primary DKC.
+12. ULP traffic transitions to the new Primary DKC.
 
 The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
