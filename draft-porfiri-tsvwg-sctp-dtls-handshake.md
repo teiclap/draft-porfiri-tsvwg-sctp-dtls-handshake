@@ -725,42 +725,48 @@ For protected SCTP restart to succeed:
 ~~~~~~~~~~~ aasvg
 
 Initiator                                            Responder
+    |                                                    |
+ 1. |  (install restart keys from storage)               |
     |                                                    | -.
- 1. +------------------------(INIT)--------------------->|   | Plain
+ 2. +------------------------(INIT)--------------------->|   | Plain
     |<---------------------(INIT-ACK)--------------------+   +-------
     |                                                    | -'
     |                                                    | -.
- 2. +-------------[DTLS CHUNK(COOKIE ECHO)]------------->|   | Protected
- 3. |<------------[DTLS CHUNK(COOKIE ACK)]---------------+   +----------
+ 3. +-------------[DTLS CHUNK(COOKIE ECHO)]------------->|   | Protected
+ 4. |<------------[DTLS CHUNK(COOKIE ACK)]---------------+   +----------
     |                                                    | -'
     |                                                    |
     |  (TLS handshake for new keys, steps 4-9            |
     |   as in initial establishment)                     |
     |                                                    |
- 10. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
+11. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+
     |                                                    |
 
 ~~~~~~~~~~~
 {: #restart-diagram title="SCTP Restart Procedure" artwork-align="center"}
 
-1. Initiator sends INIT (VTag=0), Responder replies INIT-ACK in
+1. The restarting endpoint (Initiator) retrieves the restart key
+   material from persistent secure storage and installs the Restart
+   DKC for both send and receive directions.
+
+2. Initiator sends INIT (VTag=0), Responder replies INIT-ACK in
    plain text per {{RFC9260}}.  Both include the DTLS Key Management
    Parameter with the same method list but a new random Tie Breaker.
 
-2. Initiator sends COOKIE ECHO in a DTLS chunk protected with the
+3. Initiator sends COOKIE ECHO in a DTLS chunk protected with the
    Restart DKC (R bit set).
 
-3. Responder replies COOKIE ACK in a DTLS chunk protected with the
+4. Responder replies COOKIE ACK in a DTLS chunk protected with the
    Restart DKC.  ULP traffic MAY begin immediately using the Restart
    DKC.
 
-4–9. A TLS handshake is performed identically to steps 4–9 of the
+5–10. A TLS handshake is performed identically to steps 4–9 of the
    initial establishment ({{initial-establishment}}) to derive new
    Primary and Restart DKCs.  After restart, the new Primary DKC
    MUST use epoch 3 (epoch resets).
 
-10. ULP traffic transitions to the new Primary DKC.
+11. ULP traffic transitions to the new Primary DKC.
 
 The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
