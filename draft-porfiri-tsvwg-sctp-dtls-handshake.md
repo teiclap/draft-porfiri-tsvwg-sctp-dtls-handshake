@@ -630,9 +630,9 @@ NOT be used.
 
 As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already
-sent its own.  In this case, the ClientHello from the endpoint that
-held the TLS client role in the previous TLS connection SHALL be
-processed, and the other SHALL be dropped.
+sent its own.  In this case, the ClientHello from the Initiator
+(the endpoint with the client role) SHALL be processed, and the
+other SHALL be dropped.
 
 ### Key Transition State Machine
 
