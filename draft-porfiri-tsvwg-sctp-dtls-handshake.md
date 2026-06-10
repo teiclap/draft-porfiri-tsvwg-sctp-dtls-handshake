@@ -503,6 +503,13 @@ Initiator                                            Responder
 ~~~~~~~~~~~
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
 
+The diagram {{initial-establishment-diagram}} shows the case
+where SCTP Initiator is also resulting as Key Manager Client.
+The opposite case is identical but with inverted roles among
+Key Managers. In the following procedure we use Initiator
+and Responder referring to SCTP, Client and Server referring
+to TLS.
+
 The procedure is as follows:
 
 1. The Initiator sends INIT containing the DTLS Key Management
@@ -515,47 +522,47 @@ The procedure is as follows:
    using the "Get Agreed DTLS Key Management Method and Role" API
    defined in Section 7.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
    and verifies that the selected method matches the one defined in
-   this document (see {{sec-iana-psi}}) and that the assigned role
-   is server (Responder).
+   this document (see {{sec-iana-psi}}) and gets the assigned role
+   is as TLS client or server (in the example depicted in
+   {{initial-establishment-diagram}} it is server).
 
 3. The Initiator enters ESTABLISHED state.  It performs the same
-   retrieval and verification as the Responder, confirming that the
-   assigned role is client (Initiator).  Note: if the role assignment
-   differs from the SCTP-level Initiator/Responder (e.g., due to
-   tie-breaking), the endpoint assigned the client role is the one
-   that performs
-   step 4.
+   retrieval and verification as the Responder, confirming the
+   assigned role is TLS client or server (in the example depicted in
+   {{initial-establishment-diagram}} it is client).
 
-4. The Initiator's key manager starts a TLS 1.3 handshake, limiting
+4. The client key manager starts a TLS 1.3 handshake, limiting
    offered cipher suites to those supported by the DTLS Chunk
    Protection Operator.  TLS messages are sent per
    {{tls-user-message}}.
 
-5. The Responder receives TLS ClientHello and generates its response.
+5. The server key manager receives TLS ClientHello and generates
+   its serverHello response.
    If a HelloRetryRequest is needed, an additional round-trip occurs
    before proceeding.
 
-6. The Responder uses the TLS Exporter to derive the client
-   (Initiator) key material for both the Primary and Restart DKCs
+6. The server key manager uses the TLS Exporter to derive the client
+   key material for both the Primary and Restart DKCs
    and installs it as its read (receive) key material, per
-   {{dtls-key-derivation}}.  It then sends its TLS response messages.
+   {{dtls-key-derivation}}.  It then sends its TLS
+   serverHello response messages.
 
-7. The Initiator receives the TLS server messages, exports and
+7. The client key manager receives the TLS serverHello message, exports and
    installs all Primary and Restart DKC keys: the client key material
    as its write (send) key and the server key material as its read
    (receive) key.  It then sends its TLS
    Certificate/CertificateVerify/Finished, protected by the DTLS
    Chunk using the new Primary DKC.
 
-8. The Responder decrypts the DTLS-chunk-protected TLS messages,
+8. The server key manager decrypts the DTLS-chunk-protected TLS messages,
    completes the handshake, exports and installs the server key
    material for both the Primary and Restart DKCs as its write
-   (send) key.  It enforces DTLS chunk protection for all future
+   (send) key. It enforces DTLS chunk protection for all future
    packets, informs the ULP that the association is protected, and
    sends a Protection Established control message
-   ({{protection-established}}) to the Initiator.
+   ({{protection-established}}) to the client key manager.
 
-9. The Initiator receives the Protection Established control message,
+9. The client key manager receives the Protection Established control message,
    enforces DTLS chunk protection for all future packets, and
    informs the ULP that the association is protected.
 
@@ -597,28 +604,40 @@ Initiator                                            Responder
 
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
+The diagram {{rekey-diagram}} shows the case
+where SCTP Initiator is also resulting as Key Manager Client.
+The opposite case is identical but with inverted roles among
+Key Managers. In the following procedure we use Initiator
+and Responder referring to SCTP, Client and Server referring
+to TLS.
+
 
 Either endpoint may initiate rekeying.  The procedure is as follows:
 
-1. The Initiator sends a TLS ClientHello.  TLS messages are carried
+1. The peer willing to rekey sends a TLS ClientHello, from now on
+   on the current rekey procedure it will be TLS client. TLS messages are carried
    inside DTLS chunks (the association is already protected).
 
-2. The Responder receives and processes the ClientHello.  It exports
-   the client key material for both the Primary and Restart DKCs and
+2. The other peer receives and processes the ClientHello, from now
+   on on the current rekey procedure it will be TLS server.
+   It exports the client key material
+   for both the Primary and Restart DKCs and
    installs it as its read (receive) key.  It then sends its TLS
-   ServerHello through Finished messages to the Initiator.
+   ServerHello through Finished messages to the client.
 
-3. The Initiator receives the TLS server messages and installs both
+3. The client receives the TLS ServerHello message and installs both
    sets of keys: the client key material as its write (send) key and
    the server key material as its read (receive) key, for both the
    Primary and Restart DKCs.  It then sends its TLS
-   Certificate/CertificateVerify/Finished.  The Initiator starts the
-   drain timer to remove the old (epoch N) DKC.
+   Certificate/CertificateVerify/Finished encrypted with the new keys.
+   The client starts the drain timer to remove the old (epoch N) DKC.
+   From now on the client uses new keys.
 
-4. The Responder receives and verifies the Finished message.  It
+4. The server receives and verifies the Finished message.  It
    exports and installs the server key material for both the Primary
-   and Restart DKCs as its write (send) key.  The Responder starts
+   and Restart DKCs as its write (send) key.  The server starts
    the drain timer to remove the old (epoch N) DKC.
+   From now on the server uses new keys
 
 The new DKCs use epoch N+1 (where N is the current epoch).  Both old
 (epoch N) and new (epoch N+1) DKCs coexist temporarily.  After no
