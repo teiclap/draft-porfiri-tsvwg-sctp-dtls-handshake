@@ -707,7 +707,8 @@ YOUNG:
   AGED.
 
 LOCAL AGED:
-: A supervision timer runs.  Event 5 (timeout) causes ABORT.  Event
+: A supervision timer runs.  Event 5 (timeout) causes the key manager to check
+  for local aging expire, in that case ABORT otherwise return to YOUNG.  Event
   4 (peer ClientHello with tie-break yielding server role) transitions
   to REMOTE OLD.  Event 6 (ServerHello received) transitions to LOCAL
   OLD.
