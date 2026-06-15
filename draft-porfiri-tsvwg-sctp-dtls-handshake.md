@@ -613,12 +613,14 @@ Initiator                                            Responder
 
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
-The diagram {{rekey-diagram}} shows the case
-where SCTP Initiator is also resulting as Key Manager Client.
-The opposite case is identical but with inverted roles among
-Key Managers. In the following procedure we use Initiator
-and Responder referring to SCTP, Client and Server referring
-TLS roles.
+
+The diagram {{rekey-diagram}} shows the case where SCTP Initiator is
+also resulting as Key Manager Client.  The opposite case is identical
+but with inverted roles among Key Managers. In the following procedure
+we use Initiator and Responder referring to SCTP, Client and Server
+referring TLS roles. The Key manager roles are only used to handle in
+the case both sides initiate a rekey simultanously, see
+{{sim-rekeying}}.
 
 
 Either endpoint may initiate rekeying.  The procedure is as follows:
@@ -659,7 +661,7 @@ MUST be removed.
 All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
 NOT be used.
 
-### Simultaneous Rekey Resolution
+### Simultaneous Rekey Resolution {#sim-rekeying}
 
 As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already sent
