@@ -693,7 +693,7 @@ Association.Max.Retrans = 10), T_fail is approximately 303 seconds.
 Implementations SHOULD set the drain timer to at least T_fail when
 delivery of the final rekeying message has not been confirmed.
 
-### Simultaneous Rekey Resolution
+### Simultaneous Rekey Resolution {#sim-rekeying}
 
 As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already sent
