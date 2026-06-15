@@ -654,14 +654,46 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
    new keys.
 
 The new DKCs use epoch N+1 (where N is the current epoch).  Both old
-(epoch N) and new (epoch N+1) DKCs coexist temporarily.  After no
-longer than 120 seconds (one Maximum Segment Lifetime), the old DKCs
-MUST be removed.
+(epoch N) and new (epoch N+1) DKCs coexist temporarily until the
+drain timer expires (see {{drain-timer}}).
 
 All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
 NOT be used.
 
-### Simultaneous Rekey Resolution {#sim-rekeying}
+### Drain Timer Considerations {#drain-timer}
+
+The drain timer determines how long old (epoch N) DKCs are retained
+after new (epoch N+1) DKCs have been activated.  Its purpose is to
+allow in-flight packets protected with the old keys to be received
+and processed before those keys are removed.
+
+The drain timer value depends on whether the delivery of the final
+rekeying message has been confirmed:
+
+* If delivery of the last rekeying message has been confirmed (e.g.,
+  through SCTP acknowledgment of the DATA chunk carrying the TLS
+  Finished), the old DKC MAY be removed after a short drain timer.
+  A value of 120 seconds (one Maximum Segment Lifetime) is
+  RECOMMENDED in this case.
+
+* If delivery has not been confirmed, the drain timer MUST be set to
+  at least the SCTP association failure time (T_fail).  This ensures
+  that if the final rekeying message is lost and requires
+  retransmission, the old DKC remains available for as long as SCTP
+  continues retransmission attempts.  If the association fails
+  (i.e., SCTP declares the peer unreachable), the DKCs are removed
+  as part of association teardown.
+
+The SCTP association failure time depends on the Retransmission
+Timeout (RTO) and the maximum number of retransmissions
+(Association.Max.Retrans, as defined in {{RFC9260}}).  With the
+default values from {{RFC9260}} (RTO.Initial = 1s, RTO.Max = 60s,
+Association.Max.Retrans = 10), T_fail is approximately 303 seconds.
+
+Implementations SHOULD set the drain timer to at least T_fail when
+delivery of the final rekeying message has not been confirmed.
+
+### Simultaneous Rekey Resolution
 
 As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already sent
