@@ -714,7 +714,10 @@ same time.  The following state machine governs the transition:
                 |
                 | 1. TLS initial H/S
                 |    completed
-                V
+                |
+                |  +----------------------- Association Restart
+                |  |
+                V  V
            +---------+
 +--------->|  YOUNG  |
 + +------->|         +--------------------+
