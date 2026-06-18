@@ -69,26 +69,7 @@ normative:
   RFC9147:
   RFC9260:
   RFC9325:
-
-  I-D.draft-ietf-tsvwg-sctp-dtls-chunk:
-    target: "https://datatracker.ietf.org/doc/draft-ietf-tsvwg-sctp-dtls-chunk/"
-    title: "Stream Control Transmission Protocol (SCTP) DTLS chunk"
-    author:
-      -
-       ins:  M. Westerlund
-       name: Magnus Westerlund
-       org: Ericsson
-       email: magnus.westerlund@ericsson.com
-      -
-       ins: J. Preuß Mattsson
-       name: John Preuß Mattsson
-       org: Ericsson
-       email: john.mattsson@ericsson.com
-      -
-       ins: C. Porfiri
-       name: Claudio Porfiri
-       org: Ericsson
-       email: claudio.porfiri@ericsson.com
+  I-D.ietf-tsvwg-sctp-dtls-chunk:
 
 
 --- abstract
@@ -113,7 +94,7 @@ deployments, particularly telecommunication networks and WebRTC data
 channels, it is essential to provide confidentiality, integrity, and
 peer authentication for SCTP traffic.
 
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} defines a mechanism for
+{{I-D.ietf-tsvwg-sctp-dtls-chunk}} defines a mechanism for
 securing SCTP by encapsulating SCTP chunks within DTLS 1.3 records at
 the chunk level.  That specification defines the DTLS chunk format,
 negotiation procedures, and an abstract API for key management, but
@@ -160,7 +141,7 @@ Initiator:
 : The endpoint assigned the client role during SCTP association
   establishment.  This corresponds to the "client" role (C bit) in
   the DTLS Key Management Parameter of
-  {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
+  {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 Primary DKC:
 : A DTLS Key Context used to protect regular SCTP association traffic.
@@ -169,7 +150,7 @@ Responder:
 : The endpoint assigned the server role during SCTP association
   establishment.  This corresponds to the "server" role (S bit) in
   the DTLS Key Management Parameter of
-  {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
+  {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 Restart DKC:
 : A DTLS Key Context reserved exclusively for the SCTP association
@@ -280,7 +261,7 @@ key-exchange MUST NOT be supported.
 The cipher suites negotiated in the key-management TLS connection
 MUST only include those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
-suites (see Section 7.3 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}).
+suites (see Section 7.3 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 
 ## Authentication and Identity {#tls-auth}
 
@@ -329,7 +310,7 @@ to one.
 TLS records and control messages for key-management are sent as SCTP
 user messages using reliable in-order delivery on stream 0 with the
 DTLS Key Management Messages PPID (4242)
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.
+{{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 Each SCTP user message uses the format defined in
 {{sctp-dtls-user-message}}.
@@ -407,7 +388,7 @@ protection and informs the ULP that the association is protected.
 ## Role Determination {#role-determination}
 
 Role determination and method selection follow the procedure defined
-in Section 5.1 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}.  After
+in Section 5.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.  After
 the SCTP association is established, the key-management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
 (Initiator/client or Responder/server), the selected DTLS Key
@@ -429,7 +410,7 @@ the concatenation of the following fields:
 | Responder KM Param | variable | DTLS Key Management Parameter sent by the Responder |
 
 Each DTLS Key Management Parameter (Section 4.1 of
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) is included as the
+{{I-D.ietf-tsvwg-sctp-dtls-chunk}}) is included as the
 sequence of bytes sent on the wire, including the parameter header
 and excluding padding.
 
@@ -515,14 +496,14 @@ to Keymanager role, and implicitly TLS roles.
 The procedure is as follows:
 
 1. The Initiator sends INIT containing the DTLS Key Management
-   Parameter (Section 4.1 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   Parameter (Section 4.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}})
    with this method's identifier (see {{sec-iana-psi}}) in its
    preference-ordered list.
 
 2. The Responder enters ESTABLISHED state.  It retrieves the agreed
    DTLS Key Management Method and role from the SCTP stack (e.g.,
    using the "Get Agreed DTLS Key Management Method and Role" API
-   defined in Section 7.2 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}})
+   defined in Section 7.2 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}})
    and verifies that the selected method matches the one defined in
    this document (see {{sec-iana-psi}}) and gets the assigned role
    as key manager client or server (in the example depicted in
@@ -715,7 +696,7 @@ same time.  The following state machine governs the transition:
                 | 1. TLS initial H/S
                 |    completed
                 |
-                |  +----------------------- Association Restart
+                |  +------------------ Association Restart
                 |  |
                 V  V
            +---------+
@@ -746,6 +727,7 @@ same time.  The following state machine governs the transition:
 ~~~~~~~~~~~
 {: #dtls-rekeying-state-diagram title="State Diagram for Rekeying" artwork-align="center"}
 
+
 INIT:
 : Initial state.  Only event 1 (TLS handshake completed) transitions
   to YOUNG.
@@ -774,7 +756,6 @@ LOCAL OLD:
 In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
 arrives, the flushing timer is cleared and behavior is as in YOUNG.
 
-
 ## SCTP Association Restart {#sctp-restart}
 
 ### Prerequisites
@@ -784,7 +765,7 @@ For protected SCTP restart to succeed:
 * Both endpoints MUST have a valid Restart DKC.
 * The Restart DKC MUST be stored securely and persistently to
   survive crash events (see
-  Section 10.4 of {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}).
+  Section 10.4 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 * Both endpoints MUST have indicated restart support (R bit) in the
   DTLS Key Management Parameter.
 
@@ -837,7 +818,7 @@ Initiator                                            Responder
    agreed DTLS Key Management Method and role from the SCTP stack
    (e.g., using the "Get Agreed DTLS Key Management Method and Role"
    API defined in Section 7.2 of
-   {{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}}) and verifies that the
+   {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) and verifies that the
    selected method matches the one defined in this document (see
    {{sec-iana-psi}}) and that the assigned role is as expected.
 
@@ -957,7 +938,7 @@ of compromised data due to key compromise.
 
 IANA is requested to assign one DTLS Key Management Method Identifier
 in the "DTLS Key Management Method" registry defined by
-{{I-D.draft-ietf-tsvwg-sctp-dtls-chunk}} to identify the
+{{I-D.ietf-tsvwg-sctp-dtls-chunk}} to identify the
 key-management method defined in this document.
 
 | Identifier | Key Management Method Name     | Reference | Contact       |
