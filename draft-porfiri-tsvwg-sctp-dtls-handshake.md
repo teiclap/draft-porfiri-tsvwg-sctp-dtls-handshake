@@ -701,7 +701,7 @@ same time.  The following state machine governs the transition:
                 V  V
            +---------+
 +--------->|  YOUNG  |
-+ +------->|         +--------------------+
+| +------->|         +--------------------+
 | |        +----+----+                    |
 | |             |                         |
 | |             | 2. Client Hello         | 3. Aging event
