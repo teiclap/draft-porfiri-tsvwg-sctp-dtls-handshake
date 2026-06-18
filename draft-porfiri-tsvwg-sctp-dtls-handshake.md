@@ -32,15 +32,8 @@ author:
    email: claudio.porfiri@ericsson.com
 
 informative:
-  RFC3758:
-  RFC4895:
-  RFC5061:
   RFC5705:
-  RFC6083:
-  RFC6347:
   RFC9525:
-  I-D.ietf-tls-rfc8446bis:
-  I-D.ietf-uta-rfc6125bis:
 
   ANSSI-DAT-NT-003:
     target: <https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf>
