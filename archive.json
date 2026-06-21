@@ -1,0 +1,395 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2026-06-21T03:34:58.971055+00:00",
+  "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 5,
+      "id": "I_kwDORGnINM8AAAABE4tsYQ",
+      "title": "Need to clarify TLS errors like authentication error",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/5",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In some cases errors should likely result in SCTP assocation abort. But should it always? Are there cases where a new TLS connection requrest can succeed?",
+      "createdAt": "2026-06-09T14:28:46Z",
+      "updatedAt": "2026-06-09T14:28:46Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "I_kwDORGnINM8AAAABFg96ZQ",
+      "title": "Write section on timer algnment",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/6",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Timer to remove old epoch needs to be longer than transmission timeout to ensure that all alloted time to deliver the TLS finished messages during rekying has been given. Otherwise the timer for removing the old keys will trigger prior to transmission failure timers. Which would deadlock the assocation anyway resulting association no-responsive timer triggering later. \n",
+      "createdAt": "2026-06-15T12:31:16Z",
+      "updatedAt": "2026-06-15T16:01:22Z",
+      "closedAt": "2026-06-15T16:01:22Z",
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDORGnINM8AAAABFg-njg",
+      "title": "Fix initial and restart sequence",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/7",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The initial and restart sequence can be aligned to install restart keys at the same time as protection required is set. \nRestart should clarify that protection required is set immendiatly (DTLS chunk?)\nSplit API calls into own sequence bullets compared to messages. ",
+      "createdAt": "2026-06-15T12:33:00Z",
+      "updatedAt": "2026-06-15T15:57:15Z",
+      "closedAt": "2026-06-15T15:57:15Z",
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDORGnINM7UVUhQ",
+      "title": "Edits of chapter 1-3",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/1",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-04-21T14:30:23Z",
+      "updatedAt": "2026-04-21T14:34:49Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "972c5bb9feeaab0de3c205847c9a8679d3512299",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "mw-edits",
+      "headRefOid": "f7b4b21485d5deb4084a482362c5f8d61761d3b0",
+      "closedAt": "2026-04-21T14:34:49Z",
+      "mergedAt": "2026-04-21T14:34:49Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "41a13a65f9153bdcf07ab85951e3ae67fb96731e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM73RUdv",
+          "commit": {
+            "abbreviatedOid": "9146d10"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-21T14:34:34Z",
+          "updatedAt": "2026-04-21T14:34:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDORGnINM7UV6v7",
+      "title": "Tuned the key setting schedule in relation to TLS messages.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/2",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Optimized when Keys can be set in relation to TLS message exchange. Consider so this will not deadlock for the Initial one. I think it is impossible to really do that for the rekeying one as long as one don't set the send key before the peer have received the handshake. ",
+      "createdAt": "2026-04-21T14:59:34Z",
+      "updatedAt": "2026-04-21T16:07:20Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "e9a7161555bbc08b95665c73c19e7413744684af",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "mw-edits",
+      "headRefOid": "e72e6c5a07040161c9286a515f29874ecf433023",
+      "closedAt": "2026-04-21T16:07:20Z",
+      "mergedAt": "2026-04-21T16:07:20Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "5192746e6340acfa047263d65e5290197aadae76"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDORGnINM7Uit0a",
+      "title": "Updated chapter 4 on TLS message in SCTP user messages.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/3",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-04-22T07:41:22Z",
+      "updatedAt": "2026-04-22T07:44:06Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "5192746e6340acfa047263d65e5290197aadae76",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "chapter4",
+      "headRefOid": "29bee6f5c2d0d73bce73567fe7821183e1fb0380",
+      "closedAt": "2026-04-22T07:44:06Z",
+      "mergedAt": "2026-04-22T07:44:06Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "fbc5775b182239ded94f456e94a9a7691c05079c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM73h9VP",
+          "commit": {
+            "abbreviatedOid": "29bee6f"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-22T07:43:56Z",
+          "updatedAt": "2026-04-22T07:43:56Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDORGnINM7kY7CI",
+      "title": "Restructure",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/4",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "teiclap"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-09T13:13:42Z",
+      "updatedAt": "2026-06-10T07:37:05Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "70dab6f8c62234e145e7fc382fa45171ddce4093",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "restructure",
+      "headRefOid": "29a6ac0e32eff7cb0235fc6fcad1f40d6b0d3abb",
+      "closedAt": "2026-06-10T07:37:05Z",
+      "mergedAt": "2026-06-10T07:37:05Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "97d52cf42b5d55babe608eed9c66dc3e0e3cee52"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDORGnINM7mlt7X",
+      "title": "Improved sequence numbering",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/8",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-15T14:44:13Z",
+      "updatedAt": "2026-06-15T15:57:14Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "b49d90303067db46479bb9f88bffef7773c554c7",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "imp_seq",
+      "headRefOid": "8135618acd96ff104310fa861da162920fe4b74f",
+      "closedAt": "2026-06-15T15:57:14Z",
+      "mergedAt": "2026-06-15T15:57:14Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "107b94d700b5a62a077d8c1ca7f4d9efed510755"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCjAaQ",
+          "commit": {
+            "abbreviatedOid": "8135618"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:50:50Z",
+          "updatedAt": "2026-06-15T15:50:50Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCjS0g",
+          "commit": {
+            "abbreviatedOid": "8135618"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:51:30Z",
+          "updatedAt": "2026-06-15T15:51:30Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCjgGA",
+          "commit": {
+            "abbreviatedOid": "8135618"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:52:00Z",
+          "updatedAt": "2026-06-15T15:52:00Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCkC0g",
+          "commit": {
+            "abbreviatedOid": "8135618"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:53:05Z",
+          "updatedAt": "2026-06-15T15:53:05Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCkq8A",
+          "commit": {
+            "abbreviatedOid": "8135618"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:54:18Z",
+          "updatedAt": "2026-06-15T15:54:18Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCk7ww",
+          "commit": {
+            "abbreviatedOid": "8135618"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:54:50Z",
+          "updatedAt": "2026-06-15T15:54:50Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "PR_kwDORGnINM7mmL86",
+      "title": "Initial take on drain timer considerations.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/9",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-15T15:01:55Z",
+      "updatedAt": "2026-06-15T16:01:21Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "107b94d700b5a62a077d8c1ca7f4d9efed510755",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "timers",
+      "headRefOid": "489a0968fb9f25e2014288b5860eccccadaf06b6",
+      "closedAt": "2026-06-15T16:01:20Z",
+      "mergedAt": "2026-06-15T16:01:20Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "6bafeae6239f5e73b45d2ad2c5fabd81d0d73f97"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABDCnPjQ",
+          "commit": {
+            "abbreviatedOid": "589c118"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-15T15:59:17Z",
+          "updatedAt": "2026-06-15T15:59:17Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
