@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 20 December 2026                                       Ericsson
-                                                            18 June 2026
+Expires: 26 December 2026                                       Ericsson
+                                                            24 June 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 December 2026.
+   This Internet-Draft will expire on 26 December 2026.
 
 Copyright Notice
 
@@ -490,19 +490,19 @@ Initiator                                             Responder
     +--------------------[COOKIE ECHO]------------------->| 2.
  3. |<--------------------[COOKIE ACK]--------------------+
     |                                                     |
-    |  Key Manager                            Key Manager  |
+    |  Key Manager                           Key Manager  |
     |    |                                          |     |
  4. +--->| TLS START                      TLS START |<----+
     |    |                                          |     |
     |    +---------[DATA(TLS Client Hello)]-------->|  5. |
-    |    |                                          |  6. |
-    | 8. |<-[DATA(TLS Server Hello ... Finished)]---+  7. |
-    | 9. +--[DATA(TLS Certificate ... Finished)]--->| 10. |
-    |    |                                          | 11. |
-    |13. |<--[DATA(Protection Established)]---------+ 12. |
+    |    |                                          |     |
+    | 7. |<-[DATA(TLS Server Hello ... Finished)]---+  6. |
+    | 8. +--[DATA(TLS Certificate ... Finished)]--->|  9. |
+    |    |                                          | 10. |
+    |12. |<--[DATA(Protection Established)]---------+ 11. |
     |    |                                          |     |
     |                                                     | -.
-14. +------------[DTLS CHUNK(DATA(APP DATA))]------------>|   | APP DATA
+13. +------------[DTLS CHUNK(DATA(APP DATA))]------------>|   | APP DATA
     +<-----------[DTLS CHUNK(DATA(APP DATA))]-------------+   +---------
     |                         ...                         |   |
 
@@ -543,40 +543,35 @@ Initiator                                             Responder
         HelloRetryRequest is needed, an additional round-trip occurs
         before proceeding.
 
-   6.   The server key manager uses the TLS Exporter to derive the
-        client key material for both the Primary and Restart DKCs and
-        installs it as the read (receive) key material, per Section 5.
-
-   7.   The server key manager sends its TLS ServerHello through
+   6.   The server key manager sends its TLS ServerHello through
         Finished messages.
 
-   8.   The client key manager receives the TLS ServerHello message,
+   7.   The client key manager receives the TLS ServerHello message,
         exports all Primary and Restart DKC keys, and installs the
-        client key material as its write (send) key and the server key
-        material as its read (receive) key.
+        client key material as its read (receive) key.
 
-   9.   The client key manager sends its TLS
-        Certificate/CertificateVerify/Finished, protected by the DTLS
-        Chunk using the new Primary DKC.
+   8.   The client key manager sends its TLS
+        Certificate/CertificateVerify/Finished.
 
-   10.  The server key manager decrypts the DTLS-chunk-protected TLS
-        messages, completes the handshake, exports the server key
-        material for both the Primary and Restart DKCs, and installs it
-        as its write (send) key.
+   9.   The server key manager exports the server key material for both
+        the Primary and Restart DKCs, and installs it as its read
+        (receive) key and as its write (send) key.
 
-   11.  The server key manager calls Require Protected SCTP Packets to
+   10.  The server key manager calls Require Protected SCTP Packets to
         enforce DTLS chunk protection for all future packets and informs
         the ULP that the association is protected.
 
-   12.  The server key manager sends a Protection Established control
+   11.  The server key manager sends a Protection Established control
         message (Section 4.1.1) to the client key manager.
 
-   13.  The client key manager receives the Protection Established
-        control message, calls Require Protected SCTP Packets to enforce
-        DTLS chunk protection for all future packets, and informs the
-        ULP that the association is protected.
+   12.  The client key manager receives the Protection Established
+        control message, exports all Primary and Restart DKC keys, and
+        installs the server key material as its write (send) key, calls
+        Require Protected SCTP Packets to enforce DTLS chunk protection
+        for all future packets, and informs the ULP that the association
+        is protected.
 
-   14.  Application traffic can begin.
+   13.  Application traffic can begin.
 
    If the TLS handshake fails, the SCTP association MUST be aborted.
 
@@ -630,27 +625,25 @@ Initiator                                             Responder
        association is already protected).
 
    2.  The other peer becomes the TLS server for this rekey procedure.
-       It receives and processes the ClientHello, exports the client key
-       material for both the Primary and Restart DKCs, and installs it
-       as its read (receive) key.
+       It receives and processes the ClientHello.
 
    3.  The server sends its TLS ServerHello through Finished messages to
        the client.
 
    4.  The client receives the TLS ServerHello message, exports all
-       Primary and Restart DKC keys, and installs the client key
-       material as its write (send) key and the server key material as
+       Primary and Restart DKC keys, and installs server key material as
        its read (receive) key.
 
    5.  The client sends its TLS Certificate/CertificateVerify/Finished
-       encrypted with the new keys and starts the drain timer to remove
-       the old (epoch N) DKC.  From now on the client uses new keys.
+       encrypted with the old keys, installs the client key material as
+       its write (send) key and starts the drain timer to remove the old
+       (epoch N) DKC.  From now on the client uses new keys.
 
    6.  The server receives and verifies the Finished message, exports
        and installs the server key material for both the Primary and
-       Restart DKCs as its write (send) key, and starts the drain timer
-       to remove the old (epoch N) DKC.  From now on the server uses new
-       keys.
+       Restart DKCs as its read (receive) key and write (send) key, and
+       starts the drain timer to remove the old (epoch N) DKC.  From now
+       on the server uses new keys.
 
    The new DKCs use epoch N+1 (where N is the current epoch).  Both old
    (epoch N) and new (epoch N+1) DKCs coexist temporarily until the
