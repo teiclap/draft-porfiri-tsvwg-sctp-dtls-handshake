@@ -552,8 +552,7 @@ The procedure is as follows:
 8. The client key manager sends its TLS
    Certificate/CertificateVerify/Finished.
 
-9. The server key manager decrypts the DTLS-chunk-protected TLS
-   messages, completes the handshake, exports the server key
+9. The server key manager completes the handshake, exports the server key
    material for both the Primary and Restart DKCs, and installs it
    as its read (receive) key and as its write (send) key.
 
