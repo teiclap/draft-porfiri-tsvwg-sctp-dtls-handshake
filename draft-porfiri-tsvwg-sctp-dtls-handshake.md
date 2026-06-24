@@ -552,7 +552,7 @@ The procedure is as follows:
 8. The client key manager sends its TLS
    Certificate/CertificateVerify/Finished.
 
-9. The server key manager completes the handshake, exports the server key
+9. The server key manager exports the server key
    material for both the Primary and Restart DKCs, and installs it
    as its read (receive) key and as its write (send) key.
 
@@ -632,12 +632,12 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
    the client.
 
 4. The client receives the TLS ServerHello message, exports all
-   Primary and Restart DKC keys, and installs the client key
-   material as its write (send) key and the server key material as
+   Primary and Restart DKC keys, and installs server key material as
    its read (receive) key.
 
 5. The client sends its TLS Certificate/CertificateVerify/Finished
-   encrypted with the old keys and starts the drain timer to remove
+   encrypted with the old keys, installs the client key
+   material as its write (send) key  and starts the drain timer to remove
    the old (epoch N) DKC.  From now on the client uses new keys.
 
 6. The server receives and verifies the Finished message, exports
