@@ -704,20 +704,22 @@ same time.  The following state machine governs the transition:
 | |             V                         V
 | |        +---------+  4. Client H +---------+  5. TLS H/S
 | |        | REMOTE  |    tie-break |  LOCAL  |    Timeout
-| |        |  OLD    |<-------------+  AGED   +-----+
+| |        |  AGED   |<-------------+  AGED   +-----+
 | |        +----+----+              +----+----+     |
-| | 7. Flush    |                        |          |
-| +-------------+                        |          |
-|                     6. Server Hello    |          |
-|               +------------------------+          |
-|               |                                   |
-|               V                                   V
-|          +---------+                         +---------+
-|          |  LOCAL  |                         |  ABORT  |
-|          |   OLD   |                         |         |
-|          +-----+---+                         +---------+
-|   8. Flush     |
-+----------------+
+| |             |                        |          |
+| |             |                        |          |
+| | 7. Finished |        6. Server Hello |          |
+| |             |                  +-----+          |
+| |             |                  |                |
+| |             V                  V                V
+| |        +---------+       +---------+       +---------+
+| |        | REMOTE  |       |  LOCAL  |       |  ABORT  |
+| |        |  OLD    |       |   OLD   |       |         |
+| |        +-----+---+       +-----+---+       +---------+
+| | 8. Flush     |                 |
+| +--------------+                 |
+|   9. Flush                       |
++----------------------------------+
 
 ~~~~~~~~~~~
 {: #dtls-rekeying-state-diagram title="State Diagram for Rekeying" artwork-align="center"}
@@ -739,15 +741,20 @@ LOCAL AGED:
   to REMOTE OLD.  Event 6 (ServerHello received) transitions to LOCAL
   OLD.
 
+LOCAL AGED:
+: TLS handshake happens in this state. Local keys are installed.
+Event 7 (peer sends Certificate..Finished enable transition to REMOTE_OLD)
+
+
 REMOTE OLD:
 : Both Old and Current DKCs exist.  Old DKC is used for sending until
   Protection Established control message is sent.
-  Event 7 (flush timer expires) transitions to YOUNG.
+  Event 8 (flush timer expires) transitions to YOUNG.
 
 LOCAL OLD:
 : Both Old and Current DKCs exist.  Old DKC is used for sending,
   until Protection Established control message is received.
-  Event 8 (flush timer expires) transitions to YOUNG.
+  Event 9 (flush timer expires) transitions to YOUNG.
 
 In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
 arrives, the flushing timer is cleared and behavior is as in YOUNG.
