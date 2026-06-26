@@ -740,7 +740,7 @@ LOCAL AGED:
 
 REMOTE OLD:
 : Both Old and Current DKCs exist.  Old DKC is used for sending until
-  Protection Established control message is sent. 
+  Protection Established control message is sent.
   Event 7 (flush timer expires) transitions to YOUNG.
 
 LOCAL OLD:
