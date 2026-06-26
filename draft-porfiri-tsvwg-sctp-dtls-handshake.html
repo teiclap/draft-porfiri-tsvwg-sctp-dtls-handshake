@@ -1056,7 +1056,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 26 December 2026</td>
+<td class="center">Expires 28 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1069,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-24" class="published">24 June 2026</time>
+<time datetime="2026-06-26" class="published">26 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-26">26 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-28">28 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1138,7 +1138,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 26 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2244,18 +2244,21 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
 <figure id="figure-5">
             <div id="section-6.2.2-1.1">
               <div class="alignCenter art-svg artwork" id="section-6.2.2-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="272" width="504" viewBox="0 0 504 272" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 40,48 L 40,240" fill="none" stroke="black"></path>
-                  <path d="M 80,112 L 80,160" fill="none" stroke="black"></path>
-                  <path d="M 416,112 L 416,160" fill="none" stroke="black"></path>
-                  <path d="M 464,48 L 464,240" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="288" width="504" viewBox="0 0 504 288" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 40,48 L 40,256" fill="none" stroke="black"></path>
+                  <path d="M 80,112 L 80,176" fill="none" stroke="black"></path>
+                  <path d="M 416,112 L 416,176" fill="none" stroke="black"></path>
+                  <path d="M 464,48 L 464,256" fill="none" stroke="black"></path>
                   <path d="M 80,128 L 152,128" fill="none" stroke="black"></path>
                   <path d="M 352,128 L 408,128" fill="none" stroke="black"></path>
                   <path d="M 400,144 L 416,144" fill="none" stroke="black"></path>
                   <path d="M 80,160 L 96,160" fill="none" stroke="black"></path>
                   <path d="M 392,160 L 408,160" fill="none" stroke="black"></path>
+                  <path d="M 88,176 L 104,176" fill="none" stroke="black"></path>
+                  <path d="M 352,176 L 416,176" fill="none" stroke="black"></path>
                   <polygon class="arrowhead" points="416,160 404,154.4 404,165.6" fill="black" transform="rotate(0,408,160)"></polygon>
                   <polygon class="arrowhead" points="416,128 404,122.4 404,133.6" fill="black" transform="rotate(0,408,128)"></polygon>
+                  <polygon class="arrowhead" points="96,176 84,170.4 84,181.6" fill="black" transform="rotate(180,88,176)"></polygon>
                   <g class="text">
                     <text x="40" y="36">Initiator</text>
                     <text x="464" y="36">Responder</text>
@@ -2287,18 +2290,22 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
                     <text x="288" y="164">...</text>
                     <text x="348" y="164">Finished)]</text>
                     <text x="436" y="164">6.</text>
-                    <text x="92" y="196">(traffic</text>
-                    <text x="176" y="196">transitions</text>
-                    <text x="236" y="196">to</text>
-                    <text x="272" y="196">epoch</text>
-                    <text x="312" y="196">N+1</text>
-                    <text x="348" y="196">DKC)</text>
-                    <text x="84" y="228">(after</text>
-                    <text x="152" y="228">draining,</text>
-                    <text x="220" y="228">remove</text>
-                    <text x="272" y="228">epoch</text>
-                    <text x="304" y="228">N</text>
-                    <text x="332" y="228">DKC)</text>
+                    <text x="60" y="180">8.</text>
+                    <text x="172" y="180">[DATA(Protection</text>
+                    <text x="296" y="180">Established)]</text>
+                    <text x="436" y="180">7.</text>
+                    <text x="92" y="212">(traffic</text>
+                    <text x="176" y="212">transitions</text>
+                    <text x="236" y="212">to</text>
+                    <text x="272" y="212">epoch</text>
+                    <text x="312" y="212">N+1</text>
+                    <text x="348" y="212">DKC)</text>
+                    <text x="84" y="244">(after</text>
+                    <text x="152" y="244">draining,</text>
+                    <text x="220" y="244">remove</text>
+                    <text x="272" y="244">epoch</text>
+                    <text x="304" y="244">N</text>
+                    <text x="332" y="244">DKC)</text>
                   </g>
                 </svg><a href="#section-6.2.2-1.1.1" class="pilcrow">¶</a>
 </div>
@@ -2337,9 +2344,7 @@ its read (receive) key.<a href="#section-6.2.2-4.4.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.5">
               <p id="section-6.2.2-4.5.1">The client sends its TLS Certificate/CertificateVerify/Finished
-encrypted with the old keys, installs the client key
-material as its write (send) key  and starts the drain timer to remove
-the old (epoch N) DKC.  From now on the client uses new keys.<a href="#section-6.2.2-4.5.1" class="pilcrow">¶</a></p>
+encrypted with the old keys.<a href="#section-6.2.2-4.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.6">
               <p id="section-6.2.2-4.6.1">The server receives and verifies the Finished message, exports
@@ -2347,6 +2352,17 @@ and installs the server key material for both the Primary and
 Restart DKCs as its  read (receive) key and write (send) key,
 and starts the drain timer to remove the old (epoch N) DKC.
 From now on the server uses new keys.<a href="#section-6.2.2-4.6.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.7">
+              <p id="section-6.2.2-4.7.1">The server key manager sends a Protection Established control
+message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.2.2-4.7.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.8">
+              <p id="section-6.2.2-4.8.1">The client key manager receives the Protection Established
+control message, exports all Primary and Restart DKC keys,
+and installs the server key material as its write (send) key,
+and starts the drain timer to remove the old (epoch N) DKC.
+From now on the client uses new keys.<a href="#section-6.2.2-4.8.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
 <p id="section-6.2.2-5">The new DKCs use epoch N+1 (where N is the current epoch).  Both old
@@ -2551,13 +2567,14 @@ OLD.<a href="#section-6.2.5-3.6.1" class="pilcrow">¶</a></p>
 <dt id="section-6.2.5-3.7">REMOTE OLD:</dt>
             <dd style="margin-left: 1.5em" id="section-6.2.5-3.8">
               <p id="section-6.2.5-3.8.1">Both Old and Current DKCs exist.  Old DKC is used for sending until
-the first packet encrypted with Current DKC is received from the
-peer.  Event 7 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.8.1" class="pilcrow">¶</a></p>
+Protection Established control message is sent.
+Event 7 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.8.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-6.2.5-3.9">LOCAL OLD:</dt>
             <dd style="margin-left: 1.5em" id="section-6.2.5-3.10">
-              <p id="section-6.2.5-3.10.1">Both Old and Current DKCs exist.  Current DKC is used for sending.
+              <p id="section-6.2.5-3.10.1">Both Old and Current DKCs exist.  Old DKC is used for sending,
+until Protection Established control message is received.
 Event 8 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.10.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>

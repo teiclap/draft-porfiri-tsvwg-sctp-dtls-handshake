@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 26 December 2026                                       Ericsson
-                                                            24 June 2026
+Expires: 28 December 2026                                       Ericsson
+                                                            26 June 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 December 2026.
+   This Internet-Draft will expire on 28 December 2026.
 
 Copyright Notice
 
@@ -601,6 +601,7 @@ Initiator                                             Responder
           | 1. +---------[DATA(TLS Client Hello)]------->| 2.  |
           | 4. |<-[DATA(TLS Server Hello ... Finished)]--+ 3.  |
           | 5. +--[DATA(TLS Certificate ... Finished)]-->| 6.  |
+          | 8. |<--[DATA(Protection Established)]--------+ 7.  |
           |                                                    |
           |  (traffic transitions to epoch N+1 DKC)            |
           |                                                    |
@@ -635,15 +636,22 @@ Initiator                                             Responder
        its read (receive) key.
 
    5.  The client sends its TLS Certificate/CertificateVerify/Finished
-       encrypted with the old keys, installs the client key material as
-       its write (send) key and starts the drain timer to remove the old
-       (epoch N) DKC.  From now on the client uses new keys.
+       encrypted with the old keys.
 
    6.  The server receives and verifies the Finished message, exports
        and installs the server key material for both the Primary and
        Restart DKCs as its read (receive) key and write (send) key, and
        starts the drain timer to remove the old (epoch N) DKC.  From now
        on the server uses new keys.
+
+   7.  The server key manager sends a Protection Established control
+       message (Section 4.1.1) to the client key manager.
+
+   8.  The client key manager receives the Protection Established
+       control message, exports all Primary and Restart DKC keys, and
+       installs the server key material as its write (send) key, and
+       starts the drain timer to remove the old (epoch N) DKC.  From now
+       on the client uses new keys.
 
    The new DKCs use epoch N+1 (where N is the current epoch).  Both old
    (epoch N) and new (epoch N+1) DKCs coexist temporarily until the
@@ -749,12 +757,12 @@ Initiator                                             Responder
       (ServerHello received) transitions to LOCAL OLD.
 
    REMOTE OLD:  Both Old and Current DKCs exist.  Old DKC is used for
-      sending until the first packet encrypted with Current DKC is
-      received from the peer.  Event 7 (flush timer expires) transitions
-      to YOUNG.
+      sending until Protection Established control message is sent.
+      Event 7 (flush timer expires) transitions to YOUNG.
 
-   LOCAL OLD:  Both Old and Current DKCs exist.  Current DKC is used for
-      sending.  Event 8 (flush timer expires) transitions to YOUNG.
+   LOCAL OLD:  Both Old and Current DKCs exist.  Old DKC is used for
+      sending, until Protection Established control message is received.
+      Event 8 (flush timer expires) transitions to YOUNG.
 
    In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
    arrives, the flushing timer is cleared and behavior is as in YOUNG.
