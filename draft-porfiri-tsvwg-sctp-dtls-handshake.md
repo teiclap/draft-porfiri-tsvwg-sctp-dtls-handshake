@@ -574,6 +574,7 @@ Initiator                                            Responder
     | 1. +---------[DATA(TLS Client Hello)]------->| 2.  |
     | 4. |<-[DATA(TLS Server Hello ... Finished)]--+ 3.  |
     | 5. +--[DATA(TLS Certificate ... Finished)]-->| 6.  |
+    | 8. |<--[DATA(Protection Established)]--------+ 7.  |
     |                                                    |
     |  (traffic transitions to epoch N+1 DKC)            |
     |                                                    |
@@ -610,15 +611,22 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
    its read (receive) key.
 
 5. The client sends its TLS Certificate/CertificateVerify/Finished
-   encrypted with the old keys, installs the client key
-   material as its write (send) key  and starts the drain timer to remove
-   the old (epoch N) DKC.  From now on the client uses new keys.
+   encrypted with the old keys.
 
 6. The server receives and verifies the Finished message, exports
    and installs the server key material for both the Primary and
    Restart DKCs as its  read (receive) key and write (send) key,
    and starts the drain timer to remove the old (epoch N) DKC.
    From now on the server uses new keys.
+
+7. The server key manager sends a Protection Established control
+   message ({{protection-established}}) to the client key manager.
+
+8. The client key manager receives the Protection Established
+   control message, exports all Primary and Restart DKC keys,
+   and installs the server key material as its write (send) key,
+   and starts the drain timer to remove the old (epoch N) DKC.
+   From now on the client uses new keys.
 
 The new DKCs use epoch N+1 (where N is the current epoch).  Both old
 (epoch N) and new (epoch N+1) DKCs coexist temporarily until the
@@ -732,11 +740,12 @@ LOCAL AGED:
 
 REMOTE OLD:
 : Both Old and Current DKCs exist.  Old DKC is used for sending until
-  the first packet encrypted with Current DKC is received from the
-  peer.  Event 7 (flush timer expires) transitions to YOUNG.
+  Protection Established control message is sent. 
+  Event 7 (flush timer expires) transitions to YOUNG.
 
 LOCAL OLD:
-: Both Old and Current DKCs exist.  Current DKC is used for sending.
+: Both Old and Current DKCs exist.  Old DKC is used for sending,
+  until Protection Established control message is received.
   Event 8 (flush timer expires) transitions to YOUNG.
 
 In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
