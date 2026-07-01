@@ -597,7 +597,7 @@ Initiator                                            Responder
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
 The diagram {{rekey-diagram}} shows the case where SCTP Initiator is
-also resulting as Key Manager Client.  The opposite case is identical
+acting as Key Manager Client.  The opposite case is identical
 but with inverted roles among Key Managers. In the following procedure
 we use Initiator and Responder referring to SCTP, Client and Server
 referring TLS roles. The Key manager roles are only used to handle in
@@ -608,12 +608,12 @@ the case both sides initiate a rekey simultanously, see
 Either endpoint may initiate rekeying.  The procedure is as follows:
 
 1. The peer willing to rekey becomes the TLS client for this rekey
-   procedure.  It sends a TLS ClientHello in a key management
-   message. TLS messages are carried inside DTLS chunks (the
+   procedure.  It sends a TLS ClientHello in a key management message
+   using epoch N+1. TLS messages are carried inside DTLS chunks (the
    association is already protected).
 
 2. The other peer becomes the TLS server for this rekey procedure.
-   It receives and processes the ClientHello.
+   It receives and processes the ClientHello for the epoch N+1.
 
 3. The server sends its TLS ServerHello through Finished messages to
    the client.
@@ -625,18 +625,18 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
 5. The client sends its TLS Certificate/CertificateVerify/Finished
    encrypted with the old keys.
 
-6. The server receives and verifies the Finished message, exports
-   and installs the server key material for both the Primary and
-   Restart DKCs as its  read (receive) key and write (send) key,
-   and starts the drain timer to remove the old (epoch N) DKC.
-   From now on the server uses new keys.
+6. The server receives and verifies the Finished message, exports and
+   installs the server key material for both the Primary and Restart
+   DKCs as its read (receive) key and the client key material as write
+   (send) key.  Then it starts the drain timer to remove the old
+   (epoch N) DKC.  From now on the server uses new keys.
 
 7. The server key manager sends a Protection Established control
    message ({{protection-established}}) to the client key manager.
 
 8. The client key manager receives the Protection Established
-   control message, exports all Primary and Restart DKC keys,
-   and installs the server key material as its write (send) key,
+   control message, exports the client Primary and Restart DKC keys,
+   and installs the client key material as its write (send) key,
    and starts the drain timer to remove the old (epoch N) DKC.
    From now on the client uses new keys.
 
