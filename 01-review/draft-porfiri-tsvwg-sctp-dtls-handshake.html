@@ -1,0 +1,3095 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</title>
+<meta content="Magnus Westerlund" name="author">
+<meta content="John Preuß Mattsson" name="author">
+<meta content="Claudio Porfiri" name="author">
+<meta content="
+       This document defines how Transport Layer Security (TLS) 1.3
+is used as a key-management method for the SCTP DTLS Chunk mechanism.
+It specifies how a TLS handshake establishes the initial security
+context for an SCTP association and how subsequent TLS handshakes
+provide key updates and re-authentication. The goal is to enable
+authenticated and confidential communication over SCTP using the
+DTLS Chunk, leveraging standardized TLS 1.3 features for key
+management and rekeying. 
+    " name="description">
+<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="draft-porfiri-tsvwg-sctp-dtls-handshake-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.8.1
+-->
+<link href="draft-porfiri-tsvwg-sctp-dtls-handshake.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">TLS for DTLS in SCTP</td>
+<td class="right">July 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Westerlund, et al.</td>
+<td class="center">Expires 2 January 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">TSVWG</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-07-01" class="published">1 July 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-01-02">2 January 2027</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">M. Westerlund</div>
+<div class="org">Ericsson</div>
+</div>
+<div class="author">
+      <div class="author-name">J. Preuß Mattsson</div>
+<div class="org">Ericsson</div>
+</div>
+<div class="author">
+      <div class="author-name">C. Porfiri</div>
+<div class="org">Ericsson</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines how Transport Layer Security (TLS) 1.3
+is used as a key-management method for the SCTP DTLS Chunk mechanism.
+It specifies how a TLS handshake establishes the initial security
+context for an SCTP association and how subsequent TLS handshakes
+provide key updates and re-authentication. The goal is to enable
+authenticated and confidential communication over SCTP using the
+DTLS Chunk, leveraging standardized TLS 1.3 features for key
+management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-porfiri-tsvwg-sctp-dtls-handshake/">https://datatracker.ietf.org/doc/draft-porfiri-tsvwg-sctp-dtls-handshake/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Transport Area Working Group (tsvwg) Working Group mailing list (<span><a href="mailto:tsvwg@ietf.org">mailto:tsvwg@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/tsvwg/">https://mailarchive.ietf.org/arch/browse/tsvwg/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/tsvwg/">https://www.ietf.org/mailman/listinfo/tsvwg/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake">https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 2 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-conventions" class="internal xref">Conventions</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
+                <p id="section-toc.1-1.1.2.3.1" class="keepWithNext"><a href="#section-1.3" class="auto internal xref">1.3</a>.  <a href="#name-abbreviations" class="internal xref">Abbreviations</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-architecture" class="internal xref">Architecture</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-protocol-flow-summary" class="internal xref">Protocol Flow Summary</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-tls-configuration-requireme" class="internal xref">TLS Configuration Requirements</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-tls-version" class="internal xref">TLS Version</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-cipher-suite-constraints" class="internal xref">Cipher Suite Constraints</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-authentication-and-identity" class="internal xref">Authentication and Identity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-rekeying-policy" class="internal xref">Rekeying Policy</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-tls-message-transport" class="internal xref">TLS Message Transport</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-control-messages" class="internal xref">Control Messages</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
+                    <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-protection-established" class="internal xref">Protection Established</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-key-derivation" class="internal xref">Key Derivation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-role-determination" class="internal xref">Role Determination</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-exporter-context" class="internal xref">Exporter Context</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-exporter-labels" class="internal xref">Exporter Labels</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-dkc-installation" class="internal xref">DKC Installation</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-procedures" class="internal xref">Procedures</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-initial-establishment" class="internal xref">Initial Establishment</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-rekeying" class="internal xref">Rekeying</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.1">
+                    <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1" class="auto internal xref">6.2.1</a>.  <a href="#name-triggering-criteria" class="internal xref">Triggering Criteria</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.2">
+                    <p id="section-toc.1-1.6.2.2.2.2.1"><a href="#section-6.2.2" class="auto internal xref">6.2.2</a>.  <a href="#name-procedure" class="internal xref">Procedure</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.3">
+                    <p id="section-toc.1-1.6.2.2.2.3.1"><a href="#section-6.2.3" class="auto internal xref">6.2.3</a>.  <a href="#name-drain-timer-considerations" class="internal xref">Drain Timer Considerations</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.4">
+                    <p id="section-toc.1-1.6.2.2.2.4.1"><a href="#section-6.2.4" class="auto internal xref">6.2.4</a>.  <a href="#name-simultaneous-rekey-resoluti" class="internal xref">Simultaneous Rekey Resolution</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.5">
+                    <p id="section-toc.1-1.6.2.2.2.5.1"><a href="#section-6.2.5" class="auto internal xref">6.2.5</a>.  <a href="#name-key-transition-state-machin" class="internal xref">Key Transition State Machine</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-sctp-association-restart" class="internal xref">SCTP Association Restart</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-prerequisites" class="internal xref">Prerequisites</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
+                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-restart-procedure" class="internal xref">Restart Procedure</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-error-handling" class="internal xref">Error Handling</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-general" class="internal xref">General</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-dtls-key-management-method-" class="internal xref">DTLS Key Management Method Identifier</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-tls-exporter-labels" class="internal xref">TLS Exporter Labels</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The Stream Control Transmission Protocol (SCTP) <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> is a
+transport protocol designed to support message-oriented communication
+with features such as multiple streams for messages and multi-homing.
+In many deployments, particularly telecommunication networks, it is
+essential to provide confidentiality, integrity, and peer
+authentication for SCTP traffic.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2"><span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span> defines a mechanism for
+securing SCTP by encapsulating SCTP chunks within DTLS 1.3 records at
+the chunk level.  That specification defines the DTLS chunk format,
+negotiation procedures, and an abstract API for key management, but
+delegates the actual key management to external methods identified by
+a DTLS Key Management Identifier.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document defines one such method: it uses TLS 1.3 <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>
+handshakes carried as SCTP user messages to perform mutual
+authentication and derive keying material for the DTLS Chunk
+Protection Operator.  The combination of the SCTP DTLS Chunk and the
+key-management defined in this document is referred to as "TLS for
+DTLS in SCTP".<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">The key advantages of this approach are:<a href="#section-1-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-5.1">
+          <p id="section-1-5.1.1">It requires no extensions to TLS 1.3 to support long-lived sessions.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-5.2">
+          <p id="section-1-5.2.1">It is based on TLS 1.3 rather than DTLS 1.3, leveraging widely
+available TLS implementations.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<div id="conventions">
+<section id="section-1.1">
+        <h3 id="name-conventions">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-conventions" class="section-name selfRef">Conventions</a>
+        </h3>
+<p id="section-1.1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">In this document, || denotes concatenation of byte sequences.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-1.2">
+        <h3 id="name-terminology">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-1.2-1">This document uses the following terms:<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-1.2-2">
+          <dt id="section-1.2-2.1">Association:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.2">
+            <p id="section-1.2-2.2.1">An SCTP association.<a href="#section-1.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.3">Client:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.4">
+            <p id="section-1.2-2.4.1">The endpoint that has the key management client role. This
+corresponds to the "client" role (C bit) in the DTLS Key Management
+Parameter of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.5">Connection:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.6">
+            <p id="section-1.2-2.6.1">A TLS 1.3 connection used for key management.<a href="#section-1.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.7">DTLS Key Context (DKC):</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.8">
+            <p id="section-1.2-2.8.1">The keying material (record payload key, sequence number key, and
+IV) for both send and receive directions, together with the replay
+window and last used sequence number.  Each DKC is identified by a
+tuple of (SCTP Association, restart indicator, DTLS epoch).<a href="#section-1.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.9">Initiator:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.10">
+            <p id="section-1.2-2.10.1">The endpoint initiating the SCTP association. In case of simultanous open
+both SCTP endpoints may have started as Initiator.<a href="#section-1.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.11">Primary DKC:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.12">
+            <p id="section-1.2-2.12.1">A DTLS Key Context used to protect regular SCTP association traffic.<a href="#section-1.2-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.13">Responder:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.14">
+            <p id="section-1.2-2.14.1">The endpoint acting as server during SCTP association
+establishment.<a href="#section-1.2-2.14.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.15">Restart DKC:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.16">
+            <p id="section-1.2-2.16.1">A DTLS Key Context reserved exclusively for the SCTP association
+restart procedure.<a href="#section-1.2-2.16.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.17">Server:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.18">
+            <p id="section-1.2-2.18.1">The endpoint taking the key management server role. This corresponds
+to the "server" role (S bit) in the DTLS Key Management Parameter of
+<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-1.2-2.18.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="abbreviations">
+<section id="section-1.3">
+        <h3 id="name-abbreviations">
+<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-abbreviations" class="section-name selfRef">Abbreviations</a>
+        </h3>
+<span class="break"></span><dl class="dlParallel" id="section-1.3-1">
+          <dt id="section-1.3-1.1">AEAD:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.2">
+            <p id="section-1.3-1.2.1">Authenticated Encryption with Associated Data<a href="#section-1.3-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.3-1.3">DKC:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.4">
+            <p id="section-1.3-1.4.1">DTLS Key Context<a href="#section-1.3-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.3-1.5">DTLS:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.6">
+            <p id="section-1.3-1.6.1">Datagram Transport Layer Security<a href="#section-1.3-1.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.3-1.7">PPID:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.8">
+            <p id="section-1.3-1.8.1">Payload Protocol Identifier<a href="#section-1.3-1.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.3-1.9">SCTP:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.10">
+            <p id="section-1.3-1.10.1">Stream Control Transmission Protocol<a href="#section-1.3-1.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.3-1.11">TLS:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.12">
+            <p id="section-1.3-1.12.1">Transport Layer Security<a href="#section-1.3-1.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.3-1.13">ULP:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.3-1.14">
+            <p id="section-1.3-1.14.1">Upper Layer Protocol<a href="#section-1.3-1.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="overview">
+<section id="section-2">
+      <h2 id="name-overview">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+      </h2>
+<p id="section-2-1">This section provides an informational overview of TLS for DTLS in
+SCTP.  Normative procedures are specified in <a href="#procedures" class="auto internal xref">Section 6</a>.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="architecture">
+<section id="section-2.1">
+        <h3 id="name-architecture">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-architecture" class="section-name selfRef">Architecture</a>
+        </h3>
+<span id="name-architecture-2"></span><div id="overview-layering">
+<figure id="figure-1">
+          <div id="section-2.1-1.1">
+            <div class="alignCenter art-svg artwork" id="section-2.1-1.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="464" width="440" viewBox="0 0 440 464" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,32 L 8,272" fill="none" stroke="black"></path>
+                <path d="M 8,368 L 8,448" fill="none" stroke="black"></path>
+                <path d="M 72,280 L 72,320" fill="none" stroke="black"></path>
+                <path d="M 96,320 L 96,360" fill="none" stroke="black"></path>
+                <path d="M 136,32 L 136,272" fill="none" stroke="black"></path>
+                <path d="M 152,32 L 152,272" fill="none" stroke="black"></path>
+                <path d="M 168,80 L 168,224" fill="none" stroke="black"></path>
+                <path d="M 176,384 L 176,432" fill="none" stroke="black"></path>
+                <path d="M 192,64 L 192,96" fill="none" stroke="black"></path>
+                <path d="M 192,128 L 192,160" fill="none" stroke="black"></path>
+                <path d="M 192,208 L 192,256" fill="none" stroke="black"></path>
+                <path d="M 280,160 L 280,208" fill="none" stroke="black"></path>
+                <path d="M 288,280 L 288,320" fill="none" stroke="black"></path>
+                <path d="M 352,384 L 352,432" fill="none" stroke="black"></path>
+                <path d="M 368,64 L 368,96" fill="none" stroke="black"></path>
+                <path d="M 368,128 L 368,160" fill="none" stroke="black"></path>
+                <path d="M 368,208 L 368,256" fill="none" stroke="black"></path>
+                <path d="M 392,80 L 392,400" fill="none" stroke="black"></path>
+                <path d="M 408,32 L 408,272" fill="none" stroke="black"></path>
+                <path d="M 408,368 L 408,448" fill="none" stroke="black"></path>
+                <path d="M 8,32 L 136,32" fill="none" stroke="black"></path>
+                <path d="M 152,32 L 408,32" fill="none" stroke="black"></path>
+                <path d="M 192,64 L 368,64" fill="none" stroke="black"></path>
+                <path d="M 168,80 L 184,80" fill="none" stroke="black"></path>
+                <path d="M 368,80 L 392,80" fill="none" stroke="black"></path>
+                <path d="M 192,96 L 368,96" fill="none" stroke="black"></path>
+                <path d="M 192,128 L 368,128" fill="none" stroke="black"></path>
+                <path d="M 168,144 L 192,144" fill="none" stroke="black"></path>
+                <path d="M 192,160 L 368,160" fill="none" stroke="black"></path>
+                <path d="M 192,208 L 368,208" fill="none" stroke="black"></path>
+                <path d="M 168,224 L 184,224" fill="none" stroke="black"></path>
+                <path d="M 192,256 L 368,256" fill="none" stroke="black"></path>
+                <path d="M 8,272 L 136,272" fill="none" stroke="black"></path>
+                <path d="M 152,272 L 408,272" fill="none" stroke="black"></path>
+                <path d="M 72,320 L 288,320" fill="none" stroke="black"></path>
+                <path d="M 8,368 L 408,368" fill="none" stroke="black"></path>
+                <path d="M 176,384 L 352,384" fill="none" stroke="black"></path>
+                <path d="M 360,400 L 392,400" fill="none" stroke="black"></path>
+                <path d="M 176,432 L 352,432" fill="none" stroke="black"></path>
+                <path d="M 8,448 L 408,448" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="400,360 388,354.4 388,365.6" fill="black" transform="rotate(90,392,360)"></polygon>
+                <polygon class="arrowhead" points="368,400 356,394.4 356,405.6" fill="black" transform="rotate(180,360,400)"></polygon>
+                <polygon class="arrowhead" points="296,280 284,274.4 284,285.6" fill="black" transform="rotate(270,288,280)"></polygon>
+                <polygon class="arrowhead" points="192,224 180,218.4 180,229.6" fill="black" transform="rotate(0,184,224)"></polygon>
+                <polygon class="arrowhead" points="192,80 180,74.4 180,85.6" fill="black" transform="rotate(0,184,80)"></polygon>
+                <polygon class="arrowhead" points="104,360 92,354.4 92,365.6" fill="black" transform="rotate(90,96,360)"></polygon>
+                <polygon class="arrowhead" points="80,280 68,274.4 68,285.6" fill="black" transform="rotate(270,72,280)"></polygon>
+                <g class="text">
+                  <text x="72" y="52">ULP</text>
+                  <text x="264" y="52">TLS</text>
+                  <text x="296" y="52">1.3</text>
+                  <text x="240" y="84">Key</text>
+                  <text x="292" y="84">Exporter</text>
+                  <text x="240" y="148">Key</text>
+                  <text x="300" y="148">Management</text>
+                  <text x="224" y="196">ContentType</text>
+                  <text x="240" y="228">TLS</text>
+                  <text x="284" y="228">Record</text>
+                  <text x="244" y="244">Protection</text>
+                  <text x="324" y="244">Operator</text>
+                  <text x="420" y="324">keys</text>
+                  <text x="68" y="340">PPID</text>
+                  <text x="92" y="404">SCTP</text>
+                  <text x="236" y="404">DTLS</text>
+                  <text x="280" y="404">Chunk</text>
+                  <text x="228" y="420">Protection</text>
+                  <text x="308" y="420">Operator</text>
+                </g>
+              </svg><a href="#section-2.1-1.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-architecture-2" class="selfRef">Architecture</a>
+          </figcaption></figure>
+</div>
+<p id="section-2.1-2">Application data is never transmitted in TLS application_data records.
+Instead, application data is sent via SCTP DATA chunks protected by
+the DTLS Chunk Protection Operator.  TLS 1.3 is used solely for key
+management: performing handshakes, deriving keys via the TLS Exporter,
+and then closing the TLS connection.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="protocol-flow-summary">
+<section id="section-2.2">
+        <h3 id="name-protocol-flow-summary">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-protocol-flow-summary" class="section-name selfRef">Protocol Flow Summary</a>
+        </h3>
+<p id="section-2.2-1">The protocol operates in three phases:<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2.2-2">
+<li id="section-2.2-2.1">
+            <p id="section-2.2-2.1.1"><strong>Initial Establishment:</strong> After SCTP association setup (with
+DTLS Key Management Parameter negotiation), a TLS 1.3 handshake
+derives the initial Primary and Restart DKCs.  Protection is then
+enforced.<a href="#section-2.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-2.2-2.2">
+            <p id="section-2.2-2.2.1"><strong>Rekeying:</strong> Either endpoint initiates a new TLS 1.3 handshake
+to derive fresh DKCs for the next epoch, providing forward secrecy
+and re-authentication.  Old DKCs are removed after draining.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-2.2-2.3">
+            <p id="section-2.2-2.3.1"><strong>SCTP Restart:</strong> The pre-established Restart DKC protects the
+COOKIE ECHO/COOKIE ACK exchange, followed by a new TLS handshake
+to establish fresh Primary and Restart DKCs.<a href="#section-2.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+</section>
+</div>
+<div id="tls-config">
+<section id="section-3">
+      <h2 id="name-tls-configuration-requireme">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-tls-configuration-requireme" class="section-name selfRef">TLS Configuration Requirements</a>
+      </h2>
+<div id="tls-version">
+<section id="section-3.1">
+        <h3 id="name-tls-version">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-tls-version" class="section-name selfRef">TLS Version</a>
+        </h3>
+<p id="section-3.1-1">This document defines the usage of TLS 1.3 <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.  Earlier
+versions of TLS MUST NOT be used.  Only one version of TLS MUST be
+used during the lifetime of an SCTP Association.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cipher-suite-constraints">
+<section id="section-3.2">
+        <h3 id="name-cipher-suite-constraints">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-cipher-suite-constraints" class="section-name selfRef">Cipher Suite Constraints</a>
+        </h3>
+<p id="section-3.2-1">Parameters not marked as "Y" in the "Recommended" column of TLS
+registries are NOT RECOMMENDED to support.  Non-AEAD cipher suites
+or cipher suites without confidentiality MUST NOT be supported.
+Cipher suites and parameters that do not provide ephemeral
+key-exchange MUST NOT be supported.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">The cipher suites negotiated in the key-management TLS connection
+MUST only include those supported by the DTLS Chunk Protection
+Operator.  The DTLS Chunk provides an API to query supported cipher
+suites (see Section 7.3 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="tls-auth">
+<section id="section-3.3">
+        <h3 id="name-authentication-and-identity">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-authentication-and-identity" class="section-name selfRef">Authentication and Identity</a>
+        </h3>
+<p id="section-3.3-1">TLS for DTLS in SCTP MUST be mutually authenticated.  It is
+RECOMMENDED to use certificate-based authentication.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">When certificates are used, the application is responsible for
+certificate policies, certificate chain validation, and identity
+authentication.  The application defines what the identity is and
+how it is encoded.  Guidance on server certificate validation can be
+found in <span>[<a href="#RFC9525" class="cite xref">RFC9525</a>]</span>.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">All security decisions MUST be based on the peer's authenticated
+identity, not on its transport layer identity.  Since SCTP
+associations can use multiple IP addresses per endpoint, DTLS records
+may arrive from different source IP addresses than those originally
+authenticated.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-4">Clients and servers MUST NOT accept a change of identity during the
+setup of a new TLS connection, but MAY accept negotiation of stronger
+algorithms and security parameters.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rekey-policy">
+<section id="section-3.4">
+        <h3 id="name-rekeying-policy">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-rekeying-policy" class="section-name selfRef">Rekeying Policy</a>
+        </h3>
+<p id="section-3.4-1">Implementations MUST have policies for how often to set up new TLS
+connections with ephemeral key exchange.  Implementations SHOULD
+rekey at least every hour and every 100 GB of data, which is a common
+policy for IPsec <span>[<a href="#ANSSI-DAT-NT-003" class="cite xref">ANSSI-DAT-NT-003</a>]</span>.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">Implementations MUST set up a new TLS connection using a full
+handshake with new certificates before any last used certificates
+expire.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<p id="section-3.4-3">The PSK key exchange mode psk_ke MUST NOT be used as it does not
+provide ephemeral key exchange.  TLS Key Update MUST NOT be used as it
+doesn't provide a new ephemeral key for the key exporter.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
+<p id="section-3.4-4">TLS 1.3 tickets MAY be used for resumption. Resumption can be used to
+chain the connections, increasing security by forcing an adversary to
+break them in sequence <span>[<a href="#KTH-NCSA" class="cite xref">KTH-NCSA</a>]</span>.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<p id="section-3.4-5">The endpoints MUST limit the number of simultaneous TLS connections
+to one.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="tls-user-message">
+<section id="section-4">
+      <h2 id="name-tls-message-transport">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-tls-message-transport" class="section-name selfRef">TLS Message Transport</a>
+      </h2>
+<p id="section-4-1">TLS records and control messages for key-management are sent as SCTP
+user messages using reliable in-order delivery on stream 0 with the
+DTLS Key Management Messages PPID (4242)
+<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">Each SCTP user message uses the format defined in
+<a href="#sctp-dtls-user-message" class="auto internal xref">Figure 2</a>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<span id="name-key-management-user-message"></span><div id="sctp-dtls-user-message">
+<figure id="figure-2">
+        <div id="section-4-3.1">
+          <div class="alignCenter art-svg artwork" id="section-4-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+              <path d="M 24,64 L 24,96" fill="none" stroke="black"></path>
+              <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+              <path d="M 264,128 L 264,160" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 136,96" fill="none" stroke="black"></path>
+              <path d="M 264,128 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 8,160 L 264,160" fill="none" stroke="black"></path>
+              <g class="text">
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="16" y="84">T</text>
+                <text x="72" y="84">Epoch</text>
+                <text x="264" y="100">Payload</text>
+              </g>
+            </svg><a href="#section-4-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-key-management-user-message" class="selfRef">Key Management User Message Structure</a>
+        </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-4-4">
+        <dt id="section-4-4.1">T (Message Type): 1 bit</dt>
+        <dd style="margin-left: 1.5em" id="section-4-4.2">
+          <p id="section-4-4.2.1">Indicates the type of payload carried in this user message.
+A value of 0 indicates that the payload contains TLS records.
+A value of 1 indicates that the payload is a control message
+(see <a href="#control-messages" class="auto internal xref">Section 4.1</a>).<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-4.3">Epoch: 7 bits</dt>
+        <dd style="margin-left: 1.5em" id="section-4-4.4">
+          <p id="section-4-4.4.1">The 7 lowest bits of the DTLS Key Context epoch that this
+message corresponds to — i.e., the DKC that will be created from
+this handshake, or that already exists.  The receiver uses this
+field to associate incoming data with the correct key-management
+session.<a href="#section-4-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-4.5">Payload: variable length</dt>
+        <dd style="margin-left: 1.5em" id="section-4-4.6">
+          <p id="section-4-4.6.1">When T=0, one or more complete TLS records.  When T=1, a control
+message as defined in <a href="#control-messages" class="auto internal xref">Section 4.1</a>.<a href="#section-4-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<div id="control-messages">
+<section id="section-4.1">
+        <h3 id="name-control-messages">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-control-messages" class="section-name selfRef">Control Messages</a>
+        </h3>
+<p id="section-4.1-1">When the T bit is set to 1, the payload of the user message is a
+control message with the following format:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<span id="name-control-message-format"></span><div id="control-message-format">
+<figure id="figure-3">
+          <div id="section-4.1-2.1">
+            <div class="alignCenter art-svg artwork" id="section-4.1-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="528" viewBox="0 0 528 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 392,64 L 392,72" fill="none" stroke="black"></path>
+                <path d="M 392,88 L 392,96" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path class="jump" d="M 392,88 C 398,88 398,72 392,72" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">Ctrl</text>
+                  <text x="84" y="84">Type</text>
+                  <text x="240" y="84">Control</text>
+                  <text x="292" y="84">Data</text>
+                  <text x="352" y="84">(variable</text>
+                </g>
+              </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-control-message-format" class="selfRef">Control Message Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-4.1-3">
+          <dt id="section-4.1-3.1">Ctrl Type: 8 bits</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.2">
+            <p id="section-4.1-3.2.1">Identifies the control message type.<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-3.3">Control Data: variable length</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.4">
+            <p id="section-4.1-3.4.1">Type-specific data.  May be empty.<a href="#section-4.1-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-4.1-4">The following control message type is defined:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<span id="name-control-message-types"></span><div id="control-message-types">
+<table class="center" id="table-1">
+          <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-control-message-types" class="selfRef">Control Message Types</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Ctrl Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x01</td>
+              <td class="text-left" rowspan="1" colspan="1">Protection Established</td>
+              <td class="text-left" rowspan="1" colspan="1">Signals that DTLS chunk protection has been enforced</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="protection-established">
+<section id="section-4.1.1">
+          <h4 id="name-protection-established">
+<a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-protection-established" class="section-name selfRef">Protection Established</a>
+          </h4>
+<p id="section-4.1.1-1">The Protection Established control message (Ctrl Type = 0x01) is sent
+by the Responder to the Initiator after the Responder has installed
+all keys and enforced DTLS chunk protection.  This message carries no
+Control Data (the payload following the Ctrl Type byte is empty).<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">Upon receiving this message, the Initiator enforces DTLS chunk
+protection and informs the ULP that the association is protected.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="dtls-key-derivation">
+<section id="section-5">
+      <h2 id="name-key-derivation">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-key-derivation" class="section-name selfRef">Key Derivation</a>
+      </h2>
+<div id="role-determination">
+<section id="section-5.1">
+        <h3 id="name-role-determination">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-role-determination" class="section-name selfRef">Role Determination</a>
+        </h3>
+<p id="section-5.1-1">Role determination and method selection follow the procedure defined
+in Section 5.1 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.  After
+the SCTP association is established, the key-management function
+retrieves from the SCTP stack's DTLS chunk API the assigned role
+(Initiator/client or Responder/server), the selected DTLS Key
+Management Method, and the downgrade prevention data (both endpoints'
+DTLS Key Management Parameters) used as input to key derivation.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="exporter-context">
+<section id="section-5.2">
+        <h3 id="name-exporter-context">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-exporter-context" class="section-name selfRef">Exporter Context</a>
+        </h3>
+<p id="section-5.2-1">DTLS Key Contexts are derived using the TLS Exporter as defined in
+Section 7.5 of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.  The exporter context is constructed as
+the concatenation of the following fields:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Length</th>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Direction</td>
+              <td class="text-left" rowspan="1" colspan="1">1 byte</td>
+              <td class="text-left" rowspan="1" colspan="1">0x00 = Client, 0x01 = Server</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Key role</td>
+              <td class="text-left" rowspan="1" colspan="1">1 byte</td>
+              <td class="text-left" rowspan="1" colspan="1">0x00 = primary/traffic, 0x01 = restart</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Key type</td>
+              <td class="text-left" rowspan="1" colspan="1">1 byte</td>
+              <td class="text-left" rowspan="1" colspan="1">0x00 = Key, 0x01 = SN_KEY, 0x02 = IV</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Initiator KM Param</td>
+              <td class="text-left" rowspan="1" colspan="1">variable</td>
+              <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the Initiator</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Responder KM Param</td>
+              <td class="text-left" rowspan="1" colspan="1">variable</td>
+              <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the Responder</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-5.2-3">Each DTLS Key Management Parameter (Section 4.1 of
+<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) is included as the
+sequence of bytes sent on the wire, including the parameter header
+and excluding padding.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">This construction ensures that any modification to the DTLS Key
+Management Parameter during the SCTP handshake (a downgrade attack)
+results in mismatched keys and association failure.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="exporter-labels">
+<section id="section-5.3">
+        <h3 id="name-exporter-labels">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-exporter-labels" class="section-name selfRef">Exporter Labels</a>
+        </h3>
+<p id="section-5.3-1">A single TLS Exporter label is used to derive all keying material:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.3-2">
+<pre>
+EXPORTER_TLS_FOR_DTLS_IN_SCTP
+</pre><a href="#section-5.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.3-3">The specific key material (direction, role, and type) is
+differentiated by the exporter context (<a href="#exporter-context" class="auto internal xref">Section 5.2</a>).  Each
+combination of Direction, Key role, and Key type values produces a
+distinct export, yielding 12 values in total (2 directions × 2 roles
+× 3 types).<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.3-4">The Initiator (TLS client) installs exports with Direction=Client as
+its write keys and Direction=Server as its read keys.  The Responder
+does the reverse.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-5">The length of exported material depends on the negotiated cipher
+suite.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="dkc-installation">
+<section id="section-5.4">
+        <h3 id="name-dkc-installation">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-dkc-installation" class="section-name selfRef">DKC Installation</a>
+        </h3>
+<p id="section-5.4-1">Each successful TLS handshake produces one or two (if restart is
+supported) DKCs:<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.4-2.1">
+            <p id="section-5.4-2.1.1">A Primary DKC for regular SCTP traffic.<a href="#section-5.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.4-2.2">
+            <p id="section-5.4-2.2.1">A Restart DKC for the SCTP restart procedure.<a href="#section-5.4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.4-3">The first DKC established for any SCTP association MUST use DTLS
+epoch 3.  Each subsequent Primary DKC uses the next consecutive
+epoch.  After an SCTP restart, the epoch resets to 3.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-4">If SCTP Restart is supported the endpoint MUST generate Restart DKC
+for each epoch where a Primary DKC is generated.  The Restart DKC MUST
+be maintained in a well-defined state (initialized but never used for
+regular traffic) so that both endpoints have a consistent view of
+sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="procedures">
+<section id="section-6">
+      <h2 id="name-procedures">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-procedures" class="section-name selfRef">Procedures</a>
+      </h2>
+<div id="initial-establishment">
+<section id="section-6.1">
+        <h3 id="name-initial-establishment">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-initial-establishment" class="section-name selfRef">Initial Establishment</a>
+        </h3>
+<span id="name-initial-establishment-2"></span><div id="initial-establishment-diagram">
+<figure id="figure-4">
+          <div id="section-6.1-1.1">
+            <div class="alignCenter art-svg artwork" id="section-6.1-1.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="584" viewBox="0 0 584 400" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 40,48 L 40,368" fill="none" stroke="black"></path>
+                <path d="M 80,160 L 80,304" fill="none" stroke="black"></path>
+                <path d="M 424,160 L 424,304" fill="none" stroke="black"></path>
+                <path d="M 472,48 L 472,368" fill="none" stroke="black"></path>
+                <path d="M 504,336 L 504,368" fill="none" stroke="black"></path>
+                <path d="M 40,64 L 232,64" fill="none" stroke="black"></path>
+                <path d="M 288,64 L 464,64" fill="none" stroke="black"></path>
+                <path d="M 48,80 L 216,80" fill="none" stroke="black"></path>
+                <path d="M 304,80 L 472,80" fill="none" stroke="black"></path>
+                <path d="M 40,96 L 200,96" fill="none" stroke="black"></path>
+                <path d="M 312,96 L 464,96" fill="none" stroke="black"></path>
+                <path d="M 48,112 L 208,112" fill="none" stroke="black"></path>
+                <path d="M 312,112 L 472,112" fill="none" stroke="black"></path>
+                <path d="M 40,176 L 72,176" fill="none" stroke="black"></path>
+                <path d="M 432,176 L 472,176" fill="none" stroke="black"></path>
+                <path d="M 80,208 L 152,208" fill="none" stroke="black"></path>
+                <path d="M 352,208 L 416,208" fill="none" stroke="black"></path>
+                <path d="M 400,240 L 424,240" fill="none" stroke="black"></path>
+                <path d="M 80,256 L 96,256" fill="none" stroke="black"></path>
+                <path d="M 392,256 L 416,256" fill="none" stroke="black"></path>
+                <path d="M 88,288 L 104,288" fill="none" stroke="black"></path>
+                <path d="M 352,288 L 424,288" fill="none" stroke="black"></path>
+                <path d="M 40,336 L 136,336" fill="none" stroke="black"></path>
+                <path d="M 368,336 L 464,336" fill="none" stroke="black"></path>
+                <path d="M 48,352 L 136,352" fill="none" stroke="black"></path>
+                <path d="M 368,352 L 472,352" fill="none" stroke="black"></path>
+                <path d="M 504,352 L 576,352" fill="none" stroke="black"></path>
+                <path d="M 488,320 C 496.83064,320 504,327.16936 504,336" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="472,336 460,330.4 460,341.6" fill="black" transform="rotate(0,464,336)"></polygon>
+                <polygon class="arrowhead" points="472,96 460,90.4 460,101.6" fill="black" transform="rotate(0,464,96)"></polygon>
+                <polygon class="arrowhead" points="472,64 460,58.4 460,69.6" fill="black" transform="rotate(0,464,64)"></polygon>
+                <polygon class="arrowhead" points="440,176 428,170.4 428,181.6" fill="black" transform="rotate(180,432,176)"></polygon>
+                <polygon class="arrowhead" points="424,256 412,250.4 412,261.6" fill="black" transform="rotate(0,416,256)"></polygon>
+                <polygon class="arrowhead" points="424,208 412,202.4 412,213.6" fill="black" transform="rotate(0,416,208)"></polygon>
+                <polygon class="arrowhead" points="96,288 84,282.4 84,293.6" fill="black" transform="rotate(180,88,288)"></polygon>
+                <polygon class="arrowhead" points="80,176 68,170.4 68,181.6" fill="black" transform="rotate(0,72,176)"></polygon>
+                <polygon class="arrowhead" points="56,352 44,346.4 44,357.6" fill="black" transform="rotate(180,48,352)"></polygon>
+                <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
+                <polygon class="arrowhead" points="56,80 44,74.4 44,85.6" fill="black" transform="rotate(180,48,80)"></polygon>
+                <g class="text">
+                  <text x="40" y="36">Initiator</text>
+                  <text x="472" y="36">Responder</text>
+                  <text x="20" y="68">1.</text>
+                  <text x="260" y="68">[INIT]</text>
+                  <text x="260" y="84">[INIT-ACK]</text>
+                  <text x="232" y="100">[COOKIE</text>
+                  <text x="288" y="100">ECHO]</text>
+                  <text x="492" y="100">2.</text>
+                  <text x="20" y="116">3.</text>
+                  <text x="240" y="116">[COOKIE</text>
+                  <text x="292" y="116">ACK]</text>
+                  <text x="72" y="148">Key</text>
+                  <text x="120" y="148">Manager</text>
+                  <text x="376" y="148">Key</text>
+                  <text x="424" y="148">Manager</text>
+                  <text x="20" y="180">4.</text>
+                  <text x="104" y="180">TLS</text>
+                  <text x="144" y="180">START</text>
+                  <text x="352" y="180">TLS</text>
+                  <text x="392" y="180">START</text>
+                  <text x="192" y="212">[DATA(TLS</text>
+                  <text x="260" y="212">Client</text>
+                  <text x="320" y="212">Hello)]</text>
+                  <text x="452" y="212">5.</text>
+                  <text x="60" y="244">7.</text>
+                  <text x="128" y="244">&lt;-[DATA(TLS</text>
+                  <text x="204" y="244">Server</text>
+                  <text x="256" y="244">Hello</text>
+                  <text x="296" y="244">...</text>
+                  <text x="356" y="244">Finished)]</text>
+                  <text x="452" y="244">6.</text>
+                  <text x="60" y="260">8.</text>
+                  <text x="136" y="260">[DATA(TLS</text>
+                  <text x="224" y="260">Certificate</text>
+                  <text x="288" y="260">...</text>
+                  <text x="348" y="260">Finished)]</text>
+                  <text x="452" y="260">9.</text>
+                  <text x="448" y="276">10.</text>
+                  <text x="56" y="292">12.</text>
+                  <text x="172" y="292">[DATA(Protection</text>
+                  <text x="296" y="292">Established)]</text>
+                  <text x="448" y="292">11.</text>
+                  <text x="16" y="340">13.</text>
+                  <text x="160" y="340">[DTLS</text>
+                  <text x="244" y="340">CHUNK(DATA(APP</text>
+                  <text x="336" y="340">DATA))]</text>
+                  <text x="528" y="340">APP</text>
+                  <text x="564" y="340">DATA</text>
+                  <text x="160" y="356">[DTLS</text>
+                  <text x="244" y="356">CHUNK(DATA(APP</text>
+                  <text x="336" y="356">DATA))]</text>
+                  <text x="256" y="372">...</text>
+                </g>
+              </svg><a href="#section-6.1-1.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-initial-establishment-2" class="selfRef">Initial Establishment</a>
+          </figcaption></figure>
+</div>
+<p id="section-6.1-2">The diagram <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> shows the case
+where SCTP Initiator ends up with the Key Manager client role.
+The opposite case is identical but with inverted roles among
+Key Managers. In the following procedure we use Initiator
+and Responder referring to SCTP, Client and Server referring
+to Keymanager role, and implicitly TLS roles.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">The procedure is as follows:<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.1-4">
+<li id="section-6.1-4.1">
+            <p id="section-6.1-4.1.1">The Initiator sends INIT containing the DTLS Key Management
+Parameter (Section 4.1 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>)
+with this method's identifier (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) in its
+preference-ordered list.<a href="#section-6.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.2">
+            <p id="section-6.1-4.2.1">The Responder enters ESTABLISHED state.  It retrieves the agreed
+DTLS Key Management Method and role from the SCTP stack (e.g.,
+using the "Get Agreed DTLS Key Management Method and Role" API
+defined in Section 7.2 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>)
+and verifies that the selected method matches the one defined in
+this document (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and gets the assigned role
+as key manager client or server (in the example depicted in
+<a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> it is server).<a href="#section-6.1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.3">
+            <p id="section-6.1-4.3.1">The Initiator enters ESTABLISHED state.  It performs the same
+retrieval and verification as the Responder, confirming the
+assigned role as key manager client or server (in the example
+depicted in <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> it is client).<a href="#section-6.1-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.4">
+            <p id="section-6.1-4.4.1">The client key manager starts a TLS 1.3 handshake, limiting
+offered cipher suites to those supported by the DTLS Chunk
+Protection Operator, and sends TLS ClientHello per
+<a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.1-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.5">
+            <p id="section-6.1-4.5.1">The server key manager receives the TLS ClientHello.  If a
+HelloRetryRequest is needed, an additional round-trip occurs
+before proceeding.<a href="#section-6.1-4.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.6">
+            <p id="section-6.1-4.6.1">The server key manager sends its TLS ServerHello through Finished
+messages.<a href="#section-6.1-4.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.7">
+            <p id="section-6.1-4.7.1">The client key manager receives the TLS ServerHello message,
+exports all Primary and Restart DKC keys, and installs the client
+key material as its read (receive) key.<a href="#section-6.1-4.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.8">
+            <p id="section-6.1-4.8.1">The client key manager sends its TLS
+Certificate/CertificateVerify/Finished.<a href="#section-6.1-4.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.9">
+            <p id="section-6.1-4.9.1">The server key manager receives Certificate/CertificateVerify/Finished,
+it exports the server key
+material for both the Primary and Restart DKCs, and installs it
+as its read (receive) key and as its write (send) key.<a href="#section-6.1-4.9.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.10">
+            <p id="section-6.1-4.10.1">The server key manager calls Require Protected SCTP Packets to
+enforce DTLS chunk protection for all future packets and informs
+the ULP that the association is protected.<a href="#section-6.1-4.10.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.11">
+            <p id="section-6.1-4.11.1">The server key manager sends a Protection Established control
+message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.1-4.11.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.12">
+            <p id="section-6.1-4.12.1">The client key manager receives the Protection Established
+control message, exports all Primary and Restart DKC keys,
+and installs the server key material as its write (send) key,
+calls Require Protected SCTP Packets to enforce
+DTLS chunk protection for all future packets, and informs the
+ULP that the association is protected.<a href="#section-6.1-4.12.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-4.13">
+            <p id="section-6.1-4.13.1">Application traffic can begin.<a href="#section-6.1-4.13.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-6.1-5">If the TLS handshake fails, the SCTP association MUST be aborted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.1-6">After key installation, the TLS connection SHOULD be closed promptly.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rekeying">
+<section id="section-6.2">
+        <h3 id="name-rekeying">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-rekeying" class="section-name selfRef">Rekeying</a>
+        </h3>
+<div id="triggering-criteria">
+<section id="section-6.2.1">
+          <h4 id="name-triggering-criteria">
+<a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-triggering-criteria" class="section-name selfRef">Triggering Criteria</a>
+          </h4>
+<p id="section-6.2.1-1">Rekeying is triggered by implementation-configurable criteria,
+including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2.1-2.1">
+              <p id="section-6.2.1-2.1.1">Time elapsed since last peer authentication.<a href="#section-6.2.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.2.1-2.2">
+              <p id="section-6.2.1-2.2.1">Volume of data transferred since last forward-secrecy rekeying.<a href="#section-6.2.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.2.1-2.3">
+              <p id="section-6.2.1-2.3.1">Approaching the cipher suite's AEAD usage limits.<a href="#section-6.2.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</section>
+</div>
+<div id="rekey-procedure">
+<section id="section-6.2.2">
+          <h4 id="name-procedure">
+<a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-procedure" class="section-name selfRef">Procedure</a>
+          </h4>
+<span id="name-rekeying-procedure"></span><div id="rekey-diagram">
+<figure id="figure-5">
+            <div id="section-6.2.2-1.1">
+              <div class="alignCenter art-svg artwork" id="section-6.2.2-1.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="288" width="504" viewBox="0 0 504 288" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 40,48 L 40,256" fill="none" stroke="black"></path>
+                  <path d="M 80,112 L 80,176" fill="none" stroke="black"></path>
+                  <path d="M 416,112 L 416,176" fill="none" stroke="black"></path>
+                  <path d="M 464,48 L 464,256" fill="none" stroke="black"></path>
+                  <path d="M 80,128 L 152,128" fill="none" stroke="black"></path>
+                  <path d="M 352,128 L 408,128" fill="none" stroke="black"></path>
+                  <path d="M 400,144 L 416,144" fill="none" stroke="black"></path>
+                  <path d="M 80,160 L 96,160" fill="none" stroke="black"></path>
+                  <path d="M 392,160 L 408,160" fill="none" stroke="black"></path>
+                  <path d="M 88,176 L 104,176" fill="none" stroke="black"></path>
+                  <path d="M 352,176 L 416,176" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="416,160 404,154.4 404,165.6" fill="black" transform="rotate(0,408,160)"></polygon>
+                  <polygon class="arrowhead" points="416,128 404,122.4 404,133.6" fill="black" transform="rotate(0,408,128)"></polygon>
+                  <polygon class="arrowhead" points="96,176 84,170.4 84,181.6" fill="black" transform="rotate(180,88,176)"></polygon>
+                  <g class="text">
+                    <text x="40" y="36">Initiator</text>
+                    <text x="464" y="36">Responder</text>
+                    <text x="92" y="68">(traffic</text>
+                    <text x="168" y="68">continues</text>
+                    <text x="232" y="68">using</text>
+                    <text x="280" y="68">epoch</text>
+                    <text x="312" y="68">N</text>
+                    <text x="340" y="68">DKC)</text>
+                    <text x="72" y="100">Key</text>
+                    <text x="120" y="100">Manager</text>
+                    <text x="376" y="100">Key</text>
+                    <text x="424" y="100">Manager</text>
+                    <text x="60" y="132">1.</text>
+                    <text x="192" y="132">[DATA(TLS</text>
+                    <text x="260" y="132">Client</text>
+                    <text x="320" y="132">Hello)]</text>
+                    <text x="436" y="132">2.</text>
+                    <text x="60" y="148">4.</text>
+                    <text x="128" y="148">&lt;-[DATA(TLS</text>
+                    <text x="204" y="148">Server</text>
+                    <text x="256" y="148">Hello</text>
+                    <text x="296" y="148">...</text>
+                    <text x="356" y="148">Finished)]</text>
+                    <text x="436" y="148">3.</text>
+                    <text x="60" y="164">5.</text>
+                    <text x="136" y="164">[DATA(TLS</text>
+                    <text x="224" y="164">Certificate</text>
+                    <text x="288" y="164">...</text>
+                    <text x="348" y="164">Finished)]</text>
+                    <text x="436" y="164">6.</text>
+                    <text x="60" y="180">8.</text>
+                    <text x="172" y="180">[DATA(Protection</text>
+                    <text x="296" y="180">Established)]</text>
+                    <text x="436" y="180">7.</text>
+                    <text x="92" y="212">(traffic</text>
+                    <text x="176" y="212">transitions</text>
+                    <text x="236" y="212">to</text>
+                    <text x="272" y="212">epoch</text>
+                    <text x="312" y="212">N+1</text>
+                    <text x="348" y="212">DKC)</text>
+                    <text x="84" y="244">(after</text>
+                    <text x="152" y="244">draining,</text>
+                    <text x="220" y="244">remove</text>
+                    <text x="272" y="244">epoch</text>
+                    <text x="304" y="244">N</text>
+                    <text x="332" y="244">DKC)</text>
+                  </g>
+                </svg><a href="#section-6.2.2-1.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-rekeying-procedure" class="selfRef">Rekeying Procedure</a>
+            </figcaption></figure>
+</div>
+<p id="section-6.2.2-2">The diagram <a href="#rekey-diagram" class="auto internal xref">Figure 5</a> shows the case where SCTP Initiator is
+acting as Key Manager Client.  The opposite case is identical
+but with inverted roles among Key Managers. In the following procedure
+we use Initiator and Responder referring to SCTP, Client and Server
+referring TLS roles. The Key manager roles are only used to handle in
+the case both sides initiate a rekey simultanously, see
+<a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-3">Either endpoint may initiate rekeying.  The procedure is as follows:<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2.2-4">
+<li id="section-6.2.2-4.1">
+              <p id="section-6.2.2-4.1.1">The peer willing to rekey becomes the TLS client for this rekey
+procedure.  It sends a TLS ClientHello in a key management message
+using epoch N+1. TLS messages are carried inside DTLS chunks (the
+association is already protected).<a href="#section-6.2.2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.2">
+              <p id="section-6.2.2-4.2.1">The other peer becomes the TLS server for this rekey procedure.
+It receives and processes the ClientHello for the epoch N+1.<a href="#section-6.2.2-4.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.3">
+              <p id="section-6.2.2-4.3.1">The server sends its TLS ServerHello through Finished messages to
+the client.<a href="#section-6.2.2-4.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.4">
+              <p id="section-6.2.2-4.4.1">The client receives the TLS ServerHello message, exports all
+Primary and Restart DKC keys, and installs server key material as
+its read (receive) key.<a href="#section-6.2.2-4.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.5">
+              <p id="section-6.2.2-4.5.1">The client sends its TLS Certificate/CertificateVerify/Finished
+encrypted with the old keys.<a href="#section-6.2.2-4.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.6">
+              <p id="section-6.2.2-4.6.1">The server receives and verifies the Finished message, exports and
+installs the server key material for both the Primary and Restart
+DKCs as its read (receive) key and the client key material as write
+(send) key.  Then it starts the drain timer to remove the old
+(epoch N) DKC.  From now on the server uses new keys.<a href="#section-6.2.2-4.6.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.7">
+              <p id="section-6.2.2-4.7.1">The server key manager sends a Protection Established control
+message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.2.2-4.7.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.2.2-4.8">
+              <p id="section-6.2.2-4.8.1">The client key manager receives the Protection Established
+control message, exports the client Primary and Restart DKC keys,
+and installs the client key material as its write (send) key,
+and starts the drain timer to remove the old (epoch N) DKC.
+From now on the client uses new keys.<a href="#section-6.2.2-4.8.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.2.2-5">The new DKCs use epoch N+1 (where N is the current epoch).  Both old
+(epoch N) and new (epoch N+1) DKCs coexist temporarily until the
+drain timer expires (see <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-6">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
+NOT be used.<a href="#section-6.2.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="drain-timer">
+<section id="section-6.2.3">
+          <h4 id="name-drain-timer-considerations">
+<a href="#section-6.2.3" class="section-number selfRef">6.2.3. </a><a href="#name-drain-timer-considerations" class="section-name selfRef">Drain Timer Considerations</a>
+          </h4>
+<p id="section-6.2.3-1">The drain timer determines how long old (epoch N) DKCs are retained
+after new (epoch N+1) DKCs have been activated.  Its purpose is to
+allow in-flight packets protected with the old keys to be received
+and processed before those keys are removed.<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.2.3-2">The drain timer value depends on whether the delivery of the final
+rekeying message has been confirmed:<a href="#section-6.2.3-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2.3-3.1">
+              <p id="section-6.2.3-3.1.1">If delivery of the last rekeying message has been confirmed (e.g.,
+through SCTP acknowledgment of the DATA chunk carrying the TLS
+Finished), the old DKC MAY be removed after a short drain timer.
+A value of 120 seconds (one Maximum Segment Lifetime) is
+RECOMMENDED in this case.<a href="#section-6.2.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.2.3-3.2">
+              <p id="section-6.2.3-3.2.1">If delivery has not been confirmed, the drain timer MUST be set to
+at least the SCTP association failure time (T_fail).  This ensures
+that if the final rekeying message is lost and requires
+retransmission, the old DKC remains available for as long as SCTP
+continues retransmission attempts.  If the association fails
+(i.e., SCTP declares the peer unreachable), the DKCs are removed
+as part of association teardown.<a href="#section-6.2.3-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.2.3-4">The SCTP association failure time depends on the Retransmission
+Timeout (RTO) and the maximum number of retransmissions
+(Association.Max.Retrans, as defined in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>).  With the
+default values from <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> (RTO.Initial = 1s, RTO.Max = 60s,
+Association.Max.Retrans = 10), T_fail is approximately 303 seconds.<a href="#section-6.2.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.2.3-5">Implementations SHOULD set the drain timer to at least T_fail when
+delivery of the final rekeying message has not been confirmed.<a href="#section-6.2.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sim-rekeying">
+<section id="section-6.2.4">
+          <h4 id="name-simultaneous-rekey-resoluti">
+<a href="#section-6.2.4" class="section-number selfRef">6.2.4. </a><a href="#name-simultaneous-rekey-resoluti" class="section-name selfRef">Simultaneous Rekey Resolution</a>
+          </h4>
+<p id="section-6.2.4-1">As either endpoint can initiate a TLS handshake at the same time,
+either endpoint may receive a TLS ClientHello when it has already sent
+its own.  In this case, the ClientHello from the Initiator (the
+endpoint with the keymanager client role) SHALL be processed, and the
+other SHALL be dropped.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-transition-state-machine">
+<section id="section-6.2.5">
+          <h4 id="name-key-transition-state-machin">
+<a href="#section-6.2.5" class="section-number selfRef">6.2.5. </a><a href="#name-key-transition-state-machin" class="section-name selfRef">Key Transition State Machine</a>
+          </h4>
+<p id="section-6.2.5-1">This specification allows up to 2 Primary DKCs to be active at the
+same time.  The following state machine governs the transition:<a href="#section-6.2.5-1" class="pilcrow">¶</a></p>
+<span id="name-state-diagram-for-rekeying"></span><div id="dtls-rekeying-state-diagram">
+<figure id="figure-6">
+            <div id="section-6.2.5-2.1">
+              <div class="alignCenter art-svg artwork" id="section-6.2.5-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="624" width="480" viewBox="0 0 480 624" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 8,208 L 8,592" fill="none" stroke="black"></path>
+                  <path d="M 24,224 L 24,560" fill="none" stroke="black"></path>
+                  <path d="M 96,32 L 96,64" fill="none" stroke="black"></path>
+                  <path d="M 96,192 L 96,240" fill="none" stroke="black"></path>
+                  <path d="M 96,320 L 96,368" fill="none" stroke="black"></path>
+                  <path d="M 96,480 L 96,528" fill="none" stroke="black"></path>
+                  <path d="M 136,64 L 136,184" fill="none" stroke="black"></path>
+                  <path d="M 136,240 L 136,312" fill="none" stroke="black"></path>
+                  <path d="M 136,368 L 136,472" fill="none" stroke="black"></path>
+                  <path d="M 144,528 L 144,560" fill="none" stroke="black"></path>
+                  <path d="M 160,144 L 160,184" fill="none" stroke="black"></path>
+                  <path d="M 176,32 L 176,64" fill="none" stroke="black"></path>
+                  <path d="M 176,192 L 176,240" fill="none" stroke="black"></path>
+                  <path d="M 176,320 L 176,368" fill="none" stroke="black"></path>
+                  <path d="M 176,480 L 176,528" fill="none" stroke="black"></path>
+                  <path d="M 240,480 L 240,528" fill="none" stroke="black"></path>
+                  <path d="M 288,432 L 288,472" fill="none" stroke="black"></path>
+                  <path d="M 288,528 L 288,592" fill="none" stroke="black"></path>
+                  <path d="M 296,320 L 296,368" fill="none" stroke="black"></path>
+                  <path d="M 320,480 L 320,528" fill="none" stroke="black"></path>
+                  <path d="M 336,368 L 336,432" fill="none" stroke="black"></path>
+                  <path d="M 344,224 L 344,312" fill="none" stroke="black"></path>
+                  <path d="M 376,320 L 376,368" fill="none" stroke="black"></path>
+                  <path d="M 384,480 L 384,528" fill="none" stroke="black"></path>
+                  <path d="M 424,352 L 424,472" fill="none" stroke="black"></path>
+                  <path d="M 464,480 L 464,528" fill="none" stroke="black"></path>
+                  <path d="M 96,32 L 176,32" fill="none" stroke="black"></path>
+                  <path d="M 96,64 L 176,64" fill="none" stroke="black"></path>
+                  <path d="M 160,144 L 304,144" fill="none" stroke="black"></path>
+                  <path d="M 96,192 L 176,192" fill="none" stroke="black"></path>
+                  <path d="M 8,208 L 88,208" fill="none" stroke="black"></path>
+                  <path d="M 24,224 L 88,224" fill="none" stroke="black"></path>
+                  <path d="M 176,224 L 344,224" fill="none" stroke="black"></path>
+                  <path d="M 96,240 L 176,240" fill="none" stroke="black"></path>
+                  <path d="M 96,320 L 176,320" fill="none" stroke="black"></path>
+                  <path d="M 296,320 L 376,320" fill="none" stroke="black"></path>
+                  <path d="M 184,352 L 296,352" fill="none" stroke="black"></path>
+                  <path d="M 376,352 L 424,352" fill="none" stroke="black"></path>
+                  <path d="M 96,368 L 176,368" fill="none" stroke="black"></path>
+                  <path d="M 296,368 L 376,368" fill="none" stroke="black"></path>
+                  <path d="M 288,432 L 336,432" fill="none" stroke="black"></path>
+                  <path d="M 96,480 L 176,480" fill="none" stroke="black"></path>
+                  <path d="M 240,480 L 320,480" fill="none" stroke="black"></path>
+                  <path d="M 384,480 L 464,480" fill="none" stroke="black"></path>
+                  <path d="M 96,528 L 176,528" fill="none" stroke="black"></path>
+                  <path d="M 240,528 L 320,528" fill="none" stroke="black"></path>
+                  <path d="M 384,528 L 464,528" fill="none" stroke="black"></path>
+                  <path d="M 24,560 L 144,560" fill="none" stroke="black"></path>
+                  <path d="M 8,592 L 288,592" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="432,472 420,466.4 420,477.6" fill="black" transform="rotate(90,424,472)"></polygon>
+                  <polygon class="arrowhead" points="352,312 340,306.4 340,317.6" fill="black" transform="rotate(90,344,312)"></polygon>
+                  <polygon class="arrowhead" points="296,472 284,466.4 284,477.6" fill="black" transform="rotate(90,288,472)"></polygon>
+                  <polygon class="arrowhead" points="192,352 180,346.4 180,357.6" fill="black" transform="rotate(180,184,352)"></polygon>
+                  <polygon class="arrowhead" points="168,184 156,178.4 156,189.6" fill="black" transform="rotate(90,160,184)"></polygon>
+                  <polygon class="arrowhead" points="144,472 132,466.4 132,477.6" fill="black" transform="rotate(90,136,472)"></polygon>
+                  <polygon class="arrowhead" points="144,312 132,306.4 132,317.6" fill="black" transform="rotate(90,136,312)"></polygon>
+                  <polygon class="arrowhead" points="144,184 132,178.4 132,189.6" fill="black" transform="rotate(90,136,184)"></polygon>
+                  <polygon class="arrowhead" points="96,224 84,218.4 84,229.6" fill="black" transform="rotate(0,88,224)"></polygon>
+                  <polygon class="arrowhead" points="96,208 84,202.4 84,213.6" fill="black" transform="rotate(0,88,208)"></polygon>
+                  <g class="text">
+                    <text x="132" y="52">INIT</text>
+                    <text x="240" y="52">Association</text>
+                    <text x="320" y="52">started</text>
+                    <text x="204" y="68">No</text>
+                    <text x="232" y="68">TLS</text>
+                    <text x="264" y="68">H/S</text>
+                    <text x="296" y="68">yet</text>
+                    <text x="156" y="100">1.</text>
+                    <text x="184" y="100">TLS</text>
+                    <text x="232" y="100">initial</text>
+                    <text x="280" y="100">H/S</text>
+                    <text x="208" y="116">completed</text>
+                    <text x="360" y="148">Association</text>
+                    <text x="440" y="148">Restart</text>
+                    <text x="136" y="212">YOUNG</text>
+                    <text x="156" y="276">2.</text>
+                    <text x="196" y="276">Client</text>
+                    <text x="248" y="276">Hello</text>
+                    <text x="364" y="276">3.</text>
+                    <text x="400" y="276">Aging</text>
+                    <text x="448" y="276">event</text>
+                    <text x="188" y="292">from</text>
+                    <text x="228" y="292">peer</text>
+                    <text x="204" y="324">4.</text>
+                    <text x="244" y="324">Client</text>
+                    <text x="280" y="324">H</text>
+                    <text x="404" y="324">5.</text>
+                    <text x="432" y="324">TLS</text>
+                    <text x="464" y="324">H/S</text>
+                    <text x="132" y="340">REMOTE</text>
+                    <text x="248" y="340">tie-break</text>
+                    <text x="336" y="340">LOCAL</text>
+                    <text x="440" y="340">Timeout</text>
+                    <text x="132" y="356">AGED</text>
+                    <text x="332" y="356">AGED</text>
+                    <text x="44" y="420">7.</text>
+                    <text x="92" y="420">Finished</text>
+                    <text x="212" y="420">6.</text>
+                    <text x="252" y="420">Server</text>
+                    <text x="304" y="420">Hello</text>
+                    <text x="132" y="500">REMOTE</text>
+                    <text x="280" y="500">LOCAL</text>
+                    <text x="424" y="500">ABORT</text>
+                    <text x="128" y="516">OLD</text>
+                    <text x="280" y="516">OLD</text>
+                    <text x="44" y="548">8.</text>
+                    <text x="80" y="548">Flush</text>
+                    <text x="44" y="580">9.</text>
+                    <text x="80" y="580">Flush</text>
+                  </g>
+                </svg><a href="#section-6.2.5-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<a href="#name-state-diagram-for-rekeying" class="selfRef">State Diagram for Rekeying</a>
+            </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.2.5-3">
+            <dt id="section-6.2.5-3.1">INIT:</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.5-3.2">
+              <p id="section-6.2.5-3.2.1">Initial state.  Only event 1 (TLS handshake completed) transitions
+to YOUNG.<a href="#section-6.2.5-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.5-3.3">YOUNG:</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.5-3.4">
+              <p id="section-6.2.5-3.4.1">Only the Current DKC is populated.  Event 2 (peer ClientHello)
+transitions to REMOTE OLD; event 3 (aging) transitions to LOCAL
+AGED.<a href="#section-6.2.5-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.5-3.5">LOCAL AGED:</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.5-3.6">
+              <p id="section-6.2.5-3.6.1">A supervision timer runs.  Event 5 (timeout) causes the key manager to check
+for local aging expire, in that case ABORT otherwise return to YOUNG.  Event
+4 (peer ClientHello with tie-break yielding server role) transitions
+to REMOTE OLD.  Event 6 (ServerHello received) transitions to LOCAL
+OLD.<a href="#section-6.2.5-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.5-3.7">LOCAL AGED:</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.5-3.8">
+              <p id="section-6.2.5-3.8.1">TLS handshake happens in this state. Local keys are installed.
+Event 7 (peer sends Certificate..Finished enable transition to REMOTE_OLD)<a href="#section-6.2.5-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.5-3.9">REMOTE OLD:</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.5-3.10">
+              <p id="section-6.2.5-3.10.1">Both Old and Current DKCs exist.  Old DKC is used for sending until
+Protection Established control message is sent.
+Event 8 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.5-3.11">LOCAL OLD:</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.5-3.12">
+              <p id="section-6.2.5-3.12.1">Both Old and Current DKCs exist.  Old DKC is used for sending,
+until Protection Established control message is received.
+Event 9 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-6.2.5-4">In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
+arrives, the flushing timer is cleared and behavior is as in YOUNG.<a href="#section-6.2.5-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="sctp-restart">
+<section id="section-6.3">
+        <h3 id="name-sctp-association-restart">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-sctp-association-restart" class="section-name selfRef">SCTP Association Restart</a>
+        </h3>
+<div id="prerequisites">
+<section id="section-6.3.1">
+          <h4 id="name-prerequisites">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-prerequisites" class="section-name selfRef">Prerequisites</a>
+          </h4>
+<p id="section-6.3.1-1">For protected SCTP restart to succeed:<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3.1-2.1">
+              <p id="section-6.3.1-2.1.1">Both endpoints MUST have a valid Restart DKC.<a href="#section-6.3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.3.1-2.2">
+              <p id="section-6.3.1-2.2.1">The Restart DKC MUST be stored securely and persistently to
+survive crash events (see
+Section 10.4 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-6.3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.3.1-2.3">
+              <p id="section-6.3.1-2.3.1">Both endpoints MUST have indicated restart support (R bit) in the
+DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</section>
+</div>
+<div id="restart-procedure">
+<section id="section-6.3.2">
+          <h4 id="name-restart-procedure">
+<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-restart-procedure" class="section-name selfRef">Restart Procedure</a>
+          </h4>
+<span id="name-sctp-restart-procedure"></span><div id="restart-diagram">
+<figure id="figure-7">
+            <div id="section-6.3.2-1.1">
+              <div class="alignCenter art-svg artwork" id="section-6.3.2-1.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="584" viewBox="0 0 584 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 40,48 L 40,320" fill="none" stroke="black"></path>
+                  <path d="M 464,48 L 464,320" fill="none" stroke="black"></path>
+                  <path d="M 496,96 L 496,112" fill="none" stroke="black"></path>
+                  <path d="M 496,160 L 496,176" fill="none" stroke="black"></path>
+                  <path d="M 40,96 L 240,96" fill="none" stroke="black"></path>
+                  <path d="M 280,96 L 456,96" fill="none" stroke="black"></path>
+                  <path d="M 48,112 L 224,112" fill="none" stroke="black"></path>
+                  <path d="M 296,112 L 464,112" fill="none" stroke="black"></path>
+                  <path d="M 496,112 L 552,112" fill="none" stroke="black"></path>
+                  <path d="M 40,160 L 144,160" fill="none" stroke="black"></path>
+                  <path d="M 352,160 L 456,160" fill="none" stroke="black"></path>
+                  <path d="M 48,176 L 144,176" fill="none" stroke="black"></path>
+                  <path d="M 344,176 L 464,176" fill="none" stroke="black"></path>
+                  <path d="M 496,176 L 576,176" fill="none" stroke="black"></path>
+                  <path d="M 48,256 L 128,256" fill="none" stroke="black"></path>
+                  <path d="M 376,256 L 464,256" fill="none" stroke="black"></path>
+                  <path d="M 40,288 L 136,288" fill="none" stroke="black"></path>
+                  <path d="M 368,288 L 456,288" fill="none" stroke="black"></path>
+                  <path d="M 48,304 L 136,304" fill="none" stroke="black"></path>
+                  <path d="M 368,304 L 464,304" fill="none" stroke="black"></path>
+                  <path d="M 480,80 C 488.83064,80 496,87.16936 496,96" fill="none" stroke="black"></path>
+                  <path d="M 480,128 C 488.83064,128 496,120.83064 496,112" fill="none" stroke="black"></path>
+                  <path d="M 480,144 C 488.83064,144 496,151.16936 496,160" fill="none" stroke="black"></path>
+                  <path d="M 480,192 C 488.83064,192 496,184.83064 496,176" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="464,288 452,282.4 452,293.6" fill="black" transform="rotate(0,456,288)"></polygon>
+                  <polygon class="arrowhead" points="464,160 452,154.4 452,165.6" fill="black" transform="rotate(0,456,160)"></polygon>
+                  <polygon class="arrowhead" points="464,96 452,90.4 452,101.6" fill="black" transform="rotate(0,456,96)"></polygon>
+                  <polygon class="arrowhead" points="56,304 44,298.4 44,309.6" fill="black" transform="rotate(180,48,304)"></polygon>
+                  <polygon class="arrowhead" points="56,256 44,250.4 44,261.6" fill="black" transform="rotate(180,48,256)"></polygon>
+                  <polygon class="arrowhead" points="56,176 44,170.4 44,181.6" fill="black" transform="rotate(180,48,176)"></polygon>
+                  <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
+                  <g class="text">
+                    <text x="40" y="36">Initiator</text>
+                    <text x="464" y="36">Responder</text>
+                    <text x="20" y="68">1.</text>
+                    <text x="92" y="68">(install</text>
+                    <text x="160" y="68">restart</text>
+                    <text x="212" y="68">keys</text>
+                    <text x="252" y="68">from</text>
+                    <text x="308" y="68">storage)</text>
+                    <text x="20" y="100">2.</text>
+                    <text x="260" y="100">INIT</text>
+                    <text x="528" y="100">Plain</text>
+                    <text x="20" y="116">3.</text>
+                    <text x="260" y="116">INIT-ACK</text>
+                    <text x="20" y="164">4.</text>
+                    <text x="168" y="164">[DTLS</text>
+                    <text x="244" y="164">CHUNK(COOKIE</text>
+                    <text x="324" y="164">ECHO)]</text>
+                    <text x="544" y="164">Protected</text>
+                    <text x="20" y="180">5.</text>
+                    <text x="168" y="180">[DTLS</text>
+                    <text x="244" y="180">CHUNK(COOKIE</text>
+                    <text x="320" y="180">ACK)]</text>
+                    <text x="20" y="196">6.</text>
+                    <text x="20" y="212">7.</text>
+                    <text x="76" y="228">(TLS</text>
+                    <text x="136" y="228">handshake</text>
+                    <text x="192" y="228">for</text>
+                    <text x="224" y="228">new</text>
+                    <text x="264" y="228">keys,</text>
+                    <text x="312" y="228">steps</text>
+                    <text x="360" y="228">8-13)</text>
+                    <text x="16" y="260">15.</text>
+                    <text x="196" y="260">[DATA(Protection</text>
+                    <text x="320" y="260">Established)]</text>
+                    <text x="488" y="260">14.</text>
+                    <text x="16" y="276">16.</text>
+                    <text x="16" y="292">17.</text>
+                    <text x="160" y="292">[DTLS</text>
+                    <text x="244" y="292">CHUNK(DATA(APP</text>
+                    <text x="336" y="292">DATA))]</text>
+                    <text x="504" y="292">APP</text>
+                    <text x="540" y="292">DATA</text>
+                    <text x="160" y="308">[DTLS</text>
+                    <text x="244" y="308">CHUNK(DATA(APP</text>
+                    <text x="336" y="308">DATA))]</text>
+                  </g>
+                </svg><a href="#section-6.3.2-1.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
+<a href="#name-sctp-restart-procedure" class="selfRef">SCTP Restart Procedure</a>
+            </figcaption></figure>
+</div>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.2-2">
+<li id="section-6.3.2-2.1">
+              <p id="section-6.3.2-2.1.1">The restarting endpoint (Initiator) retrieves the restart key
+material from persistent secure storage and installs the Restart
+DKC for both send and receive directions.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.2">
+              <p id="section-6.3.2-2.2.1">The Initiator sends INIT (VTag=0).<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.3">
+              <p id="section-6.3.2-2.3.1">The Responder replies INIT-ACK in plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.
+Both include the DTLS Key Management Parameter with the same
+method list but a new random Tie Breaker.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.4">
+              <p id="section-6.3.2-2.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
+the Restart DKC (R bit set).<a href="#section-6.3.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.5">
+              <p id="section-6.3.2-2.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
+the Restart DKC.<a href="#section-6.3.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.6">
+              <p id="section-6.3.2-2.6.1">Both endpoints have a new established association.  Each endpoint
+immediately calls Require Protected SCTP Packets to enforce DTLS
+chunk protection (using the Restart DKC), then retrieves the
+agreed DTLS Key Management Method and role from the SCTP stack
+(e.g., using the "Get Agreed DTLS Key Management Method and Role"
+API defined in Section 7.2 of
+<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and verifies that the
+selected method matches the one defined in this document (see
+<a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and that the assigned role is as expected.<a href="#section-6.3.2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.7">
+              <p id="section-6.3.2-2.7.1">The ULP MAY be informed that the association is protected at this
+point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-2.7.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.8">
+              <p id="section-6.3.2-2.8.1">The client key manager starts a TLS 1.3 handshake, limiting
+offered cipher suites to those supported by the DTLS Chunk
+Protection Operator, and sends TLS ClientHello per
+<a href="#tls-user-message" class="auto internal xref">Section 4</a>, protected by the Restart DKC.<a href="#section-6.3.2-2.8.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.9">
+              <p id="section-6.3.2-2.9.1">The server key manager receives the TLS ClientHello, exports the
+client key material for the Primary DKC, and installs it as its
+read (receive) key.<a href="#section-6.3.2-2.9.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.10">
+              <p id="section-6.3.2-2.10.1">The server key manager sends its TLS ServerHello through Finished
+messages.<a href="#section-6.3.2-2.10.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.11">
+              <p id="section-6.3.2-2.11.1">The client key manager receives the TLS ServerHello message,
+exports all Primary DKC keys, and installs the client key
+material as its write (send) key and the server key material as
+its read (receive) key for the Primary DKC.<a href="#section-6.3.2-2.11.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.12">
+              <p id="section-6.3.2-2.12.1">The client key manager sends its TLS
+Certificate/CertificateVerify/Finished, protected by the DTLS
+Chunk using the new Primary DKC.<a href="#section-6.3.2-2.12.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.13">
+              <p id="section-6.3.2-2.13.1">The server key manager decrypts the DTLS-chunk-protected TLS
+messages, completes the handshake, exports the server key
+material for the Primary DKC, and installs it as its write
+(send) key.<a href="#section-6.3.2-2.13.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.14">
+              <p id="section-6.3.2-2.14.1">The server key manager sends a Protection Established control
+message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.
+The server endpoint export and install the new Restart DKC key
+material (both send and receive directions), remove the old
+Restart DKC, and commit the new Restart DKC to persistent secure
+storage.<a href="#section-6.3.2-2.14.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.15">
+              <p id="section-6.3.2-2.15.1">The client key manager receives the Protection Established
+control message.<a href="#section-6.3.2-2.15.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.16">
+              <p id="section-6.3.2-2.16.1">The client key manager export and install the new Restart DKC key
+material (both send and receive directions), remove the old
+Restart DKC, and commit the new Restart DKC to persistent secure
+storage.<a href="#section-6.3.2-2.16.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-2.17">
+              <p id="section-6.3.2-2.17.1">Application traffic uses to the new Primary DKC.<a href="#section-6.3.2-2.17.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.3.2-3">After restart, the new Primary DKC MUST use epoch 3 (the epoch
+resets).<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-4">The Responder MUST NOT change the Restart DKC during the restart
+procedure.  After the new Restart DKC is installed, the old one is
+removed.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-5">It is RECOMMENDED to complete the TLS handshake and install new DKCs
+as soon as possible after restart, to minimize the window during
+which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-6">Note: There MAY exist a short time gap after association establishment
+where no Restart DKC is yet installed.  If an SCTP restart is
+initiated during that time, it will fail.  However, this is unlikely
+as the restarting endpoint sends INIT multiple times with exponential
+back-off.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="error-handling">
+<section id="section-7">
+      <h2 id="name-error-handling">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
+      </h2>
+<p id="section-7-1">TLS has its own error reporting via TLS alert messages.  When a TLS
+handshake error occurs, the TLS alert is sent in an SCTP user message
+(see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the DTLS Key Management Messages PPID
+(4242).<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">If a TLS handshake fails during initial establishment, the SCTP
+association MUST be aborted.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">If a TLS handshake fails during rekeying, and the current DKC has not
+yet reached its usage limits, the implementation SHOULD retry the
+handshake.  If retry is not possible or the current DKC is aged
+beyond policy limits, the association MUST be aborted.<a href="#section-7-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-8">
+      <h2 id="name-security-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="general">
+<section id="section-8.1">
+        <h3 id="name-general">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-general" class="section-name selfRef">General</a>
+        </h3>
+<p id="section-8.1-1">The security considerations given in <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, <span>[<a href="#RFC9147" class="cite xref">RFC9147</a>]</span>, and
+<span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> also apply to this document.  BCP 195 <span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>
+          <span>[<a href="#RFC8996" class="cite xref">RFC8996</a>]</span> provides recommendations and requirements for improving
+the security of deployed services that use TLS.  BCP 195 MUST be
+followed.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="privacy-considerations">
+<section id="section-8.2">
+        <h3 id="name-privacy-considerations">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+        </h3>
+<p id="section-8.2-1">Although TLS for DTLS in SCTP provides privacy for user messages and
+almost all SCTP chunks, the SCTP common header, DTLS chunk header,
+and DTLS record header are not confidentiality protected.  An
+attacker can correlate TLS connections over the same SCTP association
+using the SCTP common header.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">To provide identity protection, it is RECOMMENDED to use
+certificate-based authentication in TLS 1.3 and to not reuse tickets.
+TLS 1.3 with external PSK authentication does not provide identity
+protection.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">By mandating ephemeral key exchange and cipher suites with
+confidentiality, TLS for DTLS in SCTP effectively mitigates many
+forms of passive pervasive monitoring.  Frequent rekeying forces
+attackers to perform dynamic key exfiltration and limits the amount
+of compromised data due to key compromise.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-9">
+      <h2 id="name-iana-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="sec-iana-psi">
+<section id="section-9.1">
+        <h3 id="name-dtls-key-management-method-">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-dtls-key-management-method-" class="section-name selfRef">DTLS Key Management Method Identifier</a>
+        </h3>
+<p id="section-9.1-1">IANA is requested to assign one DTLS Key Management Method Identifier
+in the "DTLS Key Management Method" registry defined by
+<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span> to identify the
+key-management method defined in this document.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<span id="name-dtls-key-management-method-i"></span><div id="iana-psi">
+<table class="center" id="table-3">
+          <caption>
+<a href="#table-3" class="selfRef">Table 3</a>:
+<a href="#name-dtls-key-management-method-i" class="selfRef">DTLS Key Management Method Identifier</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">Identifier</th>
+              <th class="text-left" rowspan="1" colspan="1">Key Management Method Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+              <th class="text-left" rowspan="1" colspan="1">Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+              <td class="text-left" rowspan="1" colspan="1">Draft Authors</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="iana-export-label">
+<section id="section-9.2">
+        <h3 id="name-tls-exporter-labels">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-tls-exporter-labels" class="section-name selfRef">TLS Exporter Labels</a>
+        </h3>
+<p id="section-9.2-1">IANA is requested to register the following value in the TLS
+Exporter Label Registry <span>[<a href="#RFC5705" class="cite xref">RFC5705</a>]</span> with Reference RFC-TBD and empty
+Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<span id="name-tls-exporter-label"></span><div id="iana-tls-exporter">
+<table class="center" id="table-4">
+          <caption>
+<a href="#table-4" class="selfRef">Table 4</a>:
+<a href="#name-tls-exporter-label" class="selfRef">TLS Exporter Label</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">DTLS-OK</th>
+              <th class="text-left" rowspan="1" colspan="1">Recommended</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">EXPORTER_TLS_FOR_DTLS_IN_SCTP</td>
+              <td class="text-left" rowspan="1" colspan="1">Y</td>
+              <td class="text-left" rowspan="1" colspan="1">N</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-10">
+      <h2 id="name-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-10.1">
+        <h3 id="name-normative-references">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC8446">[RFC8446]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8996">[RFC8996]</dt>
+        <dd>
+<span class="refAuthor">Moriarty, K.</span> and <span class="refAuthor">S. Farrell</span>, <span class="refTitle">"Deprecating TLS 1.0 and TLS 1.1"</span>, <span class="seriesInfo">BCP 195</span>, <span class="seriesInfo">RFC 8996</span>, <span class="seriesInfo">DOI 10.17487/RFC8996</span>, <time datetime="2021-03" class="refDate">March 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8996">https://www.rfc-editor.org/info/rfc8996</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9147">[RFC9147]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">N. Modadugu</span>, <span class="refTitle">"The Datagram Transport Layer Security (DTLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9147</span>, <span class="seriesInfo">DOI 10.17487/RFC9147</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9147">https://www.rfc-editor.org/info/rfc9147</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9260">[RFC9260]</dt>
+        <dd>
+<span class="refAuthor">Stewart, R.</span>, <span class="refAuthor">Tüxen, M.</span>, and <span class="refAuthor">K. Nielsen</span>, <span class="refTitle">"Stream Control Transmission Protocol"</span>, <span class="seriesInfo">RFC 9260</span>, <span class="seriesInfo">DOI 10.17487/RFC9260</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9260">https://www.rfc-editor.org/info/rfc9260</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9325">[RFC9325]</dt>
+        <dd>
+<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Saint-Andre, P.</span>, and <span class="refAuthor">T. Fossati</span>, <span class="refTitle">"Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="seriesInfo">BCP 195</span>, <span class="seriesInfo">RFC 9325</span>, <span class="seriesInfo">DOI 10.17487/RFC9325</span>, <time datetime="2022-11" class="refDate">November 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9325">https://www.rfc-editor.org/info/rfc9325</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-tsvwg-sctp-dtls-chunk">[I-D.ietf-tsvwg-sctp-dtls-chunk]</dt>
+        <dd>
+<span class="refAuthor">Westerlund, M.</span>, <span class="refAuthor">Mattsson, J. P.</span>, <span class="refAuthor">Porfiri, C.</span>, and <span class="refAuthor">M. Tüxen</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) DTLS Chunk"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-sctp-dtls-chunk-03</span>, <time datetime="2026-06-18" class="refDate">18 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-03">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-03</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-10.2">
+        <h3 id="name-informative-references">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC5705">[RFC5705]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"Keying Material Exporters for Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 5705</span>, <span class="seriesInfo">DOI 10.17487/RFC5705</span>, <time datetime="2010-03" class="refDate">March 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5705">https://www.rfc-editor.org/info/rfc5705</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9525">[RFC9525]</dt>
+        <dd>
+<span class="refAuthor">Saint-Andre, P.</span> and <span class="refAuthor">R. Salz</span>, <span class="refTitle">"Service Identity in TLS"</span>, <span class="seriesInfo">RFC 9525</span>, <span class="seriesInfo">DOI 10.17487/RFC9525</span>, <time datetime="2023-11" class="refDate">November 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9525">https://www.rfc-editor.org/info/rfc9525</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ANSSI-DAT-NT-003">[ANSSI-DAT-NT-003]</dt>
+        <dd>
+<span class="refAuthor">Agence nationale de la sécurité des systèmes d'information</span>, <span class="refTitle">"Recommendations for securing networks with IPsec"</span>, <span class="seriesInfo">ANSSI Technical Report DAT-NT-003 </span>, <time datetime="2015-08" class="refDate">August 2015</time>, <span>&lt;<a href="&lt;https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf&gt;">&lt;https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf&gt;</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="KTH-NCSA">[KTH-NCSA]</dt>
+      <dd>
+<span class="refAuthor">Ekerå, M.</span>, <span class="refTitle">"On factoring integers, and computing discrete logarithms and orders, quantumly"</span>, <span class="seriesInfo">KTH, School of Electrical Engineering and Computer Science (EECS), Computer Science, Theoretical Computer Science, TCS. Swedish NCSA, Swedish Armed Forces. </span>, <time datetime="2024-10" class="refDate">October 2024</time>, <span>&lt;<a href="http://kth.diva-portal.org/smash/get/diva2:1902626/FULLTEXT01.pdf">http://kth.diva-portal.org/smash/get/diva2:1902626/FULLTEXT01.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Magnus Westerlund</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:magnus.westerlund@ericsson.com" class="email">magnus.westerlund@ericsson.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">John Preuß Mattsson</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:john.mattsson@ericsson.com" class="email">john.mattsson@ericsson.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Claudio Porfiri</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:claudio.porfiri@ericsson.com" class="email">claudio.porfiri@ericsson.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
