@@ -82,10 +82,10 @@ management and rekeying.
 
 The Stream Control Transmission Protocol (SCTP) {{RFC9260}} is a
 transport protocol designed to support message-oriented communication
-with features such as multi-streaming and multi-homing.  In many
-deployments, particularly telecommunication networks and WebRTC data
-channels, it is essential to provide confidentiality, integrity, and
-peer authentication for SCTP traffic.
+with features such as multiple streams for messages and multi-homing.
+In many deployments, particularly telecommunication networks, it is
+essential to provide confidentiality, integrity, and peer
+authentication for SCTP traffic.
 
 {{I-D.ietf-tsvwg-sctp-dtls-chunk}} defines a mechanism for
 securing SCTP by encapsulating SCTP chunks within DTLS 1.3 records at
@@ -121,6 +121,11 @@ This document uses the following terms:
 Association:
 : An SCTP association.
 
+Client:
+: The endpoint that has the key management client role. This
+  corresponds to the "client" role (C bit) in the DTLS Key Management
+  Parameter of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+
 Connection:
 : A TLS 1.3 connection used for key management.
 
@@ -131,23 +136,25 @@ DTLS Key Context (DKC):
   tuple of (SCTP Association, restart indicator, DTLS epoch).
 
 Initiator:
-: The endpoint assigned the client role during SCTP association
-  establishment.  This corresponds to the "client" role (C bit) in
-  the DTLS Key Management Parameter of
-  {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+: The endpoint initiating the SCTP association. In case of simultanous open
+  both SCTP endpoints may have started as Initiator.
+
 
 Primary DKC:
 : A DTLS Key Context used to protect regular SCTP association traffic.
 
 Responder:
-: The endpoint assigned the server role during SCTP association
-  establishment.  This corresponds to the "server" role (S bit) in
-  the DTLS Key Management Parameter of
-  {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+: The endpoint acting as server during SCTP association
+  establishment.
 
 Restart DKC:
 : A DTLS Key Context reserved exclusively for the SCTP association
   restart procedure.
+
+Server:
+: The endpoint taking the key management server role. This corresponds
+  to the "server" role (S bit) in the DTLS Key Management Parameter of
+  {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 ## Abbreviations
 
@@ -285,14 +292,16 @@ rekey at least every hour and every 100 GB of data, which is a common
 policy for IPsec {{ANSSI-DAT-NT-003}}.
 
 Implementations MUST set up a new TLS connection using a full
-handshake before any of the certificates expire.
+handshake with new certificates before any last used certificates
+expire.
 
 The PSK key exchange mode psk_ke MUST NOT be used as it does not
-provide ephemeral key exchange.  TLS Key Update MUST NOT be used.
+provide ephemeral key exchange.  TLS Key Update MUST NOT be used as it
+doesn't provide a new ephemeral key for the key exporter.
 
-TLS 1.3 tickets MAY be used for resumption (valid up to seven days).
-Resumption can be used to chain the connections, increasing security
-by forcing an adversary to break them in sequence {{KTH-NCSA}}.
+TLS 1.3 tickets MAY be used for resumption. Resumption can be used to
+chain the connections, increasing security by forcing an adversary to
+break them in sequence {{KTH-NCSA}}.
 
 The endpoints MUST limit the number of simultaneous TLS connections
 to one.
@@ -432,7 +441,8 @@ suite.
 
 ## DKC Installation {#dkc-installation}
 
-Each successful TLS handshake produces two DKCs:
+Each successful TLS handshake produces one or two (if restart is
+supported) DKCs:
 
 * A Primary DKC for regular SCTP traffic.
 * A Restart DKC for the SCTP restart procedure.
@@ -441,10 +451,11 @@ The first DKC established for any SCTP association MUST use DTLS
 epoch 3.  Each subsequent Primary DKC uses the next consecutive
 epoch.  After an SCTP restart, the epoch resets to 3.
 
-The Restart DKC MUST be maintained in a well-defined state
-(initialized but never used for regular traffic) so that both
-endpoints have a consistent view of sequence numbers and replay
-window.
+If SCTP Restart is supported the endpoint MUST generate Restart DKC
+for each epoch where a Primary DKC is generated.  The Restart DKC MUST
+be maintained in a well-defined state (initialized but never used for
+regular traffic) so that both endpoints have a consistent view of
+sequence numbers and replay window.
 
 
 # Procedures {#procedures}
@@ -480,7 +491,7 @@ Initiator                                             Responder
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
 
 The diagram {{initial-establishment-diagram}} shows the case
-where SCTP Initiator is also resulting as Key Manager Client.
+where SCTP Initiator ends up with the Key Manager client role.
 The opposite case is identical but with inverted roles among
 Key Managers. In the following procedure we use Initiator
 and Responder referring to SCTP, Client and Server referring
