@@ -2330,23 +2330,23 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
             </figcaption></figure>
 </div>
 <p id="section-6.2.2-2">The diagram <a href="#rekey-diagram" class="auto internal xref">Figure 5</a> shows the case where SCTP Initiator is
-acting as Key Manager Client.  The opposite case is identical
-but with inverted roles among Key Managers. In the following procedure
-we use Initiator and Responder referring to SCTP, Client and Server
-referring TLS roles. The Key manager roles are only used to handle in
-the case both sides initiate a rekey simultanously, see
+initiating the rekeying.  The opposite case where the Responder
+initates rekeying is identical but inverted between Initiator and
+Responder. The determined Key manager roles are only used to handle
+in the case both sides initiate a rekey simultanously, see
 <a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.2.2-3">Either endpoint may initiate rekeying.  The procedure is as follows:<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.2.2-4">
 <li id="section-6.2.2-4.1">
               <p id="section-6.2.2-4.1.1">The peer willing to rekey becomes the TLS client for this rekey
 procedure.  It sends a TLS ClientHello in a key management message
-using epoch N+1. TLS messages are carried inside DTLS chunks (the
-association is already protected).<a href="#section-6.2.2-4.1.1" class="pilcrow">¶</a></p>
+using epoch N+1. The key management messages are carried inside
+DTLS chunks (the association is already protected).<a href="#section-6.2.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.2">
-              <p id="section-6.2.2-4.2.1">The other peer becomes the TLS server for this rekey procedure.
-It receives and processes the ClientHello for the epoch N+1.<a href="#section-6.2.2-4.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.2-4.2.1">The other peer becomes the TLS server for this rekey procedure.  It
+receives and processes the ClientHello for the key management epoch
+N+1.<a href="#section-6.2.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.3">
               <p id="section-6.2.2-4.3.1">The server sends its TLS ServerHello through Finished messages to
@@ -2362,9 +2362,9 @@ its read (receive) key.<a href="#section-6.2.2-4.4.1" class="pilcrow">¶</a></p>
 encrypted with the old keys.<a href="#section-6.2.2-4.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.6">
-              <p id="section-6.2.2-4.6.1">The server receives and verifies the Finished message, exports and
-installs the server key material for both the Primary and Restart
-DKCs as its read (receive) key and the client key material as write
+              <p id="section-6.2.2-4.6.1">The server receives and process the TLS message, exports and
+installs the client key material for both the Primary and Restart
+DKCs as its read (receive) key and the server key material as write
 (send) key.  Then it starts the drain timer to remove the old
 (epoch N) DKC.  From now on the server uses new keys.<a href="#section-6.2.2-4.6.1" class="pilcrow">¶</a></p>
 </li>
@@ -2432,9 +2432,9 @@ delivery of the final rekeying message has not been confirmed.<a href="#section-
           </h4>
 <p id="section-6.2.4-1">As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already sent
-its own.  In this case, the ClientHello from the Initiator (the
-endpoint with the keymanager client role) SHALL be processed, and the
-other SHALL be dropped.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
+its own.  In this case, the ClientHello from the endpoint with the
+keymanager client role SHALL be processed, and the other SHALL be
+dropped.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="key-transition-state-machine">
@@ -2448,7 +2448,7 @@ same time.  The following state machine governs the transition:<a href="#section
 <figure id="figure-6">
             <div id="section-6.2.5-2.1">
               <div class="alignCenter art-svg artwork" id="section-6.2.5-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="624" width="480" viewBox="0 0 480 624" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="624" width="496" viewBox="0 0 496 624" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                   <path d="M 8,208 L 8,592" fill="none" stroke="black"></path>
                   <path d="M 24,224 L 24,560" fill="none" stroke="black"></path>
                   <path d="M 96,32 L 96,64" fill="none" stroke="black"></path>
@@ -2524,12 +2524,15 @@ same time.  The following state machine governs the transition:<a href="#section
                     <text x="360" y="148">Association</text>
                     <text x="440" y="148">Restart</text>
                     <text x="136" y="212">YOUNG</text>
+                    <text x="364" y="260">3.</text>
+                    <text x="400" y="260">Aging</text>
+                    <text x="448" y="260">event</text>
                     <text x="156" y="276">2.</text>
                     <text x="196" y="276">Client</text>
                     <text x="248" y="276">Hello</text>
-                    <text x="364" y="276">3.</text>
-                    <text x="400" y="276">Aging</text>
-                    <text x="448" y="276">event</text>
+                    <text x="372" y="276">Send</text>
+                    <text x="420" y="276">Client</text>
+                    <text x="472" y="276">Hello</text>
                     <text x="188" y="292">from</text>
                     <text x="228" y="292">peer</text>
                     <text x="204" y="324">4.</text>
@@ -2745,11 +2748,12 @@ material from persistent secure storage and installs the Restart
 DKC for both send and receive directions.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.2">
-              <p id="section-6.3.2-2.2.1">The Initiator sends INIT (VTag=0).<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.2.1">The Initiator sends INIT (VTag=0). Include the DTLS Key Management
+Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.3">
               <p id="section-6.3.2-2.3.1">The Responder replies INIT-ACK in plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.
-Both include the DTLS Key Management Parameter with the same
+Include the DTLS Key Management Parameter with the same
 method list but a new random Tie Breaker.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.4">
@@ -2758,7 +2762,7 @@ the Restart DKC (R bit set).<a href="#section-6.3.2-2.4.1" class="pilcrow">¶</a
 </li>
             <li id="section-6.3.2-2.5">
               <p id="section-6.3.2-2.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
-the Restart DKC.<a href="#section-6.3.2-2.5.1" class="pilcrow">¶</a></p>
+the Restart DKC (R bit set).<a href="#section-6.3.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.6">
               <p id="section-6.3.2-2.6.1">Both endpoints have a new established association.  Each endpoint
@@ -2782,9 +2786,9 @@ Protection Operator, and sends TLS ClientHello per
 <a href="#tls-user-message" class="auto internal xref">Section 4</a>, protected by the Restart DKC.<a href="#section-6.3.2-2.8.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.9">
-              <p id="section-6.3.2-2.9.1">The server key manager receives the TLS ClientHello, exports the
-client key material for the Primary DKC, and installs it as its
-read (receive) key.<a href="#section-6.3.2-2.9.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.9.1">The server key manager receives the TLS ClientHello. If a
+HelloRetryRequest is needed, an additional round-trip occurs before
+proceeding.<a href="#section-6.3.2-2.9.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.10">
               <p id="section-6.3.2-2.10.1">The server key manager sends its TLS ServerHello through Finished
@@ -2792,20 +2796,19 @@ messages.<a href="#section-6.3.2-2.10.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.11">
               <p id="section-6.3.2-2.11.1">The client key manager receives the TLS ServerHello message,
-exports all Primary DKC keys, and installs the client key
-material as its write (send) key and the server key material as
+exports all Primary DKC keys, and installs the server key material as
 its read (receive) key for the Primary DKC.<a href="#section-6.3.2-2.11.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.12">
               <p id="section-6.3.2-2.12.1">The client key manager sends its TLS
-Certificate/CertificateVerify/Finished, protected by the DTLS
-Chunk using the new Primary DKC.<a href="#section-6.3.2-2.12.1" class="pilcrow">¶</a></p>
+Certificate/CertificateVerify/Finished.<a href="#section-6.3.2-2.12.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.13">
-              <p id="section-6.3.2-2.13.1">The server key manager decrypts the DTLS-chunk-protected TLS
-messages, completes the handshake, exports the server key
-material for the Primary DKC, and installs it as its write
-(send) key.<a href="#section-6.3.2-2.13.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.13.1">The server key manager receives
+Certificate/CertificateVerify/Finished, it exports the client and
+server key material for the Primary DKC, and installs client key
+as its read (receive) key and the server key as its write (send)
+key.<a href="#section-6.3.2-2.13.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.14">
               <p id="section-6.3.2-2.14.1">The server key manager sends a Protection Established control
@@ -2816,8 +2819,8 @@ Restart DKC, and commit the new Restart DKC to persistent secure
 storage.<a href="#section-6.3.2-2.14.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.15">
-              <p id="section-6.3.2-2.15.1">The client key manager receives the Protection Established
-control message.<a href="#section-6.3.2-2.15.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.15.1">The client key manager receives the Protection Established control
+message. Installs the primary client Key as its write (send) key.<a href="#section-6.3.2-2.15.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.16">
               <p id="section-6.3.2-2.16.1">The client key manager export and install the new Restart DKC key
