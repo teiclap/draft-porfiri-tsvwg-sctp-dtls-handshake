@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-21T03:34:58.971055+00:00",
+  "timestamp": "2026-07-02T02:45:17.175203+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -96,6 +96,22 @@
       "createdAt": "2026-06-15T12:33:00Z",
       "updatedAt": "2026-06-15T15:57:15Z",
       "closedAt": "2026-06-15T15:57:15Z",
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDORGnINM8AAAABHUL7mQ",
+      "title": "Mostly Theoretical deadlock in Key Initation procedure",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/10",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In the intial procedures we currently have these steps: \n`9. The server key manager receives Certificate/CertificateVerify/Finished,\n   it exports the server key\n   material for both the Primary and Restart DKCs, and installs it\n   as its read (receive) key and as its write (send) key.\n\n10. The server key manager calls Require Protected SCTP Packets to\n    enforce DTLS chunk protection for all future packets and informs\n    the ULP that the association is protected.\n\n11. The server key manager sends a Protection Established control\n    message ({{protection-established}}) to the client key manager.\n\n12. The client key manager receives the Protection Established\n    control message, exports all Primary and Restart DKC keys,\n    and installs the server key material as its write (send) key,\n    calls Require Protected SCTP Packets to enforce\n    DTLS chunk protection for all future packets, and informs the\n    ULP that the association is protected.`\n\nIn this procedure there exists a potential for deadlock that is uncertain if you even can make it trigger. But the case that exist here is the following:\n\nWhen step 10 is completed the server only accepts protected packets. Then in step 11 it sends a encrypted Protection Established (PE) message to the client. At this point the client doesn't have a write key installed, only the read key. The server requires the client to send encrypted packets for them to reach the server and actually be processed. This situation lasts until the client receives the PE message, which triggers it to install the write key and also enable protection following step 12. \n\nSo if the a SCTP packet carrying the PE message (or part of it) is lost between the server and the client, the client can't send any SACK that will actually reach the server. However, if the server does not receive the PE message its retransmission timer will fire and retransmit the non acked PE message. Thus, a true deadlock can only occur if the SCTP association at this stage would require a SACK message or some other control message to complete the transmission of the PE. \n\nSo the question here is if this very unlikely situation needs to be addressed? \n\nOne way of addressing this is to add additional control messages:\n10. Server sends Protection Ready (Encrypted) -> Client\n11. Client installs write key and sets Protection Required\n12. Client sends Protection Established (Encrypted) -> Server\n13. Server receives and sets Protection Required. Notifies ULP\n14. Server sends Protection Established (Encrypted) -> Client\n15. Client receives Protection Established, sets Protection Required and Notifies ULP\n\nThis procedure adds one RTT at minimal. Steps 14 and 15 is there to ensure that there are coordination of the ULP activation. It may be possible to skip 14 and 15 and instead have the client activate ULP at the end of step 12. But, that puts implementation requirements on server to prevent unprotected data to be delivered to ULP while delivering protected. \n  ",
+      "createdAt": "2026-07-01T13:16:17Z",
+      "updatedAt": "2026-07-01T13:16:17Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -390,6 +406,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDORGnINM7sxN97",
+      "title": "Fixing restart procedure and other edits",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/11",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-01T16:32:06Z",
+      "updatedAt": "2026-07-01T16:32:07Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "65051e256a0915f260a1259ef3d79fbf91fe3327",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "01-review",
+      "headRefOid": "6918e2f0511db5c64ed61966a9690d64cafe4bc5",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
