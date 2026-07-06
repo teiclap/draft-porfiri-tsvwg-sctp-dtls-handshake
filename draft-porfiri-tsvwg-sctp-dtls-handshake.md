@@ -377,13 +377,16 @@ The following control message type is defined:
 ### Protection Established {#protection-established}
 
 The Protection Established control message (Ctrl Type = 0x01) is sent
-by the Responder to the Initiator after the Responder has installed
+by the Server to the Client after the Server has installed
 all keys and enforced DTLS chunk protection.  This message carries no
 Control Data (the payload following the Ctrl Type byte is empty).
 
-Upon receiving this message, the Initiator enforces DTLS chunk
+Upon receiving this message, the Client enforces DTLS chunk
 protection and informs the ULP that the association is protected.
 
+The message is also used during rekeying to confirm to the endpoint
+with the client role in that procedure that the server has installed
+all keys, and the client can install write keys.
 
 # Key Derivation {#dtls-key-derivation}
 
@@ -393,7 +396,7 @@ Role determination and method selection follow the procedure defined
 in Section 5.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.  After
 the SCTP association is established, the key-management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
-(Initiator/client or Responder/server), the selected DTLS Key
+(Client or Server), the selected DTLS Key
 Management Method, and the downgrade prevention data (both endpoints'
 DTLS Key Management Parameters) used as input to key derivation.
 
@@ -405,11 +408,11 @@ the concatenation of the following fields:
 
 | Field | Length | Value |
 |-------|--------|-------|
-| Direction | 1 byte | 0x00 = Client, 0x01 = Server |
+| Direction | 1 byte | 0x00 = Client to Server, 0x01 = Server to Client |
 | Key role | 1 byte | 0x00 = primary/traffic, 0x01 = restart |
 | Key type | 1 byte | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
-| Initiator KM Param | variable | DTLS Key Management Parameter sent by the Initiator |
-| Responder KM Param | variable | DTLS Key Management Parameter sent by the Responder |
+| Client KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Client |
+| Server KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Server |
 
 Each DTLS Key Management Parameter (Section 4.1 of
 {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) is included as the
@@ -432,9 +435,9 @@ combination of Direction, Key role, and Key type values produces a
 distinct export, yielding 12 values in total (2 directions × 2 roles
 × 3 types).
 
-The Initiator (TLS client) installs exports with Direction=Client as
-its write keys and Direction=Server as its read keys.  The Responder
-does the reverse.
+The Client installs exports with Direction=Client to server as its
+write keys and Direction=Server to client as its read keys.  The
+Responder does the reverse.
 
 The length of exported material depends on the negotiated cipher
 suite.
@@ -471,7 +474,7 @@ Initiator                                             Responder
     +--------------------[COOKIE ECHO]------------------->| 2.
  3. |<--------------------[COOKIE ACK]--------------------+
     |                                                     |
-    |  Key Manager                           Key Manager  |
+    |  Key Manager Client              Key Manager Server |
     |    |                                          |     |
  4. +--->| TLS START                      TLS START |<----+
     |    |                                          |     |
@@ -531,16 +534,16 @@ The procedure is as follows:
    messages.
 
 7. The client key manager receives the TLS ServerHello message,
-   exports all Primary and Restart DKC keys, and installs the client
+   exports all Primary and Restart DKC keys, and installs the server to client
    key material as its read (receive) key.
 
 8. The client key manager sends its TLS
    Certificate/CertificateVerify/Finished.
 
-9. The server key manager receives Certificate/CertificateVerify/Finished,
-   it exports the server key
-   material for both the Primary and Restart DKCs, and installs it
-   as its read (receive) key and as its write (send) key.
+9. The server key manager receives
+   Certificate/CertificateVerify/Finished, it exports both direction
+   key material for both the Primary and Restart DKCs, and installs both
+   read (receive) keys and as its write (send) keys.
 
 10. The server key manager calls Require Protected SCTP Packets to
     enforce DTLS chunk protection for all future packets and informs
@@ -549,12 +552,11 @@ The procedure is as follows:
 11. The server key manager sends a Protection Established control
     message ({{protection-established}}) to the client key manager.
 
-12. The client key manager receives the Protection Established
-    control message, exports all Primary and Restart DKC keys,
-    and installs the server key material as its write (send) key,
-    calls Require Protected SCTP Packets to enforce
-    DTLS chunk protection for all future packets, and informs the
-    ULP that the association is protected.
+12. The client key manager receives the Protection Established control
+    message, and installs the client key material as its write (send)
+    key, calls Require Protected SCTP Packets to enforce DTLS chunk
+    protection for all future packets, and informs the ULP that the
+    association is protected.
 
 13. Application traffic can begin.
 
@@ -581,7 +583,7 @@ Initiator                                            Responder
     |                                                    |
     |  (traffic continues using epoch N DKC)             |
     |                                                    |
-    |  Key Manager                           Key Manager |
+    |  Client Key Manager             Key Manager Server |
     |    |                                         |     |
     | 1. +---------[DATA(TLS Client Hello)]------->| 2.  |
     | 4. |<-[DATA(TLS Server Hello ... Finished)]--+ 3.  |
@@ -598,10 +600,11 @@ Initiator                                            Responder
 
 The diagram {{rekey-diagram}} shows the case where SCTP Initiator is
 initiating the rekeying.  The opposite case where the Responder
-initates rekeying is identical but inverted between Initiator and
-Responder. The determined Key manager roles are only used to handle
-in the case both sides initiate a rekey simultanously, see
-{{sim-rekeying}}.
+initates rekeying is identical but inverts which key manager role that
+executes the various steps between Client and Server temporarly for
+this exchange only. The initially determined Key manager roles are
+only used to handle the case both sides initiate a rekey
+simultanously, see {{sim-rekeying}}.
 
 
 Either endpoint may initiate rekeying.  The procedure is as follows:
@@ -619,8 +622,8 @@ Either endpoint may initiate rekeying.  The procedure is as follows:
    the client.
 
 4. The client receives the TLS ServerHello message, exports all
-   Primary and Restart DKC keys, and installs server key material as
-   its read (receive) key.
+   Primary and Restart DKC keys, and installs server to client key
+   material as its read (receive) key.
 
 5. The client sends its TLS Certificate/CertificateVerify/Finished
    encrypted with the old keys.
@@ -685,7 +688,7 @@ delivery of the final rekeying message has not been confirmed.
 As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already sent
 its own.  In this case, the ClientHello from the endpoint with the
-keymanager client role SHALL be processed, and the other SHALL be
+initial keymanager client role SHALL be processed, and the other SHALL be
 dropped.
 
 ### Key Transition State Machine
@@ -817,9 +820,9 @@ Initiator                                            Responder
 2. The Initiator sends INIT (VTag=0). Include the DTLS Key Management
    Parameter with the same method list but a new random Tie Breaker.
 
-3. The Responder replies INIT-ACK in plain text per {{RFC9260}}.
-   Include the DTLS Key Management Parameter with the same
-   method list but a new random Tie Breaker.
+3. The Responder (the not restarting endpoint) replies INIT-ACK in
+   plain text per {{RFC9260}}.  Include the DTLS Key Management
+   Parameter with the same method list but a new random Tie Breaker.
 
 4. The Initiator sends COOKIE ECHO in a DTLS chunk protected with
    the Restart DKC (R bit set).
