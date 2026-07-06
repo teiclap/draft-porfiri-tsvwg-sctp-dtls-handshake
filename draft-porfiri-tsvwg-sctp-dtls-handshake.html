@@ -33,7 +33,7 @@ management and rekeying.
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.1
+    wcwidth 0.8.2
 -->
 <link href="draft-porfiri-tsvwg-sctp-dtls-handshake.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1056,7 +1056,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 3 January 2027</td>
+<td class="center">Expires 7 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1069,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-02" class="published">2 July 2026</time>
+<time datetime="2026-07-06" class="published">6 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-03">3 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-07">7 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1138,7 +1138,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1891,11 +1891,14 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
 <a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-protection-established" class="section-name selfRef">Protection Established</a>
           </h4>
 <p id="section-4.1.1-1">The Protection Established control message (Ctrl Type = 0x01) is sent
-by the Responder to the Initiator after the Responder has installed
+by the Server to the Client after the Server has installed
 all keys and enforced DTLS chunk protection.  This message carries no
 Control Data (the payload following the Ctrl Type byte is empty).<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-2">Upon receiving this message, the Initiator enforces DTLS chunk
+<p id="section-4.1.1-2">Upon receiving this message, the Client enforces DTLS chunk
 protection and informs the ULP that the association is protected.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">The message is also used during rekeying to confirm to the endpoint
+with the client role in that procedure that the server has installed
+all keys, and the client can install write keys.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1916,7 +1919,7 @@ protection and informs the ULP that the association is protected.<a href="#secti
 in Section 5.1 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.  After
 the SCTP association is established, the key-management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
-(Initiator/client or Responder/server), the selected DTLS Key
+(Client or Server), the selected DTLS Key
 Management Method, and the downgrade prevention data (both endpoints'
 DTLS Key Management Parameters) used as input to key derivation.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 </section>
@@ -1942,7 +1945,7 @@ the concatenation of the following fields:<a href="#section-5.2-1" class="pilcro
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Direction</td>
               <td class="text-left" rowspan="1" colspan="1">1 byte</td>
-              <td class="text-left" rowspan="1" colspan="1">0x00 = Client, 0x01 = Server</td>
+              <td class="text-left" rowspan="1" colspan="1">0x00 = Client to Server, 0x01 = Server to Client</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Key role</td>
@@ -1955,14 +1958,14 @@ the concatenation of the following fields:<a href="#section-5.2-1" class="pilcro
               <td class="text-left" rowspan="1" colspan="1">0x00 = Key, 0x01 = SN_KEY, 0x02 = IV</td>
             </tr>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">Initiator KM Param</td>
+              <td class="text-left" rowspan="1" colspan="1">Client KM Param</td>
               <td class="text-left" rowspan="1" colspan="1">variable</td>
-              <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the Initiator</td>
+              <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the endpoint designated as Client</td>
             </tr>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">Responder KM Param</td>
+              <td class="text-left" rowspan="1" colspan="1">Server KM Param</td>
               <td class="text-left" rowspan="1" colspan="1">variable</td>
-              <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the Responder</td>
+              <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the endpoint designated as Server</td>
             </tr>
           </tbody>
         </table>
@@ -1991,9 +1994,9 @@ differentiated by the exporter context (<a href="#exporter-context" class="auto 
 combination of Direction, Key role, and Key type values produces a
 distinct export, yielding 12 values in total (2 directions × 2 roles
 × 3 types).<a href="#section-5.3-3" class="pilcrow">¶</a></p>
-<p id="section-5.3-4">The Initiator (TLS client) installs exports with Direction=Client as
-its write keys and Direction=Server as its read keys.  The Responder
-does the reverse.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-4">The Client installs exports with Direction=Client to server as its
+write keys and Direction=Server to client as its read keys.  The
+Responder does the reverse.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
 <p id="section-5.3-5">The length of exported material depends on the negotiated cipher
 suite.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
 </section>
@@ -2093,8 +2096,10 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
                   <text x="292" y="116">ACK]</text>
                   <text x="72" y="148">Key</text>
                   <text x="120" y="148">Manager</text>
-                  <text x="376" y="148">Key</text>
-                  <text x="424" y="148">Manager</text>
+                  <text x="180" y="148">Client</text>
+                  <text x="328" y="148">Key</text>
+                  <text x="376" y="148">Manager</text>
+                  <text x="436" y="148">Server</text>
                   <text x="20" y="180">4.</text>
                   <text x="104" y="180">TLS</text>
                   <text x="144" y="180">START</text>
@@ -2187,7 +2192,7 @@ messages.<a href="#section-6.1-4.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.7">
             <p id="section-6.1-4.7.1">The client key manager receives the TLS ServerHello message,
-exports all Primary and Restart DKC keys, and installs the client
+exports all Primary and Restart DKC keys, and installs the server to client
 key material as its read (receive) key.<a href="#section-6.1-4.7.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.8">
@@ -2195,10 +2200,10 @@ key material as its read (receive) key.<a href="#section-6.1-4.7.1" class="pilcr
 Certificate/CertificateVerify/Finished.<a href="#section-6.1-4.8.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.9">
-            <p id="section-6.1-4.9.1">The server key manager receives Certificate/CertificateVerify/Finished,
-it exports the server key
-material for both the Primary and Restart DKCs, and installs it
-as its read (receive) key and as its write (send) key.<a href="#section-6.1-4.9.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.9.1">The server key manager receives
+Certificate/CertificateVerify/Finished, it exports both direction
+key material for both the Primary and Restart DKCs, and installs both
+read (receive) keys and as its write (send) keys.<a href="#section-6.1-4.9.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.10">
             <p id="section-6.1-4.10.1">The server key manager calls Require Protected SCTP Packets to
@@ -2210,12 +2215,11 @@ the ULP that the association is protected.<a href="#section-6.1-4.10.1" class="p
 message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.1-4.11.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.12">
-            <p id="section-6.1-4.12.1">The client key manager receives the Protection Established
-control message, exports all Primary and Restart DKC keys,
-and installs the server key material as its write (send) key,
-calls Require Protected SCTP Packets to enforce
-DTLS chunk protection for all future packets, and informs the
-ULP that the association is protected.<a href="#section-6.1-4.12.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.12.1">The client key manager receives the Protection Established control
+message, and installs the client key material as its write (send)
+key, calls Require Protected SCTP Packets to enforce DTLS chunk
+protection for all future packets, and informs the ULP that the
+association is protected.<a href="#section-6.1-4.12.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.13">
             <p id="section-6.1-4.13.1">Application traffic can begin.<a href="#section-6.1-4.13.1" class="pilcrow">¶</a></p>
@@ -2283,10 +2287,12 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
                     <text x="280" y="68">epoch</text>
                     <text x="312" y="68">N</text>
                     <text x="340" y="68">DKC)</text>
-                    <text x="72" y="100">Key</text>
-                    <text x="120" y="100">Manager</text>
-                    <text x="376" y="100">Key</text>
-                    <text x="424" y="100">Manager</text>
+                    <text x="84" y="100">Client</text>
+                    <text x="128" y="100">Key</text>
+                    <text x="176" y="100">Manager</text>
+                    <text x="320" y="100">Key</text>
+                    <text x="368" y="100">Manager</text>
+                    <text x="428" y="100">Server</text>
                     <text x="60" y="132">1.</text>
                     <text x="192" y="132">[DATA(TLS</text>
                     <text x="260" y="132">Client</text>
@@ -2331,10 +2337,11 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
 </div>
 <p id="section-6.2.2-2">The diagram <a href="#rekey-diagram" class="auto internal xref">Figure 5</a> shows the case where SCTP Initiator is
 initiating the rekeying.  The opposite case where the Responder
-initates rekeying is identical but inverted between Initiator and
-Responder. The determined Key manager roles are only used to handle
-in the case both sides initiate a rekey simultanously, see
-<a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
+initates rekeying is identical but inverts which key manager role that
+executes the various steps between Client and Server temporarly for
+this exchange only. The initially determined Key manager roles are
+only used to handle the case both sides initiate a rekey
+simultanously, see <a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.2.2-3">Either endpoint may initiate rekeying.  The procedure is as follows:<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.2.2-4">
 <li id="section-6.2.2-4.1">
@@ -2354,8 +2361,8 @@ the client.<a href="#section-6.2.2-4.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.4">
               <p id="section-6.2.2-4.4.1">The client receives the TLS ServerHello message, exports all
-Primary and Restart DKC keys, and installs server key material as
-its read (receive) key.<a href="#section-6.2.2-4.4.1" class="pilcrow">¶</a></p>
+Primary and Restart DKC keys, and installs server to client key
+material as its read (receive) key.<a href="#section-6.2.2-4.4.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-4.5">
               <p id="section-6.2.2-4.5.1">The client sends its TLS Certificate/CertificateVerify/Finished
@@ -2433,7 +2440,7 @@ delivery of the final rekeying message has not been confirmed.<a href="#section-
 <p id="section-6.2.4-1">As either endpoint can initiate a TLS handshake at the same time,
 either endpoint may receive a TLS ClientHello when it has already sent
 its own.  In this case, the ClientHello from the endpoint with the
-keymanager client role SHALL be processed, and the other SHALL be
+initial keymanager client role SHALL be processed, and the other SHALL be
 dropped.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2752,9 +2759,9 @@ DKC for both send and receive directions.<a href="#section-6.3.2-2.1.1" class="p
 Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.3">
-              <p id="section-6.3.2-2.3.1">The Responder replies INIT-ACK in plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.
-Include the DTLS Key Management Parameter with the same
-method list but a new random Tie Breaker.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.3.1">The Responder (the not restarting endpoint) replies INIT-ACK in
+plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.  Include the DTLS Key Management
+Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.4">
               <p id="section-6.3.2-2.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
@@ -3015,7 +3022,7 @@ Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="I-D.ietf-tsvwg-sctp-dtls-chunk">[I-D.ietf-tsvwg-sctp-dtls-chunk]</dt>
         <dd>
-<span class="refAuthor">Westerlund, M.</span>, <span class="refAuthor">Mattsson, J. P.</span>, <span class="refAuthor">Porfiri, C.</span>, and <span class="refAuthor">M. Tüxen</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) DTLS Chunk"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-sctp-dtls-chunk-03</span>, <time datetime="2026-06-18" class="refDate">18 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-03">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-03</a>&gt;</span>. </dd>
+<span class="refAuthor">Westerlund, M.</span>, <span class="refAuthor">Mattsson, J. P.</span>, <span class="refAuthor">Porfiri, C.</span>, and <span class="refAuthor">M. Tüxen</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) DTLS Chunk"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-sctp-dtls-chunk-04</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-04">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-04</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
