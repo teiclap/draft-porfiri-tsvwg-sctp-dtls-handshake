@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-05T02:35:12.219749+00:00",
+  "timestamp": "2026-07-07T02:35:50.558363+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -119,15 +119,15 @@
       "id": "I_kwDORGnINM8AAAABHcYurg",
       "title": "Need to review the usage of initiator, responder, client and server",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/12",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The terminology uses was not consistent and have been address in some places, but not reviewed through out the document. ",
       "createdAt": "2026-07-02T12:44:18Z",
-      "updatedAt": "2026-07-02T12:44:18Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-06T19:07:24Z",
+      "closedAt": "2026-07-06T19:07:24Z",
       "comments": []
     }
   ],
@@ -464,6 +464,34 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDORGnINM7ugQNL",
+      "title": "Rewrote use of Initiator and fixed some erronous key usage in the ini\u2026",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/13",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\u2026t procedure.",
+      "createdAt": "2026-07-06T19:06:25Z",
+      "updatedAt": "2026-07-06T19:07:23Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "697da7ab698573812722b4f589203a80223cea4f",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "terminology",
+      "headRefOid": "9526b66e84fee1e0cd94c935f31d75fcdad3686c",
+      "closedAt": "2026-07-06T19:07:23Z",
+      "mergedAt": "2026-07-06T19:07:23Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "49678ecdd53092004f6bb10f40d63f1103955e48"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
