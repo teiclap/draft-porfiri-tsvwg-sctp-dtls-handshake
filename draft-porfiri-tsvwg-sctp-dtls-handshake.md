@@ -57,11 +57,11 @@ informative:
     date: October 2024
 
 normative:
-  RFC8446:
   RFC8996:
   RFC9147:
   RFC9260:
   RFC9325:
+  RFC9846:
   I-D.ietf-tsvwg-sctp-dtls-chunk:
 
 
@@ -94,7 +94,7 @@ negotiation procedures, and an abstract API for key management, but
 delegates the actual key management to external methods identified by
 a DTLS Key Management Identifier.
 
-This document defines one such method: it uses TLS 1.3 {{RFC8446}}
+This document defines one such method: it uses TLS 1.3 {{RFC9846}}
 handshakes carried as SCTP user messages to perform mutual
 authentication and derive keying material for the DTLS Chunk
 Protection Operator.  The combination of the SCTP DTLS Chunk and the
@@ -246,7 +246,7 @@ The protocol operates in three phases:
 
 ## TLS Version
 
-This document defines the usage of TLS 1.3 {{RFC8446}}.  Earlier
+This document defines the usage of TLS 1.3 {{RFC9846}}.  Earlier
 versions of TLS MUST NOT be used.  Only one version of TLS MUST be
 used during the lifetime of an SCTP Association.
 
@@ -403,7 +403,7 @@ DTLS Key Management Parameters) used as input to key derivation.
 ## Exporter Context {#exporter-context}
 
 DTLS Key Contexts are derived using the TLS Exporter as defined in
-Section 7.5 of {{RFC8446}}.  The exporter context is constructed as
+Section 7.5 of {{RFC9846}}.  The exporter context is constructed as
 the concatenation of the following fields:
 
 | Field | Length | Value |
@@ -923,7 +923,7 @@ beyond policy limits, the association MUST be aborted.
 
 ## General
 
-The security considerations given in {{RFC8446}}, {{RFC9147}}, and
+The security considerations given in {{RFC9846}}, {{RFC9147}}, and
 {{RFC9260}} also apply to this document.  BCP 195 {{RFC9325}}
 {{RFC8996}} provides recommendations and requirements for improving
 the security of deployed services that use TLS.  BCP 195 MUST be
