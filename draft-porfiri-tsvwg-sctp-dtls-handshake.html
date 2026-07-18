@@ -29,7 +29,7 @@ management and rekeying.
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.0
+    platformdirs 4.10.1
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -1056,7 +1056,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 7 January 2027</td>
+<td class="center">Expires 19 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1069,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-06" class="published">6 July 2026</time>
+<time datetime="2026-07-18" class="published">18 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-07">7 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-19">19 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1138,7 +1138,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 7 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1338,7 +1338,7 @@ the chunk level.  That specification defines the DTLS chunk format,
 negotiation procedures, and an abstract API for key management, but
 delegates the actual key management to external methods identified by
 a DTLS Key Management Identifier.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">This document defines one such method: it uses TLS 1.3 <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>
+<p id="section-1-3">This document defines one such method: it uses TLS 1.3 <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>
 handshakes carried as SCTP user messages to perform mutual
 authentication and derive keying material for the DTLS Chunk
 Protection Operator.  The combination of the SCTP DTLS Chunk and the
@@ -1615,7 +1615,7 @@ to establish fresh Primary and Restart DKCs.<a href="#section-2.2-2.3.1" class="
         <h3 id="name-tls-version">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-tls-version" class="section-name selfRef">TLS Version</a>
         </h3>
-<p id="section-3.1-1">This document defines the usage of TLS 1.3 <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.  Earlier
+<p id="section-3.1-1">This document defines the usage of TLS 1.3 <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.  Earlier
 versions of TLS MUST NOT be used.  Only one version of TLS MUST be
 used during the lifetime of an SCTP Association.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 </section>
@@ -1930,7 +1930,7 @@ DTLS Key Management Parameters) used as input to key derivation.<a href="#sectio
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-exporter-context" class="section-name selfRef">Exporter Context</a>
         </h3>
 <p id="section-5.2-1">DTLS Key Contexts are derived using the TLS Exporter as defined in
-Section 7.5 of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.  The exporter context is constructed as
+Section 7.5 of <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.  The exporter context is constructed as
 the concatenation of the following fields:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-2">
           <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
@@ -2885,7 +2885,7 @@ beyond policy limits, the association MUST be aborted.<a href="#section-7-3" cla
         <h3 id="name-general">
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-general" class="section-name selfRef">General</a>
         </h3>
-<p id="section-8.1-1">The security considerations given in <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, <span>[<a href="#RFC9147" class="cite xref">RFC9147</a>]</span>, and
+<p id="section-8.1-1">The security considerations given in <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, <span>[<a href="#RFC9147" class="cite xref">RFC9147</a>]</span>, and
 <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> also apply to this document.  BCP 195 <span>[<a href="#RFC9325" class="cite xref">RFC9325</a>]</span>
           <span>[<a href="#RFC8996" class="cite xref">RFC8996</a>]</span> provides recommendations and requirements for improving
 the security of deployed services that use TLS.  BCP 195 MUST be
@@ -3000,10 +3000,6 @@ Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
-<dt id="RFC8446">[RFC8446]</dt>
-        <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC8996">[RFC8996]</dt>
         <dd>
 <span class="refAuthor">Moriarty, K.</span> and <span class="refAuthor">S. Farrell</span>, <span class="refTitle">"Deprecating TLS 1.0 and TLS 1.1"</span>, <span class="seriesInfo">BCP 195</span>, <span class="seriesInfo">RFC 8996</span>, <span class="seriesInfo">DOI 10.17487/RFC8996</span>, <time datetime="2021-03" class="refDate">March 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8996">https://www.rfc-editor.org/info/rfc8996</a>&gt;</span>. </dd>
@@ -3019,6 +3015,10 @@ Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <dt id="RFC9325">[RFC9325]</dt>
         <dd>
 <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Saint-Andre, P.</span>, and <span class="refAuthor">T. Fossati</span>, <span class="refTitle">"Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="seriesInfo">BCP 195</span>, <span class="seriesInfo">RFC 9325</span>, <span class="seriesInfo">DOI 10.17487/RFC9325</span>, <time datetime="2022-11" class="refDate">November 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9325">https://www.rfc-editor.org/info/rfc9325</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9846">[RFC9846]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9846</span>, <span class="seriesInfo">DOI 10.17487/RFC9846</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9846">https://www.rfc-editor.org/info/rfc9846</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-tsvwg-sctp-dtls-chunk">[I-D.ietf-tsvwg-sctp-dtls-chunk]</dt>
         <dd>
