@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-07T02:35:50.558363+00:00",
+  "timestamp": "2026-07-23T02:12:16.885590+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -128,6 +128,22 @@
       "createdAt": "2026-07-02T12:44:18Z",
       "updatedAt": "2026-07-06T19:07:24Z",
       "closedAt": "2026-07-06T19:07:24Z",
+      "comments": []
+    },
+    {
+      "number": 14,
+      "id": "I_kwDORGnINM8AAAABJs9afQ",
+      "title": "Clarify that each side MUST complete peer authentication before letting ULP communicate",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/14",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-22T06:20:48Z",
+      "updatedAt": "2026-07-22T06:20:48Z",
+      "closedAt": null,
       "comments": []
     }
   ],
