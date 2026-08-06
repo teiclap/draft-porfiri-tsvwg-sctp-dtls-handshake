@@ -280,6 +280,9 @@ associations can use multiple IP addresses per endpoint, DTLS records
 may arrive from different source IP addresses than those originally
 authenticated.
 
+The SCTP endpoint MUST NOT be permitted to send any User Data
+until the authentication has been completed.
+
 Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
