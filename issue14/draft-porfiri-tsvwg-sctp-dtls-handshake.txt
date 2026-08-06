@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 7 January 2027                                         Ericsson
-                                                             6 July 2026
+Expires: 7 February 2027                                        Ericsson
+                                                           6 August 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 January 2027.
+   This Internet-Draft will expire on 7 February 2027.
 
 Copyright Notice
 
@@ -132,7 +132,7 @@ Table of Contents
    delegates the actual key management to external methods identified by
    a DTLS Key Management Identifier.
 
-   This document defines one such method: it uses TLS 1.3 [RFC8446]
+   This document defines one such method: it uses TLS 1.3 [RFC9846]
    handshakes carried as SCTP user messages to perform mutual
    authentication and derive keying material for the DTLS Chunk
    Protection Operator.  The combination of the SCTP DTLS Chunk and the
@@ -272,7 +272,7 @@ Table of Contents
 
 3.1.  TLS Version
 
-   This document defines the usage of TLS 1.3 [RFC8446].  Earlier
+   This document defines the usage of TLS 1.3 [RFC9846].  Earlier
    versions of TLS MUST NOT be used.  Only one version of TLS MUST be
    used during the lifetime of an SCTP Association.
 
@@ -305,6 +305,9 @@ Table of Contents
    associations can use multiple IP addresses per endpoint, DTLS records
    may arrive from different source IP addresses than those originally
    authenticated.
+
+   The SCTP endpoint MUST NOT be permitted to send any User Data until
+   the authentication has been completed.
 
    Clients and servers MUST NOT accept a change of identity during the
    setup of a new TLS connection, but MAY accept negotiation of stronger
@@ -424,7 +427,7 @@ Table of Contents
 5.2.  Exporter Context
 
    DTLS Key Contexts are derived using the TLS Exporter as defined in
-   Section 7.5 of [RFC8446].  The exporter context is constructed as the
+   Section 7.5 of [RFC9846].  The exporter context is constructed as the
    concatenation of the following fields:
 
       +===========+==========+======================================+
@@ -937,7 +940,7 @@ Initiator                                            Responder
 
 8.1.  General
 
-   The security considerations given in [RFC8446], [RFC9147], and
+   The security considerations given in [RFC9846], [RFC9147], and
    [RFC9260] also apply to this document.  BCP 195 [RFC9325] [RFC8996]
    provides recommendations and requirements for improving the security
    of deployed services that use TLS.  BCP 195 MUST be followed.
@@ -996,10 +999,6 @@ Initiator                                            Responder
 
 10.1.  Normative References
 
-   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
-              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
-              <https://www.rfc-editor.org/info/rfc8446>.
-
    [RFC8996]  Moriarty, K. and S. Farrell, "Deprecating TLS 1.0 and TLS
               1.1", BCP 195, RFC 8996, DOI 10.17487/RFC8996, March 2021,
               <https://www.rfc-editor.org/info/rfc8996>.
@@ -1018,6 +1017,10 @@ Initiator                                            Responder
               Security (TLS) and Datagram Transport Layer Security
               (DTLS)", BCP 195, RFC 9325, DOI 10.17487/RFC9325, November
               2022, <https://www.rfc-editor.org/info/rfc9325>.
+
+   [RFC9846]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 9846, DOI 10.17487/RFC9846, July 2026,
+              <https://www.rfc-editor.org/info/rfc9846>.
 
    [I-D.ietf-tsvwg-sctp-dtls-chunk]
               Westerlund, M., Mattsson, J. P., Porfiri, C., and M.
