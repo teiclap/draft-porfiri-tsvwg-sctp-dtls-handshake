@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-23T02:12:16.885590+00:00",
+  "timestamp": "2026-08-09T01:15:20.368947+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -138,11 +138,13 @@
       "state": "OPEN",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "teiclap"
+      ],
       "labels": [],
       "body": "",
       "createdAt": "2026-07-22T06:20:48Z",
-      "updatedAt": "2026-07-22T06:20:48Z",
+      "updatedAt": "2026-08-06T07:43:31Z",
       "closedAt": null,
       "comments": []
     }
@@ -506,6 +508,32 @@
       "mergeCommit": {
         "oid": "49678ecdd53092004f6bb10f40d63f1103955e48"
       },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDORGnINM77d83E",
+      "title": "Clarified that traffic is permitted only after authentication",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/15",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "In \"Authentication and Identity\" section, added\r\n\r\n_The SCTP endpoint MUST NOT be permitted to send any User Data\r\nuntil the authentication has been completed._\r\n\r\n",
+      "createdAt": "2026-08-06T07:45:10Z",
+      "updatedAt": "2026-08-06T07:45:27Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "b87c64a154e80c6eb0932a54e4c1b888055e0b6f",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue14",
+      "headRefOid": "ae7b3b87874aa4d1cb886a4cd619dc05f8786f59",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
       "comments": [],
       "reviews": []
     }
