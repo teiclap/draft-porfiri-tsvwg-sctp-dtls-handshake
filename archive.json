@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-09T01:15:20.368947+00:00",
+  "timestamp": "2026-08-25T00:56:42.094685+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -145,6 +145,22 @@
       "body": "",
       "createdAt": "2026-07-22T06:20:48Z",
       "updatedAt": "2026-08-06T07:43:31Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDORGnINM8AAAABN-CkDQ",
+      "title": "Update reference to requirements doc for rekeying",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/16",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Tried following the link in the ANSSI reference and it was broken. Lets update with a currently working one.\n\nhttps://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf",
+      "createdAt": "2026-08-24T08:01:14Z",
+      "updatedAt": "2026-08-24T08:01:14Z",
       "closedAt": null,
       "comments": []
     }
