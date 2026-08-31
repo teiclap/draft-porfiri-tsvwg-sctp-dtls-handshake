@@ -36,7 +36,7 @@ informative:
   RFC9525:
 
   ANSSI-DAT-NT-003:
-    target: <https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf>
+    target: <https://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf>
     title: Recommendations for securing networks with IPsec
     seriesinfo:
       ANSSI Technical Report DAT-NT-003
