@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 7 February 2027                                        Ericsson
-                                                           6 August 2026
+Expires: 4 March 2027                                           Ericsson
+                                                          31 August 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 February 2027.
+   This Internet-Draft will expire on 4 March 2027.
 
 Copyright Notice
 
@@ -1053,7 +1053,7 @@ Initiator                                            Responder
               Agence nationale de la sécurité des systèmes
               d'information, "Recommendations for securing networks with
               IPsec", ANSSI Technical Report DAT-NT-003 , August 2015,
-              <<https://www.ssi.gouv.fr/uploads/2015/09/
+              <<https://messervices.cyber.gouv.fr/documents-guides/
               NT_IPsec_EN.pdf>>.
 
    [KTH-NCSA] Ekerå, M., "On factoring integers, and computing discrete
