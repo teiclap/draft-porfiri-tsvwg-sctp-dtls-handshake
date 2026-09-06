@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-01T03:09:03.851327+00:00",
+  "timestamp": "2026-09-06T02:29:09.141285+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -557,7 +557,7 @@
       "labels": [],
       "body": "In \"Authentication and Identity\" section, added\r\n\r\n_The SCTP endpoint MUST NOT be permitted to send any User Data\r\nuntil the authentication has been completed._\r\n\r\n",
       "createdAt": "2026-08-06T07:45:10Z",
-      "updatedAt": "2026-08-31T13:02:30Z",
+      "updatedAt": "2026-09-03T07:17:41Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "b87c64a154e80c6eb0932a54e4c1b888055e0b6f",
@@ -607,6 +607,26 @@
               "body": "You are right actually. This is too sharp. \r\nLet's try another way:\r\n\r\nThe SCTP endpoints MUST NOT be permitted to exchange any user originated data\r\nuntil the key-management allows it.\r\n",
               "createdAt": "2026-08-31T13:02:30Z",
               "updatedAt": "2026-08-31T13:05:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABL-utyw",
+          "commit": {
+            "abbreviatedOid": "38b0095"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-03T07:17:41Z",
+          "updatedAt": "2026-09-03T07:17:41Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "A possible sentence may be\r\n\r\nThe ULP MUST NOT be permitted to send user data until the association has been marked protected (i.e., Require Protected SCTP Packets has been invoked and, for the client, Protection Established has been received).",
+              "createdAt": "2026-09-03T07:17:41Z",
+              "updatedAt": "2026-09-03T07:17:41Z"
             }
           ]
         }
