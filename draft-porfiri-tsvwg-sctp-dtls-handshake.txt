@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 19 January 2027                                        Ericsson
-                                                            18 July 2026
+Expires: 13 March 2027                                          Ericsson
+                                                        9 September 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 January 2027.
+   This Internet-Draft will expire on 13 March 2027.
 
 Copyright Notice
 
@@ -961,6 +961,13 @@ Initiator                                            Responder
    attackers to perform dynamic key exfiltration and limits the amount
    of compromised data due to key compromise.
 
+   It is RECOMMENDED that implementations of this key-management method
+   is not allowing the ULP to exchange any data beyond the key-
+   management information following this specification until the peer is
+   authenticated and local endpoint and the remote has entered
+   Protection Established.  This to avoid any information leakage from
+   the ULP to none intended parties.
+
 9.  IANA Considerations
 
 9.1.  DTLS Key Management Method Identifier
@@ -1050,7 +1057,7 @@ Initiator                                            Responder
               Agence nationale de la sécurité des systèmes
               d'information, "Recommendations for securing networks with
               IPsec", ANSSI Technical Report DAT-NT-003 , August 2015,
-              <<https://www.ssi.gouv.fr/uploads/2015/09/
+              <<https://messervices.cyber.gouv.fr/documents-guides/
               NT_IPsec_EN.pdf>>.
 
    [KTH-NCSA] Ekerå, M., "On factoring integers, and computing discrete
