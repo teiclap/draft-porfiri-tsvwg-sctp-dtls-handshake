@@ -36,7 +36,7 @@ informative:
   RFC9525:
 
   ANSSI-DAT-NT-003:
-    target: <https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf>
+    target: <https://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf>
     title: Recommendations for securing networks with IPsec
     seriesinfo:
       ANSSI Technical Report DAT-NT-003
@@ -947,6 +947,13 @@ confidentiality, TLS for DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.
+
+It is RECOMMENDED that implementations of this key-management
+method is not allowing the ULP to exchange any data beyond the
+key-management information following this specification until
+the peer is authenticated and local endpoint and the remote
+has entered Protection Established. This to avoid any information
+leakage from the ULP to none intended parties.
 
 
 # IANA Considerations {#iana-considerations}
