@@ -29,11 +29,11 @@ management and rekeying.
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.11.5
+    platformdirs 4.11.7
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.2
+    wcwidth 0.8.3
 -->
 <link href="draft-porfiri-tsvwg-sctp-dtls-handshake.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1049,11 +1049,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">TLS for DTLS in SCTP</td>
-<td class="right">August 2026</td>
+<td class="right">September 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 4 March 2027</td>
+<td class="center">Expires 13 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1066,12 +1066,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-31" class="published">31 August 2026</time>
+<time datetime="2026-09-09" class="published">9 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-04">4 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-13">13 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 13 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1650,11 +1650,9 @@ identity, not on its transport layer identity.  Since SCTP
 associations can use multiple IP addresses per endpoint, DTLS records
 may arrive from different source IP addresses than those originally
 authenticated.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
-<p id="section-3.3-4">The SCTP endpoint MUST NOT be permitted to send any User Data
-until the authentication has been completed.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
-<p id="section-3.3-5">Clients and servers MUST NOT accept a change of identity during the
+<p id="section-3.3-4">Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
-algorithms and security parameters.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
+algorithms and security parameters.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekey-policy">
@@ -2910,6 +2908,10 @@ confidentiality, TLS for DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">It is RECOMMENDED that implementations of this key-management
+method is not allowing the ULP to exchange any data beyond the
+key-management information following this specification until
+the local endpoint and the remote has Protection Established.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
