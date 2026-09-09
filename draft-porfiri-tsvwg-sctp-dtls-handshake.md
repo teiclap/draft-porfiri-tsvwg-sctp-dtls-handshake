@@ -951,7 +951,9 @@ of compromised data due to key compromise.
 It is RECOMMENDED that implementations of this key-management
 method is not allowing the ULP to exchange any data beyond the
 key-management information following this specification until
-the local endpoint and the remote has Protection Established.
+the peer is authenticated and local endpoint and the remote
+has entered Protection Established. This to avoid any information
+leakage from the ULP to none intended parties.
 
 
 # IANA Considerations {#iana-considerations}
