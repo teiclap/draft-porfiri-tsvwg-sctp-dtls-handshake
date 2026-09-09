@@ -280,9 +280,6 @@ associations can use multiple IP addresses per endpoint, DTLS records
 may arrive from different source IP addresses than those originally
 authenticated.
 
-The SCTP endpoint MUST NOT be permitted to send any User Data
-until the authentication has been completed.
-
 Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
@@ -950,6 +947,11 @@ confidentiality, TLS for DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.
+
+It is RECOMMENDED that implementations of this key-management
+method is not allowing the ULP to exchange any data beyond the
+key-management information following this specification until
+the local endpoint and the remote has Protection Established.
 
 
 # IANA Considerations {#iana-considerations}
