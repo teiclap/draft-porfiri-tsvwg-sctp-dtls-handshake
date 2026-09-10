@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-06T02:29:09.141285+00:00",
+  "timestamp": "2026-09-10T02:41:49.495760+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -135,7 +135,7 @@
       "id": "I_kwDORGnINM8AAAABJs9afQ",
       "title": "Clarify that each side MUST complete peer authentication before letting ULP communicate",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/14",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -144,8 +144,8 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-07-22T06:20:48Z",
-      "updatedAt": "2026-08-06T07:43:31Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-09T14:38:03Z",
+      "closedAt": "2026-09-09T14:38:03Z",
       "comments": []
     },
     {
@@ -153,7 +153,7 @@
       "id": "I_kwDORGnINM8AAAABN-CkDQ",
       "title": "Update reference to requirements doc for rekeying",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/16",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -162,8 +162,8 @@
       "labels": [],
       "body": "Tried following the link in the ANSSI reference and it was broken. Lets update with a currently working one.\n\nhttps://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf",
       "createdAt": "2026-08-24T08:01:14Z",
-      "updatedAt": "2026-08-31T09:03:47Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-09T14:38:03Z",
+      "closedAt": "2026-09-09T14:38:03Z",
       "comments": []
     },
     {
@@ -550,25 +550,42 @@
       "id": "PR_kwDORGnINM77d83E",
       "title": "Clarified that traffic is permitted only after authentication",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/15",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "In \"Authentication and Identity\" section, added\r\n\r\n_The SCTP endpoint MUST NOT be permitted to send any User Data\r\nuntil the authentication has been completed._\r\n\r\n",
       "createdAt": "2026-08-06T07:45:10Z",
-      "updatedAt": "2026-09-03T07:17:41Z",
+      "updatedAt": "2026-09-09T14:38:02Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "b87c64a154e80c6eb0932a54e4c1b888055e0b6f",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue14",
-      "headRefOid": "38b009539e62c295bb78d9cf5f586a932df16f09",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "594262d39d239fab275c1edf6cbaa429e96ccce7",
+      "closedAt": "2026-09-09T14:38:02Z",
+      "mergedAt": "2026-09-09T14:38:02Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204"
+      },
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think my updated proposal is the best we can do based on how this is structured.",
+          "createdAt": "2026-09-09T14:31:43Z",
+          "updatedAt": "2026-09-09T14:31:43Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "I have read you proposal and agree with it.",
+          "createdAt": "2026-09-09T14:34:12Z",
+          "updatedAt": "2026-09-09T14:34:12Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDORGnINM8AAAABLf-swA",
