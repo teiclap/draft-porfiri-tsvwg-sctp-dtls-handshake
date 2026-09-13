@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-10T02:41:49.495760+00:00",
+  "timestamp": "2026-09-13T02:43:01.531392+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -58,13 +58,23 @@
       "state": "OPEN",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "teiclap"
+      ],
       "labels": [],
       "body": "In some cases errors should likely result in SCTP assocation abort. But should it always? Are there cases where a new TLS connection requrest can succeed?",
       "createdAt": "2026-06-09T14:28:46Z",
-      "updatedAt": "2026-06-09T14:28:46Z",
+      "updatedAt": "2026-09-10T12:55:06Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Likely a good solution for this is to state that if one gets a TLS error during intitial handshake if the implementation think it can address the error it should retry the TLS, otherwise it should abort the SCTP association. For rekeying one have less need to end immediately. However, at some point the key will not be appriate to use. Thus, if the TLS error is not fixible one will have to abort at some point. Else one can retry the TLS connection multiple times to attempt to fix it. However, some limit to not retry to quickly should be considered. ",
+          "createdAt": "2026-09-10T12:55:06Z",
+          "updatedAt": "2026-09-10T12:55:06Z"
+        }
+      ]
     },
     {
       "number": 6,
@@ -174,13 +184,23 @@
       "state": "OPEN",
       "author": "teiclap",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "teiclap"
+      ],
       "labels": [],
       "body": "Here are my thought on draft-porfiri-tsvwg-sctp-dtls-handshake.\n\nFirst, I want to note that draft-ietf-tls-extended-key-update, once it is finished, offers a better way to get fresh subsequent keys.  It can be used with resumption so that the TLS session does not need to be kept open.\n\nSection 1: Use the new TLS 1.3 RFC, not the original one.\n\nSection 3.2: It would be better to eliminate the double negative in the first sentence:\n\nIt is RECOMMENDED that only parameters marked as \"Y\" in the \"Recommended\" column of TLS registries are supported.\n\nSection 3.4: Is \"policy\" the right word? It is certainly quite different that certificate policies. I wonder if you are really asking for a configuration setting.  The rekey should happen whenever the time has passed _or_ the amount of data is about to be exceeded.\n\nSection 3.4: In the multi-homed situation, can more than one TLS session be needed by an endpoint?\n\n",
       "createdAt": "2026-08-31T06:05:27Z",
-      "updatedAt": "2026-08-31T06:05:27Z",
+      "updatedAt": "2026-09-10T12:44:55Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "Section 3.4 \"policy\" --> \"strategy\"",
+          "createdAt": "2026-09-10T12:44:55Z",
+          "updatedAt": "2026-09-10T12:44:55Z"
+        }
+      ]
     }
   ],
   "pulls": [
