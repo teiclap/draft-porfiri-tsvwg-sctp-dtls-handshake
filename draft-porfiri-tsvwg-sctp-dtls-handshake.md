@@ -910,13 +910,19 @@ handshake error occurs, the TLS alert is sent in an SCTP user message
 (see {{tls-user-message}}) with the DTLS Key Management Messages PPID
 (4242).
 
-If a TLS handshake fails during initial establishment, the SCTP
-association MUST be aborted.
+If a TLS handshake fails during initial establishment and the
+implementation determines that it can address the cause of the error
+(for example, by retrying with different parameters), it SHOULD retry
+the TLS handshake.  Otherwise, the SCTP association MUST be aborted.
 
-If a TLS handshake fails during rekeying, and the current DKC has not
-yet reached its usage limits, the implementation SHOULD retry the
-handshake.  If retry is not possible or the current DKC is aged
-beyond policy limits, the association MUST be aborted.
+If a TLS handshake fails during rekeying, there is no need to end the
+association immediately, since traffic can continue to be protected
+with the current DKC.  As long as the current DKC has not yet reached
+its usage limits, the implementation MAY retry the TLS handshake
+multiple times in an attempt to resolve the error.  However, the
+current DKC will eventually become inappropriate to use: if the error
+cannot be fixed and the current DKC is aged beyond policy limits or
+reaches its usage limits, the association MUST be aborted.
 
 
 # Security Considerations {#security-considerations}
