@@ -269,7 +269,7 @@ TLS for DTLS in SCTP MUST be mutually authenticated.  It is
 RECOMMENDED to use certificate-based authentication.
 
 When certificates are used, the application is responsible for
-certificate policies, certificate chain validation, and identity
+certificate strategies, certificate chain validation, and identity
 authentication.  The application defines what the identity is and
 how it is encoded.  Guidance on server certificate validation can be
 found in {{RFC9525}}.
@@ -284,12 +284,12 @@ Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
 
-## Rekeying Policy {#rekey-policy}
+## Rekeying Strategy {#rekey-strategy}
 
-Implementations MUST have policies for how often to set up new TLS
+Implementations MUST have strategies for how often to set up new TLS
 connections with ephemeral key exchange.  Implementations SHOULD
 rekey at least every hour and every 100 GB of data, which is a common
-policy for IPsec {{ANSSI-DAT-NT-003}}.
+strategy for IPsec {{ANSSI-DAT-NT-003}}.
 
 Implementations MUST set up a new TLS connection using a full
 handshake with new certificates before any last used certificates
@@ -916,7 +916,7 @@ association MUST be aborted.
 If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
 handshake.  If retry is not possible or the current DKC is aged
-beyond policy limits, the association MUST be aborted.
+beyond strategy limits, the association MUST be aborted.
 
 
 # Security Considerations {#security-considerations}
