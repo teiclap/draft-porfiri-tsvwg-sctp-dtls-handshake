@@ -284,7 +284,7 @@ Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
 
-## Rekeying Policy {#rekey-policy}
+## Rekeying Strategy {#rekey-policy}
 
 Implementations MUST have policies for how often to set up new TLS
 connections with ephemeral key exchange.  Implementations SHOULD
