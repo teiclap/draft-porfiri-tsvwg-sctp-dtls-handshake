@@ -377,16 +377,21 @@ The following control message type is defined:
 ### Protection Established {#protection-established}
 
 The Protection Established control message (Ctrl Type = 0x01) is sent
-by the Server to the Client after the Server has installed
-all keys and enforced DTLS chunk protection.  This message carries no
-Control Data (the payload following the Ctrl Type byte is empty).
+by the KM Client to the KM server for indicating that it has set
+the read key material.
 
-Upon receiving this message, the Client enforces DTLS chunk
-protection and informs the ULP that the association is protected.
+After having received the Protection Established control message
+gtom KM Client, and after having completed itself the TLS handshake
+the Server sends the Protection Established control message
+to the Client once having installed all keys, enforced DTLS chunk protection
+and having informed  the ULP that the association is protected.
 
-The message is also used during rekeying to confirm to the endpoint
-with the client role in that procedure that the server has installed
-all keys, and the client can install write keys.
+Upon receiving this message, the Client install the write keys,
+enforces DTLS chunk protection and informs the ULP that the association is protected.
+
+This message carries no Control Data (the payload following the Ctrl Type byte is empty).
+
+The message is also used during rekeying in the same way as in the initial handshake.
 
 # Key Derivation {#dtls-key-derivation}
 
