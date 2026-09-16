@@ -299,12 +299,37 @@ The PSK key exchange mode psk_ke MUST NOT be used as it does not
 provide ephemeral key exchange.  TLS Key Update MUST NOT be used as it
 doesn't provide a new ephemeral key for the key exporter.
 
-TLS 1.3 tickets MAY be used for resumption. Resumption can be used to
-chain the connections, increasing security by forcing an adversary to
-break them in sequence {{KTH-NCSA}}.
+TLS 1.3 tickets MAY be used for session resumption (see
+{{session-resumption}}).
 
 The endpoints MUST limit the number of simultaneous TLS connections
 to one.
+
+## Session Resumption {#session-resumption}
+
+Support for TLS 1.3 session resumption is OPTIONAL. When supported, it
+provides the following benefits:
+
+* It avoids re-sending the full certificate chain on subsequent TLS
+   connections. This saves a significant amount of message size,
+   especially with post-quantum cryptography (PQC) certificates, which
+   can be significantly larger than certificates based on Elliptic Curve
+   Diffie-Hellman (ECDH).
+
+* It reduces processing, and thus energy consumption and latency.
+
+* It allows successive TLS connections to be chained, increasing
+   security by forcing an adversary to break them in sequence
+   {{KTH-NCSA}}.
+
+Session resumption tickets MAY be pushed by the server key manager at
+any point after the TLS handshake has completed, or they MAY be
+explicitly requested by the client key manager from the server key
+manager. To ensure the client key manager has the opportunity to
+request a ticket before the TLS connection is torn down, the client key
+manager SHOULD initiate the closure of the TLS connection, and the
+server key manager SHOULD NOT close the TLS connection before the
+client has had the opportunity to send a ticket request.
 
 
 # TLS Message Transport {#tls-user-message}
@@ -377,16 +402,16 @@ The following control message type is defined:
 ### Protection Established {#protection-established}
 
 The Protection Established control message (Ctrl Type = 0x01) is sent
-by the KM Client to the KM server for indicating that it has set
+by the client key manager to the server key manager for indicating that it has set
 the read key material.
 
 After having received the Protection Established control message
-gtom KM Client, and after having completed itself the TLS handshake
-the Server sends the Protection Established control message
-to the Client once having installed all keys, enforced DTLS chunk protection
-and having informed  the ULP that the association is protected.
+from client key manager, and after having completed itself the TLS handshake
+the server key manager sends the Protection Established control message
+to the client key manager once having installed all keys, enforced DTLS chunk protection
+and having informed the ULP that the association is protected.
 
-Upon receiving this message, the Client install the write keys,
+Upon receiving this message, the client key manager installs the write keys,
 enforces DTLS chunk protection and informs the ULP that the association is protected.
 
 This message carries no Control Data (the payload following the Ctrl Type byte is empty).
@@ -479,7 +504,7 @@ sequence numbers and replay window.
         +------------------------------[COOKIE ECHO]----------------------------->| 2.
      3. |<-----------------------------[COOKIE ACK]-------------------------------+
         |                                                                         |
-        |   TLS          KM Client                    KM Server           TLS     |
+        |   TLS          client key manager                    server key manager           TLS     |
         |    |               |                            |                |      |
      4. |    |<-SSL_connect()+                            +--SSL_accept()->|      | 5.
         |    |               |                            |                |      |
@@ -581,7 +606,8 @@ sequence numbers and replay window.
 
   If the TLS handshake fails, the SCTP association MUST be aborted.
 
-  After key installation, the TLS connection SHOULD be closed promptly.
+ After key installation, the TLS connection SHOULD be closed promptly. When session resumption is supported, closure follows the procedure in {{session-resumption}}.
+
 
 ## Rekeying {#rekeying}
 
