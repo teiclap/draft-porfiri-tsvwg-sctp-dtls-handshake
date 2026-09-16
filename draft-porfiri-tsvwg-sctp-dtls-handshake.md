@@ -467,102 +467,116 @@ sequence numbers and replay window.
 
 ~~~~~~~~~~~ aasvg
 
-Initiator                                             Responder
-    |                                                     |
- 1. +------------------------[INIT]---------------------->|
-    |<---------------------[INIT-ACK]---------------------+
-    +--------------------[COOKIE ECHO]------------------->| 2.
- 3. |<--------------------[COOKIE ACK]--------------------+
-    |                                                     |
-    |  Key Manager Client              Key Manager Server |
-    |    |                                          |     |
- 4. +--->| TLS START                      TLS START |<----+
-    |    |                                          |     |
-    |    +---------[DATA(TLS Client Hello)]-------->|  5. |
-    |    |                                          |     |
-    | 7. |<-[DATA(TLS Server Hello ... Finished)]---+  6. |
-    | 8. +--[DATA(TLS Certificate ... Finished)]--->|  9. |
-    |    |                                          | 10. |
-    |12. |<--[DATA(Protection Established)]---------+ 11. |
-    |    |                                          |     |
-    |                                                     | -.
-13. +------------[DTLS CHUNK(DATA(APP DATA))]------------>|   | APP DATA
-    +<-----------[DTLS CHUNK(DATA(APP DATA))]-------------+   +---------
-    |                         ...                         |   |
+  Initiator                                                                  Responder
+        |                                                                         |
+     1. +--------------------------------[INIT]---------------------------------->|
+        |<-----------------------------[INIT-ACK]---------------------------------+
+        +------------------------------[COOKIE ECHO]----------------------------->| 2.
+     3. |<-----------------------------[COOKIE ACK]-------------------------------+
+        |                                                                         |
+        |   TLS          KM Client                    KM Server           TLS     |
+        |    |               |                            |                |      |
+     4. |    |<-SSL_connect()+                            +--SSL_accept()->|      | 5.
+        |    |               |                            |                |      |
+        |    |----records--->|                            |                |      |
+        |    |               +====[DATA(TLS records)]====>|                |      | 6.
+        |    |               |                            +----records---->|      |
+        |    |               |                            |<---records-----+      |
+        |    |               |<===[DATA(TLS records)]=====+                |      |
+        |    |<---records----+                            |                |      |
+        |    |              (repeat until handshake completes)             |      |
+        |    |               |                            |                |      |
+     7. |    +---complete--->|                            |                |      |
+        |   (install READ key)                            |                |      |
+        |    |               |                            |                |      |
+        |    |               +-[DATA(Protection Estab.)]->|                |      |
+        |    |               |                            |                |      |
+        |    |               |                            |<----complete---+      | 8a.
+        |    |               |                            |                |      |
+        |    |               |                   (wait for BOTH: own TLS complete |
+        |    |               |                     AND client PE received)        | 8b.
+        |    |               |                    (install READ+WRITE, enforce)   |
+        |    |               |                            |                |      |
+     9. |    |               |<-[DATA(Protection Estab.)]-+                |      |
+        |   (install WRITE key, enforce)                  |                |      |
+        |    |               |                            |                |      |
+        |    |               |                            |                |      |
+        |                                                                         | -.
+    10. +--------------------[DTLS CHUNK(DATA(APP DATA))]------------------------>|   | APP DATA
+        +<-------------------[DTLS CHUNK(DATA(APP DATA))]-------------------------+   +---------
+        |                               ...                                       |   |
 
 ~~~~~~~~~~~
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
 
-The diagram {{initial-establishment-diagram}} shows the case
-where SCTP Initiator ends up with the Key Manager client role.
-The opposite case is identical but with inverted roles among
-Key Managers. In the following procedure we use Initiator
-and Responder referring to SCTP, Client and Server referring
-to Keymanager role, and implicitly TLS roles.
+  The diagram {{initial-establishment-diagram}} shows the case where
+  SCTP Initiator ends up with the Key Manager client role. The opposite
+  case is identical but with inverted roles among Key Managers. In the
+  following procedure we use Initiator and Responder referring to
+  SCTP, Client and Server referring to Keymanager role, and implicitly
+  TLS roles. The key managers drive TLS solely through the TLS user
+  API and relay the resulting TLS records; they do not parse TLS messages.
 
-The procedure is as follows:
+  The procedure is as follows:
 
-1. The Initiator sends INIT containing the DTLS Key Management
-   Parameter (Section 4.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}})
-   with this method's identifier (see {{sec-iana-psi}}) in its
-   preference-ordered list.
+  1. The Initiator sends INIT containing the DTLS Key Management Parameter
+   (Section 4.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) with this
+   method's identifier (see {{sec-iana-psi}}) in its preference-ordered list.
 
-2. The Responder enters ESTABLISHED state.  It retrieves the agreed
-   DTLS Key Management Method and role from the SCTP stack (e.g.,
-   using the "Get Agreed DTLS Key Management Method and Role" API
-   defined in Section 7.2 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}})
-   and verifies that the selected method matches the one defined in
-   this document (see {{sec-iana-psi}}) and gets the assigned role
-   as key manager client or server (in the example depicted in
-   {{initial-establishment-diagram}} it is server).
+  2. The Responder enters ESTABLISHED state. It retrieves the agreed DTLS
+   Key Management Method and role from the SCTP stack (e.g., using
+   the "Get Agreed DTLS Key Management Method and Role" API defined in
+   Section 7.2 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) and verifies that
+   the selected method matches the one defined in this document
+   (see {{sec-iana-psi}}) and gets the assigned role as key manager client or
+   server (in the example depicted in {{initial-establishment-diagram}}
+   it is server).
 
-3. The Initiator enters ESTABLISHED state.  It performs the same
-   retrieval and verification as the Responder, confirming the
-   assigned role as key manager client or server (in the example
-   depicted in {{initial-establishment-diagram}} it is client).
+  3. The Initiator enters ESTABLISHED state. It performs the same retrieval
+   and verification as the Responder, confirming the assigned role as key
+   manager client or server (in the example depicted in {{initial-establishment-diagram}}
+   it is client).
 
-4. The client key manager starts a TLS 1.3 handshake, limiting
-   offered cipher suites to those supported by the DTLS Chunk
-   Protection Operator, and sends TLS ClientHello per
+  4. The client key manager starts a TLS 1.3 handshake, limiting offered cipher
+   suites to those supported by the DTLS Chunk Protection Operator, and relays
+   the resulting TLS records to the server key manager per {{tls-user-message}}.
+
+  5. The server key manager starts a TLS 1.3 handshake as TLS server and relays
+   the resulting TLS records to the client key manager per
    {{tls-user-message}}.
 
-5. The server key manager receives the TLS ClientHello.  If a
-   HelloRetryRequest is needed, an additional round-trip occurs
+  6. The client key manager and the server key manager relay TLS records to and
+   from their local TLS, repeating until the TLS handshake
+   completes. If a HelloRetryRequest is needed, an additional round-trip occurs
    before proceeding.
 
-6. The server key manager sends its TLS ServerHello through Finished
-   messages.
+  7. The client key manager's TLS handshake completes. It exports all Primary and
+   Restart DKC keys, installs the server to client key
+   material as its read (receive) key, and sends a Protection Established control
+   message ({{protection-established}}) to the server key
+   manager.
 
-7. The client key manager receives the TLS ServerHello message,
-   exports all Primary and Restart DKC keys, and installs the server to client
-   key material as its read (receive) key.
+  8. The server key manager proceeds only after both its own TLS handshake has
+   completed and it has received the client key manager's
+   Protection Established control message. Once both conditions are met, it
+   exports both direction key material for both the Primary and
+   Restart DKCs, installs both the read (receive) key and the write (send) key,
+   calls Require Protected SCTP Packets to enforce DTLS chunk
+   protection for all future packets, and informs the ULP that the association
+   is protected.
 
-8. The client key manager sends its TLS
-   Certificate/CertificateVerify/Finished.
+  9. The server key manager sends a Protection Established control message
+   ({{protection-established}}) to the client key manager. The
+   client key manager receives it, installs the client key material as its
+   write (send) key, calls Require Protected SCTP Packets to
+   enforce DTLS chunk protection for all future packets, and informs the ULP
+   that the association is protected.
 
-9. The server key manager receives
-   Certificate/CertificateVerify/Finished, it exports both direction
-   key material for both the Primary and Restart DKCs, and installs both
-   read (receive) keys and as its write (send) keys.
+  10. Application traffic can begin.
 
-10. The server key manager calls Require Protected SCTP Packets to
-    enforce DTLS chunk protection for all future packets and informs
-    the ULP that the association is protected.
+  If the TLS handshake fails, the SCTP association MUST be aborted.
 
-11. The server key manager sends a Protection Established control
-    message ({{protection-established}}) to the client key manager.
-
-12. The client key manager receives the Protection Established control
-    message, and installs the client key material as its write (send)
-    key, calls Require Protected SCTP Packets to enforce DTLS chunk
-    protection for all future packets, and informs the ULP that the
-    association is protected.
-
-13. Application traffic can begin.
-
-If the TLS handshake fails, the SCTP association MUST be aborted.
-
-After key installation, the TLS connection SHOULD be closed promptly.
+  After key installation, the TLS connection SHOULD be closed promptly.
 
 ## Rekeying {#rekeying}
 
