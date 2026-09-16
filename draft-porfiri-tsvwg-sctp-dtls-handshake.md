@@ -916,7 +916,7 @@ association MUST be aborted.
 If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
 handshake.  If retry is not possible or the current DKC is aged
-beyond strategy limits, the association MUST be aborted.
+beyond usage limits, the association MUST be aborted.
 
 
 # Security Considerations {#security-considerations}
