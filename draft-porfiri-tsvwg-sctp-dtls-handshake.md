@@ -269,7 +269,7 @@ TLS for DTLS in SCTP MUST be mutually authenticated.  It is
 RECOMMENDED to use certificate-based authentication.
 
 When certificates are used, the application is responsible for
-certificate strategies, certificate chain validation, and identity
+trust anchor management, certificate chain validation, and identity
 authentication.  The application defines what the identity is and
 how it is encoded.  Guidance on server certificate validation can be
 found in {{RFC9525}}.
