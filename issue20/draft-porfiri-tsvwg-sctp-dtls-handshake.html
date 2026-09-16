@@ -1204,6 +1204,9 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
                 <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-rekeying-policy" class="internal xref">Rekeying Policy</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-session-resumption" class="internal xref">Session Resumption</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
@@ -1670,11 +1673,44 @@ expire.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.4-3">The PSK key exchange mode psk_ke MUST NOT be used as it does not
 provide ephemeral key exchange.  TLS Key Update MUST NOT be used as it
 doesn't provide a new ephemeral key for the key exporter.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
-<p id="section-3.4-4">TLS 1.3 tickets MAY be used for resumption. Resumption can be used to
-chain the connections, increasing security by forcing an adversary to
-break them in sequence <span>[<a href="#KTH-NCSA" class="cite xref">KTH-NCSA</a>]</span>.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<p id="section-3.4-4">TLS 1.3 tickets MAY be used for session resumption (see
+<a href="#session-resumption" class="auto internal xref">Section 3.5</a>).<a href="#section-3.4-4" class="pilcrow">¶</a></p>
 <p id="section-3.4-5">The endpoints MUST limit the number of simultaneous TLS connections
 to one.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="session-resumption">
+<section id="section-3.5">
+        <h3 id="name-session-resumption">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-session-resumption" class="section-name selfRef">Session Resumption</a>
+        </h3>
+<p id="section-3.5-1">Support for TLS 1.3 session resumption is OPTIONAL. When supported, it
+provides the following benefits:<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.5-2.1">
+            <p id="section-3.5-2.1.1">It avoids re-sending the full certificate chain on subsequent TLS
+ connections. This saves a significant amount of message size,
+ especially with post-quantum cryptography (PQC) certificates, which
+ can be significantly larger than certificates based on Elliptic Curve
+ Diffie-Hellman (ECDH).<a href="#section-3.5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.5-2.2">
+            <p id="section-3.5-2.2.1">It reduces processing, and thus energy consumption and latency.<a href="#section-3.5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.5-2.3">
+            <p id="section-3.5-2.3.1">It allows successive TLS connections to be chained, increasing
+ security by forcing an adversary to break them in sequence
+ <span>[<a href="#KTH-NCSA" class="cite xref">KTH-NCSA</a>]</span>.<a href="#section-3.5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.5-3">Session resumption tickets MAY be pushed by the server key manager at
+any point after the TLS handshake has completed, or they MAY be
+explicitly requested by the client key manager from the server key
+manager. To ensure the client key manager has the opportunity to
+request a ticket before the TLS connection is torn down, the client key
+manager SHOULD initiate the closure of the TLS connection, and the
+server key manager SHOULD NOT close the TLS connection before the
+client has had the opportunity to send a ticket request.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1888,14 +1924,14 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
 <a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-protection-established" class="section-name selfRef">Protection Established</a>
           </h4>
 <p id="section-4.1.1-1">The Protection Established control message (Ctrl Type = 0x01) is sent
-by the KM Client to the KM server for indicating that it has set
+by the client key manager to the server key manager for indicating that it has set
 the read key material.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
 <p id="section-4.1.1-2">After having received the Protection Established control message
-gtom KM Client, and after having completed itself the TLS handshake
-the Server sends the Protection Established control message
-to the Client once having installed all keys, enforced DTLS chunk protection
-and having informed  the ULP that the association is protected.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-3">Upon receiving this message, the Client install the write keys,
+from client key manager, and after having completed itself the TLS handshake
+the server key manager sends the Protection Established control message
+to the client key manager once having installed all keys, enforced DTLS chunk protection
+and having informed the ULP that the association is protected.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">Upon receiving this message, the client key manager installs the write keys,
 enforces DTLS chunk protection and informs the ULP that the association is protected.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
 <p id="section-4.1.1-4">This message carries no Control Data (the payload following the Ctrl Type byte is empty).<a href="#section-4.1.1-4" class="pilcrow">¶</a></p>
 <p id="section-4.1.1-5">The message is also used during rekeying in the same way as in the initial handshake.<a href="#section-4.1.1-5" class="pilcrow">¶</a></p>
@@ -2042,7 +2078,7 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
 <figure id="figure-4">
           <div id="section-6.1-1.1">
             <div class="alignCenter art-svg artwork" id="section-6.1-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="672" width="760" viewBox="0 0 760 672" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="672" width="800" viewBox="0 0 800 672" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 56,48 L 56,624" fill="none" stroke="black"></path>
                 <path d="M 96,160 L 96,336" fill="none" stroke="black"></path>
                 <path d="M 96,368 L 96,512" fill="none" stroke="black"></path>
@@ -2056,7 +2092,8 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
                 <path d="M 456,496 L 456,560" fill="none" stroke="black"></path>
                 <path d="M 592,160 L 592,432" fill="none" stroke="black"></path>
                 <path d="M 592,496 L 592,560" fill="none" stroke="black"></path>
-                <path d="M 648,48 L 648,624" fill="none" stroke="black"></path>
+                <path d="M 648,48 L 648,128" fill="none" stroke="black"></path>
+                <path d="M 648,160 L 648,624" fill="none" stroke="black"></path>
                 <path d="M 680,592 L 680,624" fill="none" stroke="black"></path>
                 <path d="M 56,64 L 312,64" fill="none" stroke="black"></path>
                 <path d="M 368,64 L 640,64" fill="none" stroke="black"></path>
@@ -2124,11 +2161,14 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
                   <text x="328" y="116">[COOKIE</text>
                   <text x="380" y="116">ACK]</text>
                   <text x="96" y="148">TLS</text>
-                  <text x="196" y="148">KM</text>
-                  <text x="236" y="148">Client</text>
-                  <text x="428" y="148">KM</text>
-                  <text x="468" y="148">Server</text>
-                  <text x="592" y="148">TLS</text>
+                  <text x="212" y="148">client</text>
+                  <text x="256" y="148">key</text>
+                  <text x="304" y="148">manager</text>
+                  <text x="516" y="148">server</text>
+                  <text x="560" y="148">key</text>
+                  <text x="608" y="148">manager</text>
+                  <text x="736" y="148">TLS</text>
+                  <text x="792" y="148">|</text>
                   <text x="36" y="180">4.</text>
                   <text x="152" y="180">&lt;-SSL_connect</text>
                   <text x="516" y="180">SSL_accept</text>
@@ -2270,7 +2310,7 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
 </li>
         </ol>
 <p id="section-6.1-5">If the TLS handshake fails, the SCTP association MUST be aborted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.1-6">After key installation, the TLS connection SHOULD be closed promptly.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.1-6">After key installation, the TLS connection SHOULD be closed promptly. When session resumption is supported, closure follows the procedure in <a href="#session-resumption" class="auto internal xref">Section 3.5</a>.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekeying">
