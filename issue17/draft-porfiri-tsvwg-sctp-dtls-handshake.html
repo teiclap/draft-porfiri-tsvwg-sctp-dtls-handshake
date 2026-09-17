@@ -1202,7 +1202,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-authentication-and-identity" class="internal xref">Authentication and Identity</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
-                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-rekeying-strategy" class="internal xref">Rekeying Strategy</a></p>
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-rekeying-considerations" class="internal xref">Rekeying Considerations</a></p>
 </li>
             </ul>
 </li>
@@ -1657,13 +1657,13 @@ algorithms and security parameters.<a href="#section-3.3-4" class="pilcrow">¶</
 </div>
 <div id="rekey-strategy">
 <section id="section-3.4">
-        <h3 id="name-rekeying-strategy">
-<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-rekeying-strategy" class="section-name selfRef">Rekeying Strategy</a>
+        <h3 id="name-rekeying-considerations">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-rekeying-considerations" class="section-name selfRef">Rekeying Considerations</a>
         </h3>
-<p id="section-3.4-1">Implementations MUST have strategies for how often to set up new TLS
-connections with ephemeral key exchange.  Implementations SHOULD
-rekey at least every hour and every 100 GB of data, which is a common
-strategy for IPsec <span>[<a href="#ANSSI-DAT-NT-003" class="cite xref">ANSSI-DAT-NT-003</a>]</span>.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-1">Implementations need to implement criterias for when to initiate
+rekeying.  Implementations are RECOMMENDED rekey at least every hour
+and every 100 GB of data, which matches what is specified for IPsec in
+<span>[<a href="#ANSSI-DAT-NT-003" class="cite xref">ANSSI-DAT-NT-003</a>]</span>.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4-2">Implementations MUST set up a new TLS connection using a full
 handshake with new certificates before any last used certificates
 expire.<a href="#section-3.4-2" class="pilcrow">¶</a></p>

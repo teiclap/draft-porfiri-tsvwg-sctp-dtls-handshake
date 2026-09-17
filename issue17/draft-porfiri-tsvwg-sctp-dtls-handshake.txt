@@ -84,7 +84,7 @@ Table of Contents
      3.1.  TLS Version
      3.2.  Cipher Suite Constraints
      3.3.  Authentication and Identity
-     3.4.  Rekeying Strategy
+     3.4.  Rekeying Considerations
    4.  TLS Message Transport
      4.1.  Control Messages
        4.1.1.  Protection Established
@@ -310,12 +310,12 @@ Table of Contents
    setup of a new TLS connection, but MAY accept negotiation of stronger
    algorithms and security parameters.
 
-3.4.  Rekeying Strategy
+3.4.  Rekeying Considerations
 
-   Implementations MUST have strategies for how often to set up new TLS
-   connections with ephemeral key exchange.  Implementations SHOULD
-   rekey at least every hour and every 100 GB of data, which is a common
-   strategy for IPsec [ANSSI-DAT-NT-003].
+   Implementations need to implement criterias for when to initiate
+   rekeying.  Implementations are RECOMMENDED rekey at least every hour
+   and every 100 GB of data, which matches what is specified for IPsec
+   in [ANSSI-DAT-NT-003].
 
    Implementations MUST set up a new TLS connection using a full
    handshake with new certificates before any last used certificates
