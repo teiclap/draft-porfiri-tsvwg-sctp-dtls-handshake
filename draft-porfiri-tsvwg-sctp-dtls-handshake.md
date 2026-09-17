@@ -314,7 +314,7 @@ provides the following benefits:
    connections. This saves a significant amount of message size,
    especially with post-quantum cryptography (PQC) certificates, which
    can be significantly larger than certificates based on Elliptic Curve
-   Diffie-Hellman (ECDH).
+   Cryptography.
 
 * It reduces processing, and thus energy consumption and latency.
 
