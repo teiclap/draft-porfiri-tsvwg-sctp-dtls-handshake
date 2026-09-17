@@ -2453,6 +2453,7 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
                     <text x="324" y="356">N+1)</text>
                     <text x="296" y="388">-[DATA(Protection</text>
                     <text x="412" y="388">Estab.)]-&gt;</text>
+                    <text x="672" y="388">7b.</text>
                     <text x="532" y="420">complete</text>
                     <text x="672" y="420">7a.</text>
                     <text x="400" y="436">(wait</text>
@@ -2465,7 +2466,6 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
                     <text x="452" y="452">client</text>
                     <text x="492" y="452">PE</text>
                     <text x="544" y="452">received)</text>
-                    <text x="672" y="452">7b.</text>
                     <text x="332" y="468">(install</text>
                     <text x="412" y="468">READ+WRITE</text>
                     <text x="472" y="468">for</text>
@@ -2539,14 +2539,12 @@ already rekeying, it proceeds to initiate a rekeying TLS handshake
 </li>
             <li id="section-6.2.2-7.3">
               <p id="section-6.2.2-7.3.1">The client key manager starts a rekeying TLS handshake for epoch
-N+1 and relays the resulting TLS records to the server key manager
-per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.  The key management messages are carried
-inside DTLS chunks (the association is already protected).<a href="#section-6.2.2-7.3.1" class="pilcrow">¶</a></p>
+N+1 and relays the resulting flight of TLS records to the server key manager
+per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.2.2-7.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-7.4">
-              <p id="section-6.2.2-7.4.1">The server key manager starts a rekeying TLS handshake as TLS
-server and relays the resulting TLS records to the client key
-manager per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.2.2-7.4.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.2-7.4.1">The server key manager await rekeying TLS handshake as TLS
+server.<a href="#section-6.2.2-7.4.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-7.5">
               <p id="section-6.2.2-7.5.1">The client key manager and the server key manager relay TLS records
@@ -2562,24 +2560,28 @@ to the server key manager.<a href="#section-6.2.2-7.6.1" class="pilcrow">¶</a><
 </li>
             <li id="section-6.2.2-7.7">
               <p id="section-6.2.2-7.7.1">The server key manager proceeds only after both its own TLS
-handshake has completed and it has received the client key manager's
-Protection Established control message.  Once both conditions are
-met, it exports both direction key material for both the Primary and
-Restart DKCs for epoch N+1, installs both the read (receive) key and
-the write (send) key, starts the drain timer to remove the old
-(epoch N) DKC, and switches sending to the epoch N+1 DKC.<a href="#section-6.2.2-7.7.1" class="pilcrow">¶</a></p>
+handshake has completed (7a) and it has received the client key
+manager's Protection Established control message (7b).  Once both
+conditions are met, it exports both direction key material for
+both the Primary and Restart DKCs for epoch N+1, installs both
+the read (receive) key and the write (send) key, starts the drain
+timer to remove the old (epoch N) DKC, and switches sending to
+the epoch N+1 DKC. The server key manager sends a Protection
+Established control message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the
+client key manager.<a href="#section-6.2.2-7.7.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-7.8">
-              <p id="section-6.2.2-7.8.1">The server key manager sends a Protection Established control message
-(<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.  The client
-key manager receives it, installs the client key material as its
-write (send) key, starts the drain timer to remove the old (epoch N)
-DKC, and switches sending to the epoch N+1 DKC.<a href="#section-6.2.2-7.8.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.2-7.8.1">The client key manager receives the Protection Established
+     control message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>), installs the client
+     key material as its write (send) key, starts the drain timer to
+     remove the old (epoch N) DKC, and switches sending to the epoch
+     N+1 DKC.<a href="#section-6.2.2-7.8.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.2.2-8">The new DKCs use epoch N+1 (where N is the current epoch).  Both old
-  (epoch N) and new (epoch N+1) DKCs coexist temporarily until the
-  drain timer expires (see <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-8" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-8">The new DKCs use epoch N+1 (where N is the current epoch when
+  initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
+  coexist temporarily until the drain timer expires (see
+  <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-8" class="pilcrow">¶</a></p>
 <p id="section-6.2.2-9">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
   NOT be used.<a href="#section-6.2.2-9" class="pilcrow">¶</a></p>
 </section>
