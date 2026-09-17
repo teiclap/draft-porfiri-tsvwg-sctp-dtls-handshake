@@ -497,43 +497,44 @@ sequence numbers and replay window.
 
 ~~~~~~~~~~~ aasvg
 
-  Initiator                                                                  Responder
-        |                                                                         |
-     1. +--------------------------------[INIT]---------------------------------->|
-        |<-----------------------------[INIT-ACK]---------------------------------+
-        +------------------------------[COOKIE ECHO]----------------------------->| 2.
-     3. |<-----------------------------[COOKIE ACK]-------------------------------+
-        |                                                                         |
-        |   TLS          client KM                    server KM           TLS     |
-        |    |               |                            |                |      |
-     4. |    |<-SSL_connect()+                            +--SSL_accept()->|      | 5.
-        |    |               |                            |                |      |
-        |    |----records--->|                            |                |      |
-        |    |               +====[DATA(TLS records)]====>|                |      | 6.
-        |    |               |                            +----records---->|      |
-        |    |               |                            |<---records-----+      |
-        |    |               |<===[DATA(TLS records)]=====+                |      |
-        |    |<---records----+                            |                |      |
-        |    |              (repeat until handshake completes)             |      |
-        |    |----records--->|                            |                |      |
-        |    |               +====[DATA(TLS records)]====>|                |      |
-     7. |    +---complete--->|                            +----records---->|      |
-        |   (install READ key)                            |                |      |
-        |    |               |                            |<----complete---+      | 8a.
-        |    |               +-[DATA(Protection Estab.)]->|                |      | 8b.
-        |    |               |                            |                |      |
-        |    |               |                   (wait for BOTH: own TLS complete |
-        |    |               |                     AND client PE received)        |
-        |    |               |                    (install READ+WRITE, enforce)   |
-        |    |               |                            |                |      |
-     9. |    |               |<-[DATA(Protection Estab.)]-+                |      |
-        |   (install WRITE key, enforce)                  |                |      |
-        |    |               |                            |                |      |
-        |    |               |                            |                |      |
-        |                                                                         | -.
-    10. +--------------------[DTLS CHUNK(DATA(APP DATA))]------------------------>|   | APP DATA
-        +<-------------------[DTLS CHUNK(DATA(APP DATA))]-------------------------+   +---------
-        |                               ...                                       |   |
+ Initiator                                     Responder
+     |                                             |
+  1. +---------[INIT]----------------------------->|
+     |<--------[INIT-ACK]--------------------------+
+     +---------[COOKIE ECHO]---------------------->| 2.
+  3. |<--------[COOKIE ACK]------------------------+
+     |                                             |
+     | TLS  cliKM                       srvKM  TLS |
+     |  |    |                             |    |  |
+  4. |  |<---+ connect()          accept() +--->|  |    5.
+     |  |    |                             |    |  |
+     |  +--->|                             |<---+  |
+     |  |    +=======[TLS rec]============>|    |  |    6.
+     |  |    |                             +--->|  |
+     |  |    |                             |<---+  |
+     |  |    |<======[TLS rec]=============+    |  |
+     |  |<---+                             |    |  |
+     |  |    |   (repeat until complete)   |    |  |
+     |  |    |                             |    |  |
+  7. |  +--->| READ installed              |    |  |
+     |  |    +------------[PE]------------>|    |  |
+     |  |    |                             |<---+  |    8a.
+     |  |    |    (wait own done + cli PE) |    |  |    8b.
+     |  |    |     (install R+W, enforce)  |    |  |
+     |  |    |<------------[PE]------------+    |  |
+  9. |  |<---+ WRITE installed, enforce    |    |  |
+     |  |    |                             |    |  |
+     |                                             | -.
+ 10. +---------[protected APP DATA]--------------->|  | APP
+     +<--------[protected APP DATA]----------------+  +---
+     |                  ...                        |  |
+
+
+Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+connect()/accept() = SSL_connect()/SSL_accept(); TLS rec = TLS records
+relayed between the key managers; PE = Protection Established control
+message; R+W = read and write keys.
+
 
 ~~~~~~~~~~~
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
@@ -835,22 +836,22 @@ For protected SCTP restart to succeed:
 
 ~~~~~~~~~~~ aasvg
 
-Initiator                                            Responder
-    |                                                    |
- 1. |  (install restart keys from storage)               |
-    |                                                    | -.
- 2. +------------------------(INIT)--------------------->|   | Plain
- 3. |<---------------------(INIT-ACK)--------------------+   +-------
-    |                                                    | -'
-    |                                                    | -.
- 4. +-------------[DTLS CHUNK(COOKIE ECHO)]------------->|   | Protected
- 5. |<------------[DTLS CHUNK(COOKIE ACK)]---------------+   +----------
- 6. |                                                    | -'
-    |  (TLS handshake for new keys, steps 7-12)          |
-    |                                                    |
-13. +------------[DTLS CHUNK(DATA(APP DATA))]----------->|   APP DATA
-    +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+
-    |                                                    |
+ Initiator                                Responder
+     |                                        |
+  1. | (install Restart DKC from storage)     |
+     |                                        | -.
+  2. +---------[INIT]------------------------>|  | Plain
+  3. |<--------[INIT-ACK]---------------------+  +-----
+     |                                        | -.
+  4. +------[DTLS(COOKIE ECHO)]-------------->|  | Protected
+  5. |<-----[DTLS(COOKIE ACK)]----------------+  +-------
+  6. |                                        | -'
+     | (TLS handshake for new keys,           |
+     |  steps 7-12, as in initial setup)      |
+     |                                        |
+ 13. +------[DTLS(protected APP DATA)]------->|  APP DATA
+     +<-----[DTLS(protected APP DATA)]--------+
+     |                  ...                   |
 
 
 ~~~~~~~~~~~
