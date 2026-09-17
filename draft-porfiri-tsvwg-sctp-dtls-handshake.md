@@ -522,7 +522,7 @@ sequence numbers and replay window.
      |  |    |    (wait own done + cli PE) |    |  |    8b.
      |  |    |     (install R+W, enforce)  |    |  |
      |  |    |<------------[PE]------------+    |  |
-  9. |  |<---+ WRITE installed, enforce    |    |  |
+  9. |  |    |  WRITE installed, enforce   |    |  |
      |  |    |                             |    |  |
      |                                             | -.
  10. +---------[protected APP DATA]--------------->|  | APP
@@ -595,7 +595,7 @@ message; R+W = read and write keys.
    the ULP that the association is protected, and sends a Protection Established
    control message ({{protection-established}}) to the client key manager.
 
-  9.  The client key manager receives the Protection Established control
+  9. The client key manager receives the Protection Established control
    message, installs the client key material as its write (send) key, calls
    Require Protected SCTP Packets to enforce DTLS chunk protection for all
    future packets, and informs the ULP that the association is protected.
