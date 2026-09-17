@@ -912,7 +912,8 @@ handshake error occurs, the TLS alert is sent in an SCTP user message
 
 If a TLS handshake fails during initial establishment and the
 implementation determines that it can address the cause of the error
-(for example, by retrying with different parameters), it SHOULD retry
+(for example, by retrying with different parameters, as long as doing
+so does not compromise security), it SHOULD retry
 the TLS handshake.  Otherwise, the SCTP association MUST be aborted.
 
 If a TLS handshake fails during rekeying, there is no need to end the
