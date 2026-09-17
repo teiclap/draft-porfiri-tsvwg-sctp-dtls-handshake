@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-15T02:59:38.171666+00:00",
+  "timestamp": "2026-09-17T02:59:28.974967+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -201,6 +201,57 @@
           "updatedAt": "2026-09-10T12:44:55Z"
         }
       ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDORGnINM8AAAABRjQhWQ",
+      "title": "Improving the initial handshake procedure",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/20",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "teiclap"
+      ],
+      "labels": [],
+      "body": "During the latest meeting with  @tuexen we discussed some aspect of the draft initial procedure and potential for improvements.\n\nTwo main insights came from that discussion.\n- The current process kind of assumes that the KeyManager method do understand TLS messages, i.e. need to parse them to know where TLS is in the process to trigger the right steps.\n- The current process is poorly addressing if an endpoint only want to be client, and thus should be sufficient to be only using a TLS client implementation, rather than having to have both server and client. \n\nThus, some exploration of improvement of how the procedure works and how it interacts with the TLS session. ",
+      "createdAt": "2026-09-16T09:38:48Z",
+      "updatedAt": "2026-09-16T13:18:31Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "In the meeting we did discuss also about the relevance for resumption of the TLS sessions. From Ericsson's perspective this is an optional feature that needs to be supported for the following performance reasons:\n- Resumption results in that one don't send the whole certificate chain. This saves significant amount of message sizes, especially for the PQC certificates that is being rolled out that can be significantly bigger than any Elliptic-curve Diffie\u2013Hellman (ECDH) based ones. \n- This also saves a bit on processing and thus energy and latency. \n\nSession resumption tickets can be pushed by the server at any point after the handshake has completed or they could explicitly be requested by the TLS client from the TLS server. Based on this it appears that we likely will need the TLS client to be the one initiating the TLS session closure to ensure that it has had the chance to send a ticket request and the server not having prematurely closed the TLS session before it can be responded to. ",
+          "createdAt": "2026-09-16T12:32:09Z",
+          "updatedAt": "2026-09-16T12:32:09Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "There's also the need to explain that the KM is the only Client of SSID 4242, thus it offers a transport service to TLS by encapsulating its messages, furthermore in section 7 we talk about PE message in a way that is not actual anymore.\nI'm going to edit all this.",
+          "createdAt": "2026-09-16T13:18:31Z",
+          "updatedAt": "2026-09-16T13:18:31Z"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "id": "I_kwDORGnINM8AAAABRjUtRQ",
+      "title": "Triggering of Rekeying by server",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/21",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "teiclap"
+      ],
+      "labels": [],
+      "body": "During the discussion with @tuexen about potential improvements in regards to rekeying the important aspect was the need to not require both server and client TLS implementation when SCTP key management method has arrived at roles. Thus modification of the process should be done so that a client role should be sufficient to have only have a TLS client. This will require the server to use some other method than initiating a new TLS session to trigger the client instead initiating the TLS session. \n\nThe suggestion we have a new key managment method level message that the server can send to the client role and have it initiate the TLS session used for rekeying. \n",
+      "createdAt": "2026-09-16T09:45:17Z",
+      "updatedAt": "2026-09-16T15:21:28Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -681,7 +732,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-09-14T14:32:46Z",
-      "updatedAt": "2026-09-14T14:32:47Z",
+      "updatedAt": "2026-09-15T14:15:03Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
@@ -693,7 +744,21 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABNpxaNg",
+          "commit": {
+            "abbreviatedOid": "4ff1c42"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-15T14:15:02Z",
+          "updatedAt": "2026-09-15T14:15:02Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 19,
@@ -707,13 +772,159 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-09-14T14:40:23Z",
-      "updatedAt": "2026-09-14T14:40:31Z",
+      "updatedAt": "2026-09-16T06:58:01Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue17",
-      "headRefOid": "19b359b4f3213f8c0f5821bb87f4066b47f3f2a2",
+      "headRefOid": "db783084ad8bffa57562335026eb406eee978bdb",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABNp0BSQ",
+          "commit": {
+            "abbreviatedOid": "19b359b"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-15T14:18:13Z",
+          "updatedAt": "2026-09-15T14:18:14Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "This might be actually be policies or may acceptance. The point here is that the application is responsible for determining which peer certificates to accept. ",
+              "createdAt": "2026-09-15T14:18:14Z",
+              "updatedAt": "2026-09-15T14:18:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABNp09ag",
+          "commit": {
+            "abbreviatedOid": "19b359b"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-15T14:19:18Z",
+          "updatedAt": "2026-09-15T14:19:18Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "I think here it is better to change strategy to \"usage\"",
+              "createdAt": "2026-09-15T14:19:18Z",
+              "updatedAt": "2026-09-15T14:19:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABNp1KoA",
+          "commit": {
+            "abbreviatedOid": "19b359b"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "See comments",
+          "createdAt": "2026-09-15T14:19:33Z",
+          "updatedAt": "2026-09-15T14:19:33Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABNxmOwA",
+          "commit": {
+            "abbreviatedOid": "19b359b"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-16T06:49:22Z",
+          "updatedAt": "2026-09-16T06:49:22Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "Agree. It's done in the new commit",
+              "createdAt": "2026-09-16T06:49:22Z",
+              "updatedAt": "2026-09-16T06:49:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABNxqP9w",
+          "commit": {
+            "abbreviatedOid": "19b359b"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-16T06:56:50Z",
+          "updatedAt": "2026-09-16T06:56:50Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "I am replacing with\r\ntrust anchor management,  certificate chain validation, and identity\r\n\r\nReason is \"Trust anchor\" is the precise IETF term (RFC 5280, RFC 6024) for the CAs/roots an application chooses to trust, and it reads naturally as the first step before chain validation.",
+              "createdAt": "2026-09-16T06:56:50Z",
+              "updatedAt": "2026-09-16T06:56:50Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDORGnINM8AAAABDwmxQA",
+      "title": "Replaced parsing with TLS API",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/22",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This change addresses the problem of parsing TLS message in KM; the parsing is not needed and information between KM and TLS are via the upper layer API of TLS now.",
+      "createdAt": "2026-09-16T11:51:39Z",
+      "updatedAt": "2026-09-16T15:03:58Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue20",
+      "headRefOid": "22a5e9e08ae58af8d654a79ba35612ede01c199f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDORGnINM8AAAABDydkBg",
+      "title": "Rekey fixed according to issue #21",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/23",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The rekay mechanism has been changed to reflect the request from issue21. Partially depends on fixes from issue20.",
+      "createdAt": "2026-09-16T15:18:44Z",
+      "updatedAt": "2026-09-16T15:19:08Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue21",
+      "headRefOid": "def3b509d7b9b14c84c077258ead7a33c0545619",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
