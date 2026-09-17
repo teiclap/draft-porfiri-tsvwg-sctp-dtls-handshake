@@ -284,12 +284,12 @@ Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
 
-## Rekeying Strategy {#rekey-strategy}
+## Rekeying Considerations {#rekey-strategy}
 
-Implementations MUST have strategies for how often to set up new TLS
-connections with ephemeral key exchange.  Implementations SHOULD
-rekey at least every hour and every 100 GB of data, which is a common
-strategy for IPsec {{ANSSI-DAT-NT-003}}.
+Implementations need to implement criterias for when to initiate
+rekeying.  Implementations are RECOMMENDED rekey at least every hour
+and every 100 GB of data, which matches what is specified for IPsec in
+{{ANSSI-DAT-NT-003}}.
 
 Implementations MUST set up a new TLS connection using a full
 handshake with new certificates before any last used certificates
