@@ -674,7 +674,7 @@ including:
      |  |    |  (install R+W N+1, drain,   |    |  |
      |  |    |   TX->N+1)                  |    |  |
      |  |    |<---------[PE]---------------+    |  |
-  8. |  |<---+ WRITE N+1, drain, TX->N+1   |    |  |
+  8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
      |  |    |                             |    |  |
      |  (traffic transitions to epoch N+1 DKC)     |
      |  (after draining, remove epoch N DKC)       |
