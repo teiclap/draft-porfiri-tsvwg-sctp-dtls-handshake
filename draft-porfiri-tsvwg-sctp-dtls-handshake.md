@@ -648,44 +648,44 @@ including:
 
 ~~~~~~~~~~~ aasvg
 
-  Initiator                                                                  Responder
-        |  (traffic continues using epoch N DKC)                                  |
-        |                                                                         |
-        |   TLS       client key manager        server key manager        TLS     |
-        |    |               |                            |                |      |
-        |    |               |  (server needs to rekey:)  |                |      |
-     2. |    |               |<----[DATA(Rekey Request)]--+                |      | 1.
-        |    |               |                            |                |      |
-        |    |  (client needs to rekey, or received a Rekey Request:)      |      |
-     3. |    |<-SSL_connect()+                            +--SSL_accept()->|      | 4.
-        |    |               |                            |                |      |
-        |    |----records--->|                            |                |      |
-        |    |               +====[DATA(TLS records)]====>|                |      | 5.
-        |    |               |                            +----records---->|      |
-        |    |               |                            |<---records-----+      |
-        |    |               |<===[DATA(TLS records)]=====+                |      |
-        |    |<---records----+                            |                |      |
-        |    |              (repeat until handshake completes)             |      |
-        |    |               |                            |                |      |
-     6. |    +---complete--->|                            |                |      |
-        |   (install READ key for epoch N+1)              |                |      |
-        |    |               |                            |                |      |
-        |    |               +-[DATA(Protection Estab.)]->|                |      | 7b.
-        |    |               |                            |                |      |
-        |    |               |                            |<----complete---+      | 7a.
-        |    |               |                   (wait for BOTH: own TLS complete |
-        |    |               |                     AND client PE received)        |
-        |    |               |         (install READ+WRITE for epoch N+1, start   |
-        |    |               |          drain timer, switch TX to epoch N+1)      |
-        |    |               |                            |                |      |
-     8. |    |               |<-[DATA(Protection Estab.)]-+                |      |
-        |   (install WRITE key for epoch N+1, start drain timer,           |      |
-        |    switch TX to epoch N+1)                      |                |      |
-        |    |               |                            |                |      |
-        |  (traffic transitions to epoch N+1 DKC)                                 |
-        |                                                                         |
-        |  (after draining, remove epoch N DKC)                                   |
+ Initiator                                     Responder
+     |  (traffic continues using epoch N DKC)      |
+     |                                             |
+     | TLS  cliKM                       srvKM  TLS |
+     |  |    |                             |    |  |
+     |  |    |  (server needs to rekey:)   |    |  |
+  2. |  |    |<--------[Rekey Req]---------+    |  |  1.
+     |  |    |                             |    |  |
+     |  |  (client rekeys, or got Rekey Req:)   |  |
+  3. |  |<---+ connect()          accept() +--->|  |  4.
+     |  |    |                             |    |  |
+     |  +--->|                             |<---+  |
+     |  |    +=======[TLS rec]============>|    |  |  5.
+     |  |    |                             +--->|  |
+     |  |    |                             |<---+  |
+     |  |    |<======[TLS rec]=============+    |  |
+     |  |<---+                             |    |  |
+     |  |    |   (repeat until complete)   |    |  |
+     |  |    |                             |    |  |
+  6. |  +--->| READ (epoch N+1)            |    |  |
+     |  |    +----------[PE]-------------->|    |  |  7b.
+     |  |    |                             |<---+  |  7a.
+     |  |    |  (wait own done + cli PE)   |    |  |
+     |  |    |  (install R+W N+1, drain,   |    |  |
+     |  |    |   TX->N+1)                  |    |  |
+     |  |    |<---------[PE]---------------+    |  |
+  8. |  |<---+ WRITE N+1, drain, TX->N+1   |    |  |
+     |  |    |                             |    |  |
+     |  (traffic transitions to epoch N+1 DKC)     |
+     |  (after draining, remove epoch N DKC)       |
 
+
+Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+Rekey Req = Rekey Request control message; connect()/accept() =
+SSL_connect()/SSL_accept(); TLS rec = TLS records relayed between the key
+managers; PE = Protection Established control message; R+W = read and
+write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
+epoch N+1 DKC.
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
