@@ -670,11 +670,11 @@ including:
      6. |    +---complete--->|                            |                |      |
         |   (install READ key for epoch N+1)              |                |      |
         |    |               |                            |                |      |
-        |    |               +-[DATA(Protection Estab.)]->|                |      |
+        |    |               +-[DATA(Protection Estab.)]->|                |      | 7b.
         |    |               |                            |                |      |
         |    |               |                            |<----complete---+      | 7a.
         |    |               |                   (wait for BOTH: own TLS complete |
-        |    |               |                     AND client PE received)        | 7b.
+        |    |               |                     AND client PE received)        |
         |    |               |         (install READ+WRITE for epoch N+1, start   |
         |    |               |          drain timer, switch TX to epoch N+1)      |
         |    |               |                            |                |      |
@@ -707,13 +707,11 @@ including:
      (see {{sim-rekeying}}).
 
   3. The client key manager starts a rekeying TLS handshake for epoch
-     N+1 and relays the resulting TLS records to the server key manager
-     per {{tls-user-message}}.  The key management messages are carried
-     inside DTLS chunks (the association is already protected).
+     N+1 and relays the resulting flight of TLS records to the server key manager
+     per {{tls-user-message}}.
 
-  4. The server key manager starts a rekeying TLS handshake as TLS
-     server and relays the resulting TLS records to the client key
-     manager per {{tls-user-message}}.
+  4. The server key manager await rekeying TLS handshake as TLS
+     server.
 
   5. The client key manager and the server key manager relay TLS records
      to and from their local TLS, repeating until the TLS handshake
@@ -726,22 +724,26 @@ including:
      to the server key manager.
 
   7. The server key manager proceeds only after both its own TLS
-     handshake has completed and it has received the client key manager's
-     Protection Established control message.  Once both conditions are
-     met, it exports both direction key material for both the Primary and
-     Restart DKCs for epoch N+1, installs both the read (receive) key and
-     the write (send) key, starts the drain timer to remove the old
-     (epoch N) DKC, and switches sending to the epoch N+1 DKC.
+     handshake has completed (7a) and it has received the client key
+     manager's Protection Established control message (7b).  Once both
+     conditions are met, it exports both direction key material for
+     both the Primary and Restart DKCs for epoch N+1, installs both
+     the read (receive) key and the write (send) key, starts the drain
+     timer to remove the old (epoch N) DKC, and switches sending to
+     the epoch N+1 DKC. The server key manager sends a Protection
+     Established control message ({{protection-established}}) to the
+     client key manager.
 
-  8. The server key manager sends a Protection Established control message
-     ({{protection-established}}) to the client key manager.  The client
-     key manager receives it, installs the client key material as its
-     write (send) key, starts the drain timer to remove the old (epoch N)
-     DKC, and switches sending to the epoch N+1 DKC.
+  8.  The client key manager receives the Protection Established
+     control message ({{protection-established}}), installs the client
+     key material as its write (send) key, starts the drain timer to
+     remove the old (epoch N) DKC, and switches sending to the epoch
+     N+1 DKC.
 
-  The new DKCs use epoch N+1 (where N is the current epoch).  Both old
-  (epoch N) and new (epoch N+1) DKCs coexist temporarily until the
-  drain timer expires (see {{drain-timer}}).
+  The new DKCs use epoch N+1 (where N is the current epoch when
+  initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
+  coexist temporarily until the drain timer expires (see
+  {{drain-timer}}).
 
   All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
   NOT be used.
