@@ -374,12 +374,12 @@ control message with the following format:
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Ctrl Type    |         Control Data (variable)               |
+|T| Ctrl Type   |         Control Data (variable)               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
 {: #control-message-format title="Control Message Format" artwork-align="center"}
 
-Ctrl Type: 8 bits
+Ctrl Type: 7 bits
 : Identifies the control message type.
 
 Control Data: variable length
