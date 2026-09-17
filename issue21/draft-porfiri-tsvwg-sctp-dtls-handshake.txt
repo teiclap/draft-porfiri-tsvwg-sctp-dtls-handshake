@@ -421,19 +421,9 @@ Table of Contents
 4.1.1.  Protection Established
 
    The Protection Established control message (Ctrl Type = 0x01) is sent
-   by the client key manager to the server key manager for indicating
-   that it has set the read key material.
-
-   After having received the Protection Established control message from
-   client key manager, and after having completed itself the TLS
-   handshake the server key manager sends the Protection Established
-   control message to the client key manager once having installed all
-   keys, enforced DTLS chunk protection and having informed the ULP that
-   the association is protected.
-
-   Upon receiving this message, the client key manager installs the
-   write keys, enforces DTLS chunk protection and informs the ULP that
-   the association is protected.
+   by a key manager to its peer key manager for indicating that it has
+   set the read key material.  This enables the receiving peer to set
+   its write key upon reception of this control messages.
 
    This message carries no Control Data (the payload following the Ctrl
    Type byte is empty).
@@ -448,10 +438,10 @@ Table of Contents
    client key manager initiate a rekeying TLS handshake (see
    Section 6.2).
 
-   Because only the client key manager ever initiates a TLS handshake,
-   the server key manager uses this message when it determines that
-   rekeying is needed (per the criteria in Section 3.4).  This division
-   of roles allows an endpoint holding only the client role to implement
+   Because only the client key manager initiates a TLS handshake, the
+   server key manager uses this message when it determines that rekeying
+   is needed (per its own criteria in Section 3.4).  This division of
+   roles allows an endpoint holding only the client role to implement
    only a TLS client, and an endpoint holding only the server role to
    implement only a TLS server.
 

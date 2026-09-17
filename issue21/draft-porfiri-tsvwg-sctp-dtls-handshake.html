@@ -1918,17 +1918,13 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
 <a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-protection-established" class="section-name selfRef">Protection Established</a>
           </h4>
 <p id="section-4.1.1-1">The Protection Established control message (Ctrl Type = 0x01) is sent
-by the client key manager to the server key manager for indicating that it has set
-the read key material.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-2">After having received the Protection Established control message
-from client key manager, and after having completed itself the TLS handshake
-the server key manager sends the Protection Established control message
-to the client key manager once having installed all keys, enforced DTLS chunk protection
-and having informed the ULP that the association is protected.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-3">Upon receiving this message, the client key manager installs the write keys,
-enforces DTLS chunk protection and informs the ULP that the association is protected.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-4">This message carries no Control Data (the payload following the Ctrl Type byte is empty).<a href="#section-4.1.1-4" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-5">The message is also used during rekeying in the same way as in the initial handshake.<a href="#section-4.1.1-5" class="pilcrow">¶</a></p>
+by a key manager to its peer key manager for indicating that it has
+set the read key material. This enables the receiving peer to set its
+write key upon reception of this control messages.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">This message carries no Control Data (the payload following the Ctrl
+Type byte is empty).<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">The message is also used during rekeying in the same way as in the
+initial handshake.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekey-request">
@@ -1939,9 +1935,9 @@ enforces DTLS chunk protection and informs the ULP that the association is prote
 <p id="section-4.1.2-1">The Rekey Request control message (Ctrl Type = 0x02) is sent by the
 server key manager to the client key manager to request that the client
 key manager initiate a rekeying TLS handshake (see <a href="#rekeying" class="auto internal xref">Section 6.2</a>).<a href="#section-4.1.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.1.2-2">Because only the client key manager ever initiates a TLS handshake, the
+<p id="section-4.1.2-2">Because only the client key manager initiates a TLS handshake, the
 server key manager uses this message when it determines that rekeying
-is needed (per the criteria in <a href="#rekey-policy" class="auto internal xref">Section 3.4</a>).  This division of
+is needed (per its own criteria in <a href="#rekey-policy" class="auto internal xref">Section 3.4</a>).  This division of
 roles allows an endpoint holding only the client role to implement only
 a TLS client, and an endpoint holding only the server role to implement
 only a TLS server.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
