@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 18 March 2027                                          Ericsson
-                                                       14 September 2026
+Expires: 21 March 2027                                          Ericsson
+                                                       17 September 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 March 2027.
+   This Internet-Draft will expire on 21 March 2027.
 
 Copyright Notice
 
@@ -927,8 +927,9 @@ Initiator                                            Responder
 
    If a TLS handshake fails during initial establishment and the
    implementation determines that it can address the cause of the error
-   (for example, by retrying with different parameters), it SHOULD retry
-   the TLS handshake.  Otherwise, the SCTP association MUST be aborted.
+   (for example, by retrying with different parameters, as long as doing
+   so does not compromise security), it SHOULD retry the TLS handshake.
+   Otherwise, the SCTP association MUST be aborted.
 
    If a TLS handshake fails during rekeying, there is no need to end the
    association immediately, since traffic can continue to be protected
