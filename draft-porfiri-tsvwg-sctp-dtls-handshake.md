@@ -396,21 +396,15 @@ The following control message type is defined:
 ### Protection Established {#protection-established}
 
 The Protection Established control message (Ctrl Type = 0x01) is sent
-by the client key manager to the server key manager for indicating that it has set
-the read key material.
+by a key manager to its peer key manager for indicating that it has
+set the read key material. This enables the receiving peer to set its
+write key upon reception of this control messages.
 
-After having received the Protection Established control message
-from client key manager, and after having completed itself the TLS handshake
-the server key manager sends the Protection Established control message
-to the client key manager once having installed all keys, enforced DTLS chunk protection
-and having informed the ULP that the association is protected.
+This message carries no Control Data (the payload following the Ctrl
+Type byte is empty).
 
-Upon receiving this message, the client key manager installs the write keys,
-enforces DTLS chunk protection and informs the ULP that the association is protected.
-
-This message carries no Control Data (the payload following the Ctrl Type byte is empty).
-
-The message is also used during rekeying in the same way as in the initial handshake.
+The message is also used during rekeying in the same way as in the
+initial handshake.
 
 ### Rekey Request {#rekey-request}
 
@@ -418,9 +412,9 @@ The Rekey Request control message (Ctrl Type = 0x02) is sent by the
 server key manager to the client key manager to request that the client
 key manager initiate a rekeying TLS handshake (see {{rekeying}}).
 
-Because only the client key manager ever initiates a TLS handshake, the
+Because only the client key manager initiates a TLS handshake, the
 server key manager uses this message when it determines that rekeying
-is needed (per the criteria in {{rekey-policy}}).  This division of
+is needed (per its own criteria in {{rekey-policy}}).  This division of
 roles allows an endpoint holding only the client role to implement only
 a TLS client, and an endpoint holding only the server role to implement
 only a TLS server.
