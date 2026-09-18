@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 21 March 2027                                          Ericsson
-                                                       17 September 2026
+Expires: 22 March 2027                                          Ericsson
+                                                       18 September 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 March 2027.
+   This Internet-Draft will expire on 22 March 2027.
 
 Copyright Notice
 
@@ -557,7 +557,11 @@ Table of Contents
      |  |    | (wait for done + client PE) |    |  |
      |  |    |     (install R+W, enforce)  |    |  |
      |  |    |<------------[PE]------------+    |  |
+<<<<<<< HEAD
+  9. |  |    |  WRITE installed, enforce   |    |  |
+=======
   9. |  |    | WRITE installed, enforce    |    |  |
+>>>>>>> 00bb7fa0d48709f82f96592a86371adb1f4633ec
      |  |    |                             |    |  |
      |                                             | -.
  10. +---------[protected APP DATA]--------------->|  | APP
