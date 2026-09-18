@@ -314,7 +314,7 @@ provides the following benefits:
    connections. This saves a significant amount of message size,
    especially with post-quantum cryptography (PQC) certificates, which
    can be significantly larger than certificates based on Elliptic Curve
-   Diffie-Hellman (ECDH).
+   Cryptography.
 
 * It reduces processing, and thus energy consumption and latency.
 
@@ -504,7 +504,7 @@ sequence numbers and replay window.
      +---------[COOKIE ECHO]---------------------->| 2.
   3. |<--------[COOKIE ACK]------------------------+
      |                                             |
-     | TLS  cliKM                       srvKM  TLS |
+     | TLS  client KM               server KM  TLS |
      |  |    |                             |    |  |
   4. |  |<---+ connect()          accept() +--->|  |    5.
      |  |    |                             |    |  |
@@ -517,12 +517,16 @@ sequence numbers and replay window.
      |  |    |   (repeat until complete)   |    |  |
      |  |    |                             |    |  |
   7. |  +--->| READ installed              |    |  |
-     |  |    +------------[PE]------------>|    |  |
+     |  |    +------------[PE]------------>|    |  |    8b.
      |  |    |                             |<---+  |    8a.
-     |  |    |    (wait own done + cli PE) |    |  |    8b.
+     |  |    | (wait for done + client PE) |    |  |
      |  |    |     (install R+W, enforce)  |    |  |
      |  |    |<------------[PE]------------+    |  |
+<<<<<<< HEAD
   9. |  |    |  WRITE installed, enforce   |    |  |
+=======
+  9. |  |    | WRITE installed, enforce    |    |  |
+>>>>>>> 00bb7fa0d48709f82f96592a86371adb1f4633ec
      |  |    |                             |    |  |
      |                                             | -.
  10. +---------[protected APP DATA]--------------->|  | APP
@@ -530,7 +534,7 @@ sequence numbers and replay window.
      |                  ...                        |  |
 
 
-Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 connect()/accept() = SSL_connect()/SSL_accept(); TLS rec = TLS records
 relayed between the key managers; PE = Protection Established control
 message; R+W = read and write keys.
