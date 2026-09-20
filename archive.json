@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-17T02:59:28.974967+00:00",
+  "timestamp": "2026-09-20T02:57:32.116421+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -732,18 +732,33 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-09-14T14:32:46Z",
-      "updatedAt": "2026-09-15T14:15:03Z",
+      "updatedAt": "2026-09-17T10:22:20Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue5",
-      "headRefOid": "4ff1c42a608457f0b021e52e03f4c96fb12903b4",
+      "headRefOid": "fa1c122c21eaa0381284ea26f851b39b023b47c4",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "OLD: by retrying with different parameters\r\nNEW: by retrying with different parameters, as long as doing so does not compromise security\r\n\r\n(some parameters cannot be changed based on something that can be an attack)",
+          "createdAt": "2026-09-17T09:57:08Z",
+          "updatedAt": "2026-09-17T09:57:08Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "> OLD: by retrying with different parameters NEW: by retrying with different parameters, as long as doing so does not compromise security\r\n> \r\n> (some parameters cannot be changed based on something that can be an attack)\r\n\r\nImplemented, thanks",
+          "createdAt": "2026-09-17T10:22:20Z",
+          "updatedAt": "2026-09-17T10:22:20Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDORGnINM8AAAABNpxaNg",
@@ -772,13 +787,13 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-09-14T14:40:23Z",
-      "updatedAt": "2026-09-16T06:58:01Z",
+      "updatedAt": "2026-09-17T14:11:04Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue17",
-      "headRefOid": "db783084ad8bffa57562335026eb406eee978bdb",
+      "headRefOid": "6aab3e4dab87416163869b762283663cc148ade2",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -877,6 +892,39 @@
               "updatedAt": "2026-09-16T06:56:50Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABN_doww",
+          "commit": {
+            "abbreviatedOid": "19b359b"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-17T09:54:00Z",
+          "updatedAt": "2026-09-17T09:54:01Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "I think all \"strategy\" should be removed. ",
+              "createdAt": "2026-09-17T09:54:01Z",
+              "updatedAt": "2026-09-17T09:54:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABOBB6uw",
+          "commit": {
+            "abbreviatedOid": "c21a774"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-17T12:24:31Z",
+          "updatedAt": "2026-09-17T12:24:31Z",
+          "comments": []
         }
       ]
     },
@@ -892,19 +940,33 @@
       "labels": [],
       "body": "This change addresses the problem of parsing TLS message in KM; the parsing is not needed and information between KM and TLS are via the upper layer API of TLS now.",
       "createdAt": "2026-09-16T11:51:39Z",
-      "updatedAt": "2026-09-16T15:03:58Z",
+      "updatedAt": "2026-09-18T07:30:23Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue20",
-      "headRefOid": "22a5e9e08ae58af8d654a79ba35612ede01c199f",
+      "headRefOid": "79d8c95e4f8b145c57c0a9aad403f0a3fd27435c",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABN_hAew",
+          "commit": {
+            "abbreviatedOid": "1607d46"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-17T09:59:50Z",
+          "updatedAt": "2026-09-17T09:59:50Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 23,
@@ -918,19 +980,115 @@
       "labels": [],
       "body": "The rekay mechanism has been changed to reflect the request from issue21. Partially depends on fixes from issue20.",
       "createdAt": "2026-09-16T15:18:44Z",
-      "updatedAt": "2026-09-16T15:19:08Z",
+      "updatedAt": "2026-09-17T13:57:40Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue21",
-      "headRefOid": "def3b509d7b9b14c84c077258ead7a33c0545619",
+      "headRefOid": "c6cc2aca5aba5d81d899f738603dfcf588f1e365",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Should the rekey control message actually contain the 7-bit epoch that is being requested? The main reason I see is that if one sends a second rekey message after one is ongoing. However, this might just result in a lot of more need for error handling. The intention has never been that one should request another rekeying until the first has happened. ",
+          "createdAt": "2026-09-17T08:27:33Z",
+          "updatedAt": "2026-09-17T08:27:33Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "> Should the rekey control message actually contain the 7-bit epoch that is being requested? The main reason I see is that if one sends a second rekey message after one is ongoing. However, this might just result in a lot of more need for error handling. The intention has never been that one should request another rekeying until the first has happened.\r\n\r\nThat is also my opinion. We may remove the epoch indication totally, as it would only mean that an extra check needs to be done, whereas if there are epoch errors they will result in association closure anyhow.",
+          "createdAt": "2026-09-17T08:30:05Z",
+          "updatedAt": "2026-09-17T08:30:05Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABN-4j1Q",
+          "commit": {
+            "abbreviatedOid": "cf94f45"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-17T08:53:42Z",
+          "updatedAt": "2026-09-17T08:53:42Z",
+          "comments": [
+            {
+              "originalPosition": 282,
+              "body": "I think the figure and this step is missleading. I think the expectation here is that the server side KM will relay any TLS messages and will basically always be ready to accept new TLS sessions. ",
+              "createdAt": "2026-09-17T08:53:42Z",
+              "updatedAt": "2026-09-17T08:53:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABN-9AuA",
+          "commit": {
+            "abbreviatedOid": "cf94f45"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-17T09:01:17Z",
+          "updatedAt": "2026-09-17T09:01:17Z",
+          "comments": [
+            {
+              "originalPosition": 282,
+              "body": "Should we state that KM relays all TLS messages just once and for all and avoid repeating it here and there?",
+              "createdAt": "2026-09-17T09:01:17Z",
+              "updatedAt": "2026-09-17T09:01:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABN_Bspg",
+          "commit": {
+            "abbreviatedOid": "cf94f45"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-17T09:07:32Z",
+          "updatedAt": "2026-09-17T09:07:32Z",
+          "comments": [
+            {
+              "originalPosition": 282,
+              "body": "I think we should attempt it. I still think the figure is fine. The other aspect here is the \"ssl_accept\" calls. I guess there are both pull and push based so to say API for when TLS messages results in a new TLS session object. ",
+              "createdAt": "2026-09-17T09:07:32Z",
+              "updatedAt": "2026-09-17T09:07:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABN_DiHg",
+          "commit": {
+            "abbreviatedOid": "cf94f45"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-17T09:09:56Z",
+          "updatedAt": "2026-09-17T09:09:57Z",
+          "comments": [
+            {
+              "originalPosition": 282,
+              "body": "Agree.",
+              "createdAt": "2026-09-17T09:09:56Z",
+              "updatedAt": "2026-09-17T09:10:12Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
