@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 13 March 2027                                          Ericsson
-                                                        9 September 2026
+Expires: 28 March 2027                                          Ericsson
+                                                       24 September 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 March 2027.
+   This Internet-Draft will expire on 28 March 2027.
 
 Copyright Notice
 
@@ -88,6 +88,7 @@ Table of Contents
    4.  TLS Message Transport
      4.1.  Control Messages
        4.1.1.  Protection Established
+       4.1.2.  Rekey Request
    5.  Key Derivation
      5.1.  Role Determination
      5.2.  Exporter Context
@@ -99,8 +100,7 @@ Table of Contents
        6.2.1.  Triggering Criteria
        6.2.2.  Procedure
        6.2.3.  Drain Timer Considerations
-       6.2.4.  Simultaneous Rekey Resolution
-       6.2.5.  Key Transition State Machine
+       6.2.4.  Concurrent Rekey Requests
      6.3.  SCTP Association Restart
        6.3.1.  Prerequisites
        6.3.2.  Restart Procedure
@@ -260,9 +260,12 @@ Table of Contents
        derives the initial Primary and Restart DKCs.  Protection is then
        enforced.
 
-   2.  *Rekeying:* Either endpoint initiates a new TLS 1.3 handshake to
-       derive fresh DKCs for the next epoch, providing forward secrecy
-       and re-authentication.  Old DKCs are removed after draining.
+   2.  *Rekeying:* Either endpoint may trigger rekeying to derive fresh
+       DKCs for the next epoch, providing forward secrecy and re-
+       authentication.  The client key manager always performs the TLS
+       1.3 handshake; when the server key manager needs to rekey it
+       requests one via a Rekey Request.  Old DKCs are removed after
+       draining.
 
    3.  *SCTP Restart:* The pre-established Restart DKC protects the
        COOKIE ECHO/COOKIE ACK exchange, followed by a new TLS handshake
@@ -339,6 +342,23 @@ Table of Contents
    DTLS Key Management Messages PPID (4242)
    [I-D.ietf-tsvwg-sctp-dtls-chunk].
 
+   The key-management method defined in this document is the only user
+   of the DTLS Key Management Messages PPID (4242); no other user data
+   is sent with this PPID.  All messages exchanged by the key managers
+   are of one of the following three types:
+
+   *  TLS message (T=0): the payload encapsulates one or more TLS
+      records (see Figure 2).
+
+   *  Protection Established (T=1, Ctrl Type = 0x01): a control message
+      (see Section 4.1.1).
+
+   *  Rekey Request (T=1, Ctrl Type = 0x02): a control message (see
+      Section 4.1.2).
+
+   The message type is encoded by the T bit and, for control messages,
+   the Ctrl Type field, as defined below.
+
    Each SCTP user message uses the format defined in Figure 2.
 
       0                   1                   2                   3
@@ -375,39 +395,69 @@ Table of Contents
       0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     |  Ctrl Type    |         Control Data (variable)               |
+     |T| Ctrl Type   |         Control Data (variable)               |
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
                       Figure 3: Control Message Format
 
-   Ctrl Type: 8 bits  Identifies the control message type.
+   Ctrl Type: 7 bits  Identifies the control message type.
 
    Control Data: variable length  Type-specific data.  May be empty.
 
    The following control message type is defined:
 
-   +===========+========================+==============================+
-   | Ctrl Type | Name                   | Description                  |
-   +===========+========================+==============================+
-   | 0x01      | Protection             | Signals that DTLS chunk      |
-   |           | Established            | protection has been enforced |
-   +-----------+------------------------+------------------------------+
+     +===========+=============+====================================+
+     | Ctrl Type | Name        | Description                        |
+     +===========+=============+====================================+
+     | 0x01      | Protection  | Signals that DTLS chunk protection |
+     |           | Established | has been enforced                  |
+     +-----------+-------------+------------------------------------+
+     | 0x02      | Rekey       | Requests the client key manager to |
+     |           | Request     | initiate a rekeying TLS handshake  |
+     +-----------+-------------+------------------------------------+
 
-                       Table 1: Control Message Types
+                      Table 1: Control Message Types
 
 4.1.1.  Protection Established
 
    The Protection Established control message (Ctrl Type = 0x01) is sent
-   by the Server to the Client after the Server has installed all keys
-   and enforced DTLS chunk protection.  This message carries no Control
-   Data (the payload following the Ctrl Type byte is empty).
+   by a key manager to its peer key manager for indicating that it has
+   set the read key material.  This enables the receiving peer to set
+   its write key upon reception of this control messages.
 
-   Upon receiving this message, the Client enforces DTLS chunk
-   protection and informs the ULP that the association is protected.
+   This message carries no Control Data (the payload following the Ctrl
+   Type byte is empty).
 
-   The message is also used during rekeying to confirm to the endpoint
-   with the client role in that procedure that the server has installed
-   all keys, and the client can install write keys.
+   The message is also used during rekeying in the same way as in the
+   initial handshake.
+
+4.1.2.  Rekey Request
+
+   The Rekey Request control message (Ctrl Type = 0x02) is sent by the
+   server key manager to the client key manager to request that the
+   client key manager initiate a rekeying TLS handshake (see
+   Section 6.2).
+
+   Because only the client key manager initiates a TLS handshake, the
+   server key manager uses this message when it determines that rekeying
+   is needed (per its own criteria in Section 3.4).  This division of
+   roles allows an endpoint holding only the client role to implement
+   only a TLS client, and an endpoint holding only the server role to
+   implement only a TLS server.
+
+   Upon receiving a Rekey Request, the client key manager initiates a
+   rekeying TLS handshake as described in Section 6.2, unless a rekeying
+   is already in progress, in which case the Rekey Request is ignored
+   (see Section 6.2.4).
+
+   Because key management messages are carried on SCTP stream 0 with
+   reliable, in-order delivery, the Rekey Request is guaranteed to be
+   delivered; no key-management-level retransmission of it is required.
+
+   This message carries no Control Data (the payload following the Ctrl
+   Type byte is empty).  It is carried in a key management message with
+   the epoch field set to the epoch of the DKC that will be created by
+   the requested rekeying (epoch N+1).
 
 5.  Key Derivation
 
@@ -607,71 +657,126 @@ Initiator                                             Responder
 
 6.2.2.  Procedure
 
-      Initiator                                            Responder
-          |                                                    |
-          |  (traffic continues using epoch N DKC)             |
-          |                                                    |
-          |  Client Key Manager             Key Manager Server |
-          |    |                                         |     |
-          | 1. +---------[DATA(TLS Client Hello)]------->| 2.  |
-          | 4. |<-[DATA(TLS Server Hello ... Finished)]--+ 3.  |
-          | 5. +--[DATA(TLS Certificate ... Finished)]-->| 6.  |
-          | 8. |<--[DATA(Protection Established)]--------+ 7.  |
-          |                                                    |
-          |  (traffic transitions to epoch N+1 DKC)            |
-          |                                                    |
-          |  (after draining, remove epoch N DKC)              |
-          |                                                    |
+   The client key manager and the server key manager keep the same key-
+   management roles for the entire lifetime of the SCTP association: the
+   client key manager is always the TLS client and the server key
+   manager is always the TLS server, for the initial handshake and for
+   every rekeying.  Consequently, only the client key manager ever
+   initiates a TLS handshake.  This allows an endpoint holding only the
+   client role to implement only a TLS client, and an endpoint holding
+   only the server role to implement only a TLS server.
 
-                        Figure 5: Rekeying Procedure
+   Either endpoint may need to rekey.  The need is acted upon as
+   follows:
 
-   The diagram Figure 5 shows the case where SCTP Initiator is
-   initiating the rekeying.  The opposite case where the Responder
-   initates rekeying is identical but inverts which key manager role
-   that executes the various steps between Client and Server temporarly
-   for this exchange only.  The initially determined Key manager roles
-   are only used to handle the case both sides initiate a rekey
-   simultanously, see Section 6.2.4.
+   *  If the client key manager needs to rekey, it directly initiates a
+      rekeying TLS handshake.
 
-   Either endpoint may initiate rekeying.  The procedure is as follows:
+   *  If the server key manager needs to rekey, it cannot initiate a TLS
+      handshake itself.  Instead it sends a Rekey Request control
+      message (Section 4.1.2) to the client key manager, which then
+      initiates the rekeying TLS handshake.
 
-   1.  The peer willing to rekey becomes the TLS client for this rekey
-       procedure.  It sends a TLS ClientHello in a key management
-       message using epoch N+1.  The key management messages are carried
-       inside DTLS chunks (the association is already protected).
+   Because the key management messages are carried on SCTP stream 0 with
+   reliable, in-order delivery, the Rekey Request and all handshake
+   messages are guaranteed to be delivered and are not lost; no key-
+   management-level retransmission is required.
 
-   2.  The other peer becomes the TLS server for this rekey procedure.
-       It receives and processes the ClientHello for the key management
-       epoch N+1.
+ Initiator                                     Responder
+     |  (traffic continues using epoch N DKC)      |
+     |                                             |
+     | TLS  cliKM                       srvKM  TLS |
+     |  |    |                             |    |  |
+     |  |    |  (server needs to rekey:)   |    |  |
+  2. |  |    |<--------[Rekey Req]---------+    |  |  1.
+     |  |    |                             |    |  |
+     |  |  (client rekeys, or got Rekey Req:)   |  |
+  3. |  |<---+ connect()          accept() +--->|  |  4.
+     |  |    |                             |    |  |
+     |  +--->|                             |<---+  |
+     |  |    +=======[TLS rec]============>|    |  |  5.
+     |  |    |                             +--->|  |
+     |  |    |                             |<---+  |
+     |  |    |<======[TLS rec]=============+    |  |
+     |  |<---+                             |    |  |
+     |  |    |   (repeat until complete)   |    |  |
+     |  |    |                             |    |  |
+  6. |  +--->| READ (epoch N+1)            |    |  |
+     |  |    +----------[PE]-------------->|    |  |  7b.
+     |  |    |                             |<---+  |  7a.
+     |  |    |  (wait own done + cli PE)   |    |  |
+     |  |    |  (install R+W N+1, drain,   |    |  |
+     |  |    |   TX->N+1)                  |    |  |
+     |  |    |<---------[PE]---------------+    |  |
+  8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
+     |  |    |                             |    |  |
+     |  (traffic transitions to epoch N+1 DKC)     |
+     |  (after draining, remove epoch N DKC)       |
 
-   3.  The server sends its TLS ServerHello through Finished messages to
-       the client.
 
-   4.  The client receives the TLS ServerHello message, exports all
-       Primary and Restart DKC keys, and installs server to client key
-       material as its read (receive) key.
+Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+Rekey Req = Rekey Request control message; connect()/accept() =
+SSL_connect()/SSL_accept(); TLS rec = TLS records relayed between the key
+managers; PE = Protection Established control message; R+W = read and
+write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
+epoch N+1 DKC.
 
-   5.  The client sends its TLS Certificate/CertificateVerify/Finished
-       encrypted with the old keys.
+                     Figure 5: Rekeying Procedure
 
-   6.  The server receives and process the TLS message, exports and
-       installs the client key material for both the Primary and Restart
-       DKCs as its read (receive) key and the server key material as
-       write (send) key.  Then it starts the drain timer to remove the
-       old (epoch N) DKC.  From now on the server uses new keys.
+   The diagram Figure 5 shows both triggers.  Steps 1 and 2 (the Rekey
+   Request) are present only when the server key manager is the one that
+   needs to rekey; when the client key manager needs to rekey it starts
+   directly at step 3.  As in initial establishment, the key managers
+   drive TLS solely through the TLS user API and relay the resulting TLS
+   records; they do not parse TLS messages.  The procedure is as
+   follows:
 
-   7.  The server key manager sends a Protection Established control
-       message (Section 4.1.1) to the client key manager.
+   1.  If the server key manager needs to rekey, it sends a Rekey
+       Request control message (Section 4.1.2) to the client key
+       manager.  The server key manager does not start a TLS handshake.
+
+   2.  The client key manager receives the Rekey Request.  If it is not
+       already rekeying, it proceeds to initiate a rekeying TLS
+       handshake (step 3).  If it is already rekeying, it ignores the
+       Rekey Request (see Section 6.2.4).
+
+   3.  The client key manager starts a rekeying TLS handshake for epoch
+       N+1 and relays the resulting flight of TLS records to the server
+       key manager per Section 4.
+
+   4.  The server key manager await rekeying TLS handshake as TLS
+       server.
+
+   5.  The client key manager and the server key manager relay TLS
+       records to and from their local TLS, repeating until the TLS
+       handshake completes.
+
+   6.  The client key manager's TLS handshake completes.  It exports all
+       Primary and Restart DKC keys for epoch N+1, installs the server
+       to client key material as its read (receive) key, and sends a
+       Protection Established control message (Section 4.1.1) to the
+       server key manager.
+
+   7.  The server key manager proceeds only after both its own TLS
+       handshake has completed (7a) and it has received the client key
+       manager's Protection Established control message (7b).  Once both
+       conditions are met, it exports both direction key material for
+       both the Primary and Restart DKCs for epoch N+1, installs both
+       the read (receive) key and the write (send) key, starts the drain
+       timer to remove the old (epoch N) DKC, and switches sending to
+       the epoch N+1 DKC.  The server key manager sends a Protection
+       Established control message (Section 4.1.1) to the client key
+       manager.
 
    8.  The client key manager receives the Protection Established
-       control message, exports the client Primary and Restart DKC keys,
-       and installs the client key material as its write (send) key, and
-       starts the drain timer to remove the old (epoch N) DKC.  From now
-       on the client uses new keys.
+       control message (Section 4.1.1), installs the client key material
+       as its write (send) key, starts the drain timer to remove the old
+       (epoch N) DKC, and switches sending to the epoch N+1 DKC.
 
-   The new DKCs use epoch N+1 (where N is the current epoch).  Both old
-   (epoch N) and new (epoch N+1) DKCs coexist temporarily until the
-   drain timer expires (see Section 6.2.3).
+   The new DKCs use epoch N+1 (where N is the current epoch when
+   initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
+   coexist temporarily until the drain timer expires (see
+   Section 6.2.3).
 
    All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
    NOT be used.
@@ -709,85 +814,22 @@ Initiator                                             Responder
    Implementations SHOULD set the drain timer to at least T_fail when
    delivery of the final rekeying message has not been confirmed.
 
-6.2.4.  Simultaneous Rekey Resolution
+6.2.4.  Concurrent Rekey Requests
 
-   As either endpoint can initiate a TLS handshake at the same time,
-   either endpoint may receive a TLS ClientHello when it has already
-   sent its own.  In this case, the ClientHello from the endpoint with
-   the initial keymanager client role SHALL be processed, and the other
-   SHALL be dropped.
+   Because only the client key manager ever initiates a TLS handshake,
+   two ClientHellos cannot cross and no tie-breaker is needed.
 
-6.2.5.  Key Transition State Machine
+   The only concurrency to resolve is when the server key manager sends
+   a Rekey Request while the client key manager has already initiated
+   (or is about to initiate) a rekeying to epoch N+1.  Since both the
+   direct client trigger and the server's Rekey Request lead to the same
+   outcome — a single client-initiated rekeying to epoch N+1 — the
+   client key manager treats an incoming Rekey Request as redundant and
+   ignores it while a rekeying is already in progress.
 
-   This specification allows up to 2 Primary DKCs to be active at the
-   same time.  The following state machine governs the transition:
-
-                  +---------+
-                  |  INIT   |  Association started
-                  +----+----+  No TLS H/S yet
-                       |
-                       | 1. TLS initial H/S
-                       |    completed
-                       |
-                       |  +------------------ Association Restart
-                       |  |
-                       V  V
-                  +---------+
-       +--------->|  YOUNG  |
-       | +------->|         +--------------------+
-       | |        +----+----+                    |
-       | |             |                         | 3. Aging event
-       | |             | 2. Client Hello         | Send Client Hello
-       | |             |    from peer            |
-       | |             V                         V
-       | |        +---------+  4. Client H +---------+  5. TLS H/S
-       | |        | REMOTE  |    tie-break |  LOCAL  |    Timeout
-       | |        |  AGED   |<-------------+  AGED   +-----+
-       | |        +----+----+              +----+----+     |
-       | |             |                        |          |
-       | |             |                        |          |
-       | | 7. Finished |        6. Server Hello |          |
-       | |             |                  +-----+          |
-       | |             |                  |                |
-       | |             V                  V                V
-       | |        +---------+       +---------+       +---------+
-       | |        | REMOTE  |       |  LOCAL  |       |  ABORT  |
-       | |        |  OLD    |       |   OLD   |       |         |
-       | |        +-----+---+       +-----+---+       +---------+
-       | | 8. Flush     |                 |
-       | +--------------+                 |
-       |   9. Flush                       |
-       +----------------------------------+
-
-                    Figure 6: State Diagram for Rekeying
-
-   INIT:  Initial state.  Only event 1 (TLS handshake completed)
-      transitions to YOUNG.
-
-   YOUNG:  Only the Current DKC is populated.  Event 2 (peer
-      ClientHello) transitions to REMOTE OLD; event 3 (aging)
-      transitions to LOCAL AGED.
-
-   LOCAL AGED:  A supervision timer runs.  Event 5 (timeout) causes the
-      key manager to check for local aging expire, in that case ABORT
-      otherwise return to YOUNG.  Event 4 (peer ClientHello with tie-
-      break yielding server role) transitions to REMOTE OLD.  Event 6
-      (ServerHello received) transitions to LOCAL OLD.
-
-   LOCAL AGED:  TLS handshake happens in this state.  Local keys are
-      installed.  Event 7 (peer sends Certificate..Finished enable
-      transition to REMOTE_OLD)
-
-   REMOTE OLD:  Both Old and Current DKCs exist.  Old DKC is used for
-      sending until Protection Established control message is sent.
-      Event 8 (flush timer expires) transitions to YOUNG.
-
-   LOCAL OLD:  Both Old and Current DKCs exist.  Old DKC is used for
-      sending, until Protection Established control message is received.
-      Event 9 (flush timer expires) transitions to YOUNG.
-
-   In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
-   arrives, the flushing timer is cleared and behavior is as in YOUNG.
+   Similarly, if the server key manager needs to rekey while a client-
+   initiated rekeying is already in progress, it does not send a Rekey
+   Request, as the in-progress rekeying already satisfies the need.
 
 6.3.  SCTP Association Restart
 
@@ -826,7 +868,7 @@ Initiator                                            Responder
     +<-----------[DTLS CHUNK(DATA(APP DATA))]------------+
     |                                                    |
 
-                   Figure 7: SCTP Restart Procedure
+                   Figure 6: SCTP Restart Procedure
 
    1.   The restarting endpoint (Initiator) retrieves the restart key
         material from persistent secure storage and installs the Restart
