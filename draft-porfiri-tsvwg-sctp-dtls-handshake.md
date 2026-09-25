@@ -275,7 +275,7 @@ TLS for DTLS in SCTP MUST be mutually authenticated.  It is
 RECOMMENDED to use certificate-based authentication.
 
 When certificates are used, the application is responsible for
-certificate policies, certificate chain validation, and identity
+trust anchor management, certificate chain validation, and identity
 authentication.  The application defines what the identity is and
 how it is encoded.  Guidance on server certificate validation can be
 found in {{RFC9525}}.
@@ -290,12 +290,12 @@ Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
 
-## Rekeying Policy {#rekey-policy}
+## Rekeying Considerations {#rekey-strategy}
 
-Implementations MUST have policies for how often to set up new TLS
-connections with ephemeral key exchange.  Implementations SHOULD
-rekey at least every hour and every 100 GB of data, which is a common
-policy for IPsec {{ANSSI-DAT-NT-003}}.
+Implementations need to implement criterias for when to initiate
+rekeying.  Implementations are RECOMMENDED rekey at least every hour
+and every 100 GB of data, which matches what is specified for IPsec in
+{{ANSSI-DAT-NT-003}}.
 
 Implementations MUST set up a new TLS connection using a full
 handshake with new certificates before any last used certificates
@@ -442,7 +442,7 @@ key manager initiate a rekeying TLS handshake (see {{rekeying}}).
 
 Because only the client key manager initiates a TLS handshake, the
 server key manager uses this message when it determines that rekeying
-is needed (per its own criteria in {{rekey-policy}}).  This division of
+is needed (per its own criteria in {{rekey-strategy}}).  This division of
 roles allows an endpoint holding only the client role to implement only
 a TLS client, and an endpoint holding only the server role to implement
 only a TLS server.
@@ -967,8 +967,10 @@ current DKC will eventually become inappropriate to use: if the error
 cannot be fixed and the current DKC is aged beyond policy limits or
 reaches its usage limits, the association MUST be aborted.
 
-If a TLS handshake fails during an SCTP restart, the association MUST
-be aborted.
+If a TLS handshake fails during rekeying, and the current DKC has not
+yet reached its usage limits, the implementation SHOULD retry the
+handshake.  If retry is not possible or the current DKC is aged
+beyond limits, the association MUST be aborted.
 
 
 # Security Considerations {#security-considerations}
