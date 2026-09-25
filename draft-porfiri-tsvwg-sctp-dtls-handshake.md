@@ -442,7 +442,7 @@ key manager initiate a rekeying TLS handshake (see {{rekeying}}).
 
 Because only the client key manager initiates a TLS handshake, the
 server key manager uses this message when it determines that rekeying
-is needed (per its own criteria in {{rekey-policy}}).  This division of
+is needed (per its own criteria in {{rekey-strategy}}).  This division of
 roles allows an endpoint holding only the client role to implement only
 a TLS client, and an endpoint holding only the server role to implement
 only a TLS server.
