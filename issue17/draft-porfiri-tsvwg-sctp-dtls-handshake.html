@@ -18,22 +18,22 @@ authenticated and confidential communication over SCTP using the
 DTLS Chunk, leveraging standardized TLS 1.3 features for key
 management and rekeying. 
     " name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="draft-porfiri-tsvwg-sctp-dtls-handshake-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
+  xml2rfc 3.34.1
     Python 3.14.7
-    ConfigArgParse 1.7.5
+    ConfigArgParse 1.7.7
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.11.7
+    platformdirs 4.11.10
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.3
+    wcwidth 0.8.4
 -->
 <link href="draft-porfiri-tsvwg-sctp-dtls-handshake.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1053,7 +1053,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 21 March 2027</td>
+<td class="center">Expires 29 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1066,12 +1066,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-17" class="published">17 September 2026</time>
+<time datetime="2026-09-25" class="published">25 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-21">21 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-29">29 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1204,6 +1204,9 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
                 <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-rekeying-considerations" class="internal xref">Rekeying Considerations</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-session-resumption" class="internal xref">Session Resumption</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
@@ -1214,6 +1217,9 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
                     <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-protection-established" class="internal xref">Protection Established</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.2">
+                    <p id="section-toc.1-1.4.2.1.2.2.1"><a href="#section-4.1.2" class="auto internal xref">4.1.2</a>.  <a href="#name-rekey-request" class="internal xref">Rekey Request</a></p>
 </li>
                 </ul>
 </li>
@@ -1255,10 +1261,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                     <p id="section-toc.1-1.6.2.2.2.3.1"><a href="#section-6.2.3" class="auto internal xref">6.2.3</a>.  <a href="#name-drain-timer-considerations" class="internal xref">Drain Timer Considerations</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.4">
-                    <p id="section-toc.1-1.6.2.2.2.4.1"><a href="#section-6.2.4" class="auto internal xref">6.2.4</a>.  <a href="#name-simultaneous-rekey-resoluti" class="internal xref">Simultaneous Rekey Resolution</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.5">
-                    <p id="section-toc.1-1.6.2.2.2.5.1"><a href="#section-6.2.5" class="auto internal xref">6.2.5</a>.  <a href="#name-key-transition-state-machin" class="internal xref">Key Transition State Machine</a></p>
+                    <p id="section-toc.1-1.6.2.2.2.4.1"><a href="#section-6.2.4" class="auto internal xref">6.2.4</a>.  <a href="#name-concurrent-rekey-requests" class="internal xref">Concurrent Rekey Requests</a></p>
 </li>
                 </ul>
 </li>
@@ -1491,74 +1494,81 @@ SCTP.  Normative procedures are specified in <a href="#procedures" class="auto i
 <figure id="figure-1">
           <div id="section-2.1-1.1">
             <div class="alignCenter art-svg artwork" id="section-2.1-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="464" width="440" viewBox="0 0 440 464" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,32 L 8,272" fill="none" stroke="black"></path>
-                <path d="M 8,368 L 8,448" fill="none" stroke="black"></path>
-                <path d="M 72,280 L 72,320" fill="none" stroke="black"></path>
-                <path d="M 96,320 L 96,360" fill="none" stroke="black"></path>
-                <path d="M 136,32 L 136,272" fill="none" stroke="black"></path>
-                <path d="M 152,32 L 152,272" fill="none" stroke="black"></path>
-                <path d="M 168,80 L 168,224" fill="none" stroke="black"></path>
-                <path d="M 176,384 L 176,432" fill="none" stroke="black"></path>
-                <path d="M 192,64 L 192,96" fill="none" stroke="black"></path>
-                <path d="M 192,128 L 192,160" fill="none" stroke="black"></path>
-                <path d="M 192,208 L 192,256" fill="none" stroke="black"></path>
-                <path d="M 280,160 L 280,208" fill="none" stroke="black"></path>
-                <path d="M 288,280 L 288,320" fill="none" stroke="black"></path>
-                <path d="M 352,384 L 352,432" fill="none" stroke="black"></path>
-                <path d="M 368,64 L 368,96" fill="none" stroke="black"></path>
-                <path d="M 368,128 L 368,160" fill="none" stroke="black"></path>
-                <path d="M 368,208 L 368,256" fill="none" stroke="black"></path>
-                <path d="M 392,80 L 392,400" fill="none" stroke="black"></path>
-                <path d="M 408,32 L 408,272" fill="none" stroke="black"></path>
-                <path d="M 408,368 L 408,448" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="512" width="464" viewBox="0 0 464 512" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,32 L 8,320" fill="none" stroke="black"></path>
+                <path d="M 8,416 L 8,496" fill="none" stroke="black"></path>
+                <path d="M 72,328 L 72,368" fill="none" stroke="black"></path>
+                <path d="M 96,368 L 96,408" fill="none" stroke="black"></path>
+                <path d="M 136,32 L 136,320" fill="none" stroke="black"></path>
+                <path d="M 152,32 L 152,320" fill="none" stroke="black"></path>
+                <path d="M 168,64 L 168,304" fill="none" stroke="black"></path>
+                <path d="M 184,112 L 184,256" fill="none" stroke="black"></path>
+                <path d="M 192,432 L 192,480" fill="none" stroke="black"></path>
+                <path d="M 208,96 L 208,128" fill="none" stroke="black"></path>
+                <path d="M 208,160 L 208,192" fill="none" stroke="black"></path>
+                <path d="M 208,240 L 208,288" fill="none" stroke="black"></path>
+                <path d="M 280,328 L 280,368" fill="none" stroke="black"></path>
+                <path d="M 296,192 L 296,240" fill="none" stroke="black"></path>
+                <path d="M 368,432 L 368,480" fill="none" stroke="black"></path>
+                <path d="M 384,96 L 384,128" fill="none" stroke="black"></path>
+                <path d="M 384,160 L 384,192" fill="none" stroke="black"></path>
+                <path d="M 384,240 L 384,288" fill="none" stroke="black"></path>
+                <path d="M 400,64 L 400,304" fill="none" stroke="black"></path>
+                <path d="M 416,112 L 416,448" fill="none" stroke="black"></path>
+                <path d="M 432,32 L 432,320" fill="none" stroke="black"></path>
+                <path d="M 432,416 L 432,496" fill="none" stroke="black"></path>
                 <path d="M 8,32 L 136,32" fill="none" stroke="black"></path>
-                <path d="M 152,32 L 408,32" fill="none" stroke="black"></path>
-                <path d="M 192,64 L 368,64" fill="none" stroke="black"></path>
-                <path d="M 168,80 L 184,80" fill="none" stroke="black"></path>
-                <path d="M 368,80 L 392,80" fill="none" stroke="black"></path>
-                <path d="M 192,96 L 368,96" fill="none" stroke="black"></path>
-                <path d="M 192,128 L 368,128" fill="none" stroke="black"></path>
-                <path d="M 168,144 L 192,144" fill="none" stroke="black"></path>
-                <path d="M 192,160 L 368,160" fill="none" stroke="black"></path>
-                <path d="M 192,208 L 368,208" fill="none" stroke="black"></path>
-                <path d="M 168,224 L 184,224" fill="none" stroke="black"></path>
-                <path d="M 192,256 L 368,256" fill="none" stroke="black"></path>
-                <path d="M 8,272 L 136,272" fill="none" stroke="black"></path>
-                <path d="M 152,272 L 408,272" fill="none" stroke="black"></path>
-                <path d="M 72,320 L 288,320" fill="none" stroke="black"></path>
-                <path d="M 8,368 L 408,368" fill="none" stroke="black"></path>
-                <path d="M 176,384 L 352,384" fill="none" stroke="black"></path>
-                <path d="M 360,400 L 392,400" fill="none" stroke="black"></path>
-                <path d="M 176,432 L 352,432" fill="none" stroke="black"></path>
-                <path d="M 8,448 L 408,448" fill="none" stroke="black"></path>
-                <polygon class="arrowhead" points="400,360 388,354.4 388,365.6" fill="black" transform="rotate(90,392,360)"></polygon>
-                <polygon class="arrowhead" points="368,400 356,394.4 356,405.6" fill="black" transform="rotate(180,360,400)"></polygon>
-                <polygon class="arrowhead" points="296,280 284,274.4 284,285.6" fill="black" transform="rotate(270,288,280)"></polygon>
-                <polygon class="arrowhead" points="192,224 180,218.4 180,229.6" fill="black" transform="rotate(0,184,224)"></polygon>
-                <polygon class="arrowhead" points="192,80 180,74.4 180,85.6" fill="black" transform="rotate(0,184,80)"></polygon>
-                <polygon class="arrowhead" points="104,360 92,354.4 92,365.6" fill="black" transform="rotate(90,96,360)"></polygon>
-                <polygon class="arrowhead" points="80,280 68,274.4 68,285.6" fill="black" transform="rotate(270,72,280)"></polygon>
+                <path d="M 152,32 L 432,32" fill="none" stroke="black"></path>
+                <path d="M 168,64 L 400,64" fill="none" stroke="black"></path>
+                <path d="M 208,96 L 384,96" fill="none" stroke="black"></path>
+                <path d="M 184,112 L 200,112" fill="none" stroke="black"></path>
+                <path d="M 384,112 L 416,112" fill="none" stroke="black"></path>
+                <path d="M 208,128 L 384,128" fill="none" stroke="black"></path>
+                <path d="M 208,160 L 384,160" fill="none" stroke="black"></path>
+                <path d="M 184,176 L 208,176" fill="none" stroke="black"></path>
+                <path d="M 208,192 L 384,192" fill="none" stroke="black"></path>
+                <path d="M 208,240 L 384,240" fill="none" stroke="black"></path>
+                <path d="M 184,256 L 200,256" fill="none" stroke="black"></path>
+                <path d="M 208,288 L 384,288" fill="none" stroke="black"></path>
+                <path d="M 168,304 L 400,304" fill="none" stroke="black"></path>
+                <path d="M 8,320 L 136,320" fill="none" stroke="black"></path>
+                <path d="M 152,320 L 432,320" fill="none" stroke="black"></path>
+                <path d="M 72,368 L 280,368" fill="none" stroke="black"></path>
+                <path d="M 8,416 L 432,416" fill="none" stroke="black"></path>
+                <path d="M 192,432 L 368,432" fill="none" stroke="black"></path>
+                <path d="M 376,448 L 416,448" fill="none" stroke="black"></path>
+                <path d="M 192,480 L 368,480" fill="none" stroke="black"></path>
+                <path d="M 8,496 L 432,496" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="424,408 412,402.4 412,413.6" fill="black" transform="rotate(90,416,408)"></polygon>
+                <polygon class="arrowhead" points="384,448 372,442.4 372,453.6" fill="black" transform="rotate(180,376,448)"></polygon>
+                <polygon class="arrowhead" points="288,328 276,322.4 276,333.6" fill="black" transform="rotate(270,280,328)"></polygon>
+                <polygon class="arrowhead" points="208,256 196,250.4 196,261.6" fill="black" transform="rotate(0,200,256)"></polygon>
+                <polygon class="arrowhead" points="208,112 196,106.4 196,117.6" fill="black" transform="rotate(0,200,112)"></polygon>
+                <polygon class="arrowhead" points="104,408 92,402.4 92,413.6" fill="black" transform="rotate(90,96,408)"></polygon>
+                <polygon class="arrowhead" points="80,328 68,322.4 68,333.6" fill="black" transform="rotate(270,72,328)"></polygon>
                 <g class="text">
                   <text x="72" y="52">ULP</text>
-                  <text x="264" y="52">TLS</text>
-                  <text x="296" y="52">1.3</text>
-                  <text x="240" y="84">Key</text>
-                  <text x="292" y="84">Exporter</text>
-                  <text x="240" y="148">Key</text>
-                  <text x="300" y="148">Management</text>
-                  <text x="224" y="196">ContentType</text>
-                  <text x="240" y="228">TLS</text>
-                  <text x="284" y="228">Record</text>
-                  <text x="244" y="244">Protection</text>
-                  <text x="324" y="244">Operator</text>
-                  <text x="420" y="324">keys</text>
-                  <text x="68" y="340">PPID</text>
-                  <text x="92" y="404">SCTP</text>
-                  <text x="236" y="404">DTLS</text>
-                  <text x="280" y="404">Chunk</text>
-                  <text x="228" y="420">Protection</text>
-                  <text x="308" y="420">Operator</text>
+                  <text x="232" y="52">Key</text>
+                  <text x="292" y="52">Management</text>
+                  <text x="364" y="52">Method</text>
+                  <text x="288" y="84">TLS</text>
+                  <text x="320" y="84">1.3</text>
+                  <text x="256" y="116">Key</text>
+                  <text x="308" y="116">Exporter</text>
+                  <text x="256" y="180">Key</text>
+                  <text x="316" y="180">Management</text>
+                  <text x="240" y="228">ContentType</text>
+                  <text x="264" y="260">TLS</text>
+                  <text x="308" y="260">Record</text>
+                  <text x="260" y="276">Protection</text>
+                  <text x="340" y="276">Operator</text>
+                  <text x="444" y="372">keys</text>
+                  <text x="68" y="388">PPID</text>
+                  <text x="92" y="452">SCTP</text>
+                  <text x="252" y="452">DTLS</text>
+                  <text x="296" y="452">Chunk</text>
+                  <text x="244" y="468">Protection</text>
+                  <text x="324" y="468">Operator</text>
                 </g>
               </svg><a href="#section-2.1-1.1.1" class="pilcrow">¶</a>
 </div>
@@ -1588,9 +1598,12 @@ derives the initial Primary and Restart DKCs.  Protection is then
 enforced.<a href="#section-2.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.2-2.2">
-            <p id="section-2.2-2.2.1"><strong>Rekeying:</strong> Either endpoint initiates a new TLS 1.3 handshake
-to derive fresh DKCs for the next epoch, providing forward secrecy
-and re-authentication.  Old DKCs are removed after draining.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-2.2-2.2.1"><strong>Rekeying:</strong> Either endpoint may trigger rekeying to derive fresh
+DKCs for the next epoch, providing forward secrecy and
+re-authentication.  The client key manager always performs the
+TLS 1.3 handshake; when the server key manager needs to rekey it
+requests one via a Rekey Request.  Old DKCs are removed after
+draining.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.2-2.3">
             <p id="section-2.2-2.3.1"><strong>SCTP Restart:</strong> The pre-established Restart DKC protects the
@@ -1670,11 +1683,44 @@ expire.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.4-3">The PSK key exchange mode psk_ke MUST NOT be used as it does not
 provide ephemeral key exchange.  TLS Key Update MUST NOT be used as it
 doesn't provide a new ephemeral key for the key exporter.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
-<p id="section-3.4-4">TLS 1.3 tickets MAY be used for resumption. Resumption can be used to
-chain the connections, increasing security by forcing an adversary to
-break them in sequence <span>[<a href="#KTH-NCSA" class="cite xref">KTH-NCSA</a>]</span>.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<p id="section-3.4-4">TLS 1.3 tickets MAY be used for session resumption (see
+<a href="#session-resumption" class="auto internal xref">Section 3.5</a>).<a href="#section-3.4-4" class="pilcrow">¶</a></p>
 <p id="section-3.4-5">The endpoints MUST limit the number of simultaneous TLS connections
 to one.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="session-resumption">
+<section id="section-3.5">
+        <h3 id="name-session-resumption">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-session-resumption" class="section-name selfRef">Session Resumption</a>
+        </h3>
+<p id="section-3.5-1">Support for TLS 1.3 session resumption is OPTIONAL. When supported, it
+provides the following benefits:<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.5-2.1">
+            <p id="section-3.5-2.1.1">It avoids re-sending the full certificate chain on subsequent TLS
+ connections. This saves a significant amount of message size,
+ especially with post-quantum cryptography (PQC) certificates, which
+ can be significantly larger than certificates based on Elliptic Curve
+ Cryptography.<a href="#section-3.5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.5-2.2">
+            <p id="section-3.5-2.2.1">It reduces processing, and thus energy consumption and latency.<a href="#section-3.5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.5-2.3">
+            <p id="section-3.5-2.3.1">It allows successive TLS connections to be chained, increasing
+ security by forcing an adversary to break them in sequence
+ <span>[<a href="#KTH-NCSA" class="cite xref">KTH-NCSA</a>]</span>.<a href="#section-3.5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.5-3">Session resumption tickets MAY be pushed by the server key manager at
+any point after the TLS handshake has completed, or they MAY be
+explicitly requested by the client key manager from the server key
+manager. To ensure the client key manager has the opportunity to
+request a ticket before the TLS connection is torn down, the client key
+manager SHOULD initiate the closure of the TLS connection, and the
+server key manager SHOULD NOT close the TLS connection before the
+client has had the opportunity to send a ticket request.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1688,12 +1734,32 @@ to one.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
 user messages using reliable in-order delivery on stream 0 with the
 DTLS Key Management Messages PPID (4242)
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Each SCTP user message uses the format defined in
-<a href="#sctp-dtls-user-message" class="auto internal xref">Figure 2</a>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-2">The key-management method defined in this document is the only user of
+the DTLS Key Management Messages PPID (4242); no other user data is
+sent with this PPID.  All messages exchanged by the key managers are of
+one of the following three types:<a href="#section-4-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-3.1">
+          <p id="section-4-3.1.1">TLS message (T=0): the payload encapsulates one or more TLS records
+(see <a href="#sctp-dtls-user-message" class="auto internal xref">Figure 2</a>).<a href="#section-4-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-4-3.2">
+          <p id="section-4-3.2.1">Protection Established (T=1, Ctrl Type = 0x01): a control message
+(see <a href="#protection-established" class="auto internal xref">Section 4.1.1</a>).<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-4-3.3">
+          <p id="section-4-3.3.1">Rekey Request (T=1, Ctrl Type = 0x02): a control message
+(see <a href="#rekey-request" class="auto internal xref">Section 4.1.2</a>).<a href="#section-4-3.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-4-4">The message type is encoded by the T bit and, for control messages, the
+Ctrl Type field, as defined below.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">Each SCTP user message uses the format defined in
+<a href="#sctp-dtls-user-message" class="auto internal xref">Figure 2</a>.<a href="#section-4-5" class="pilcrow">¶</a></p>
 <span id="name-key-management-user-message"></span><div id="sctp-dtls-user-message">
 <figure id="figure-2">
-        <div id="section-4-3.1">
-          <div class="alignCenter art-svg artwork" id="section-4-3.1.1">
+        <div id="section-4-6.1">
+          <div class="alignCenter art-svg artwork" id="section-4-6.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
               <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
               <path d="M 24,64 L 24,96" fill="none" stroke="black"></path>
@@ -1745,35 +1811,35 @@ DTLS Key Management Messages PPID (4242)
                 <text x="72" y="84">Epoch</text>
                 <text x="264" y="100">Payload</text>
               </g>
-            </svg><a href="#section-4-3.1.1" class="pilcrow">¶</a>
+            </svg><a href="#section-4-6.1.1" class="pilcrow">¶</a>
 </div>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-key-management-user-message" class="selfRef">Key Management User Message Structure</a>
         </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4-4">
-        <dt id="section-4-4.1">T (Message Type): 1 bit</dt>
-        <dd style="margin-left: 1.5em" id="section-4-4.2">
-          <p id="section-4-4.2.1">Indicates the type of payload carried in this user message.
+<span class="break"></span><dl class="dlParallel" id="section-4-7">
+        <dt id="section-4-7.1">T (Message Type): 1 bit</dt>
+        <dd style="margin-left: 1.5em" id="section-4-7.2">
+          <p id="section-4-7.2.1">Indicates the type of payload carried in this user message.
 A value of 0 indicates that the payload contains TLS records.
 A value of 1 indicates that the payload is a control message
-(see <a href="#control-messages" class="auto internal xref">Section 4.1</a>).<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
+(see <a href="#control-messages" class="auto internal xref">Section 4.1</a>).<a href="#section-4-7.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-4-4.3">Epoch: 7 bits</dt>
-        <dd style="margin-left: 1.5em" id="section-4-4.4">
-          <p id="section-4-4.4.1">The 7 lowest bits of the DTLS Key Context epoch that this
+<dt id="section-4-7.3">Epoch: 7 bits</dt>
+        <dd style="margin-left: 1.5em" id="section-4-7.4">
+          <p id="section-4-7.4.1">The 7 lowest bits of the DTLS Key Context epoch that this
 message corresponds to — i.e., the DKC that will be created from
 this handshake, or that already exists.  The receiver uses this
 field to associate incoming data with the correct key-management
-session.<a href="#section-4-4.4.1" class="pilcrow">¶</a></p>
+session.<a href="#section-4-7.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-4-4.5">Payload: variable length</dt>
-        <dd style="margin-left: 1.5em" id="section-4-4.6">
-          <p id="section-4-4.6.1">When T=0, one or more complete TLS records.  When T=1, a control
-message as defined in <a href="#control-messages" class="auto internal xref">Section 4.1</a>.<a href="#section-4-4.6.1" class="pilcrow">¶</a></p>
+<dt id="section-4-7.5">Payload: variable length</dt>
+        <dd style="margin-left: 1.5em" id="section-4-7.6">
+          <p id="section-4-7.6.1">When T=0, one or more complete TLS records.  When T=1, a control
+message as defined in <a href="#control-messages" class="auto internal xref">Section 4.1</a>.<a href="#section-4-7.6.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1790,6 +1856,7 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
             <div class="alignCenter art-svg artwork" id="section-4.1-2.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="528" viewBox="0 0 528 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
+                <path d="M 24,64 L 24,96" fill="none" stroke="black"></path>
                 <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
                 <path d="M 392,64 L 392,72" fill="none" stroke="black"></path>
                 <path d="M 392,88 L 392,96" fill="none" stroke="black"></path>
@@ -1834,8 +1901,9 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
                   <text x="480" y="52">9</text>
                   <text x="496" y="52">0</text>
                   <text x="512" y="52">1</text>
-                  <text x="44" y="84">Ctrl</text>
-                  <text x="84" y="84">Type</text>
+                  <text x="16" y="84">T</text>
+                  <text x="52" y="84">Ctrl</text>
+                  <text x="92" y="84">Type</text>
                   <text x="240" y="84">Control</text>
                   <text x="292" y="84">Data</text>
                   <text x="352" y="84">(variable</text>
@@ -1848,7 +1916,7 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
           </figcaption></figure>
 </div>
 <span class="break"></span><dl class="dlParallel" id="section-4.1-3">
-          <dt id="section-4.1-3.1">Ctrl Type: 8 bits</dt>
+          <dt id="section-4.1-3.1">Ctrl Type: 7 bits</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-3.2">
             <p id="section-4.1-3.2.1">Identifies the control message type.<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1879,6 +1947,11 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
               <td class="text-left" rowspan="1" colspan="1">Protection Established</td>
               <td class="text-left" rowspan="1" colspan="1">Signals that DTLS chunk protection has been enforced</td>
             </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x02</td>
+              <td class="text-left" rowspan="1" colspan="1">Rekey Request</td>
+              <td class="text-left" rowspan="1" colspan="1">Requests the client key manager to initiate a rekeying TLS handshake</td>
+            </tr>
           </tbody>
         </table>
 </div>
@@ -1888,14 +1961,40 @@ control message with the following format:<a href="#section-4.1-1" class="pilcro
 <a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-protection-established" class="section-name selfRef">Protection Established</a>
           </h4>
 <p id="section-4.1.1-1">The Protection Established control message (Ctrl Type = 0x01) is sent
-by the Server to the Client after the Server has installed
-all keys and enforced DTLS chunk protection.  This message carries no
-Control Data (the payload following the Ctrl Type byte is empty).<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-2">Upon receiving this message, the Client enforces DTLS chunk
-protection and informs the ULP that the association is protected.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-3">The message is also used during rekeying to confirm to the endpoint
-with the client role in that procedure that the server has installed
-all keys, and the client can install write keys.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
+by a key manager to its peer key manager for indicating that it has
+set the read key material. This enables the receiving peer to set its
+write key upon reception of this control messages.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">This message carries no Control Data (the payload following the Ctrl
+Type byte is empty).<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">The message is also used during rekeying in the same way as in the
+initial handshake.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rekey-request">
+<section id="section-4.1.2">
+          <h4 id="name-rekey-request">
+<a href="#section-4.1.2" class="section-number selfRef">4.1.2. </a><a href="#name-rekey-request" class="section-name selfRef">Rekey Request</a>
+          </h4>
+<p id="section-4.1.2-1">The Rekey Request control message (Ctrl Type = 0x02) is sent by the
+server key manager to the client key manager to request that the client
+key manager initiate a rekeying TLS handshake (see <a href="#rekeying" class="auto internal xref">Section 6.2</a>).<a href="#section-4.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-2">Because only the client key manager initiates a TLS handshake, the
+server key manager uses this message when it determines that rekeying
+is needed (per its own criteria in <a href="#rekey-strategy" class="auto internal xref">Section 3.4</a>).  This division of
+roles allows an endpoint holding only the client role to implement only
+a TLS client, and an endpoint holding only the server role to implement
+only a TLS server.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-3">Upon receiving a Rekey Request, the client key manager initiates a
+rekeying TLS handshake as described in <a href="#rekeying" class="auto internal xref">Section 6.2</a>, unless a rekeying
+is already in progress, in which case the Rekey Request is ignored (see
+<a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>).<a href="#section-4.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-4">Because key management messages are carried on SCTP stream 0 with
+reliable, in-order delivery, the Rekey Request is guaranteed to be
+delivered; no key-management-level retransmission of it is required.<a href="#section-4.1.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-5">This message carries no Control Data (the payload following the Ctrl
+Type byte is empty).  It is carried in a key management message with the
+epoch field set to the epoch of the DKC that will be created by the
+requested rekeying (epoch N+1).<a href="#section-4.1.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2039,101 +2138,165 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
 <figure id="figure-4">
           <div id="section-6.1-1.1">
             <div class="alignCenter art-svg artwork" id="section-6.1-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="584" viewBox="0 0 584 400" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 40,48 L 40,368" fill="none" stroke="black"></path>
-                <path d="M 80,160 L 80,304" fill="none" stroke="black"></path>
-                <path d="M 424,160 L 424,304" fill="none" stroke="black"></path>
-                <path d="M 472,48 L 472,368" fill="none" stroke="black"></path>
-                <path d="M 504,336 L 504,368" fill="none" stroke="black"></path>
-                <path d="M 40,64 L 232,64" fill="none" stroke="black"></path>
-                <path d="M 288,64 L 464,64" fill="none" stroke="black"></path>
-                <path d="M 48,80 L 216,80" fill="none" stroke="black"></path>
-                <path d="M 304,80 L 472,80" fill="none" stroke="black"></path>
-                <path d="M 40,96 L 200,96" fill="none" stroke="black"></path>
-                <path d="M 312,96 L 464,96" fill="none" stroke="black"></path>
-                <path d="M 48,112 L 208,112" fill="none" stroke="black"></path>
-                <path d="M 312,112 L 472,112" fill="none" stroke="black"></path>
-                <path d="M 40,176 L 72,176" fill="none" stroke="black"></path>
-                <path d="M 432,176 L 472,176" fill="none" stroke="black"></path>
-                <path d="M 80,208 L 152,208" fill="none" stroke="black"></path>
-                <path d="M 352,208 L 416,208" fill="none" stroke="black"></path>
-                <path d="M 400,240 L 424,240" fill="none" stroke="black"></path>
-                <path d="M 80,256 L 96,256" fill="none" stroke="black"></path>
-                <path d="M 392,256 L 416,256" fill="none" stroke="black"></path>
-                <path d="M 88,288 L 104,288" fill="none" stroke="black"></path>
-                <path d="M 352,288 L 424,288" fill="none" stroke="black"></path>
-                <path d="M 40,336 L 136,336" fill="none" stroke="black"></path>
-                <path d="M 368,336 L 464,336" fill="none" stroke="black"></path>
-                <path d="M 48,352 L 136,352" fill="none" stroke="black"></path>
-                <path d="M 368,352 L 472,352" fill="none" stroke="black"></path>
-                <path d="M 504,352 L 576,352" fill="none" stroke="black"></path>
-                <path d="M 488,320 C 496.83064,320 504,327.16936 504,336" fill="none" stroke="black"></path>
-                <polygon class="arrowhead" points="472,336 460,330.4 460,341.6" fill="black" transform="rotate(0,464,336)"></polygon>
-                <polygon class="arrowhead" points="472,96 460,90.4 460,101.6" fill="black" transform="rotate(0,464,96)"></polygon>
-                <polygon class="arrowhead" points="472,64 460,58.4 460,69.6" fill="black" transform="rotate(0,464,64)"></polygon>
-                <polygon class="arrowhead" points="440,176 428,170.4 428,181.6" fill="black" transform="rotate(180,432,176)"></polygon>
-                <polygon class="arrowhead" points="424,256 412,250.4 412,261.6" fill="black" transform="rotate(0,416,256)"></polygon>
-                <polygon class="arrowhead" points="424,208 412,202.4 412,213.6" fill="black" transform="rotate(0,416,208)"></polygon>
-                <polygon class="arrowhead" points="96,288 84,282.4 84,293.6" fill="black" transform="rotate(180,88,288)"></polygon>
-                <polygon class="arrowhead" points="80,176 68,170.4 68,181.6" fill="black" transform="rotate(0,72,176)"></polygon>
-                <polygon class="arrowhead" points="56,352 44,346.4 44,357.6" fill="black" transform="rotate(180,48,352)"></polygon>
-                <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
-                <polygon class="arrowhead" points="56,80 44,74.4 44,85.6" fill="black" transform="rotate(180,48,80)"></polygon>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="656" width="648" viewBox="0 0 648 656" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 48,48 L 48,512" fill="none" stroke="black"></path>
+                <path d="M 72,160 L 72,448" fill="none" stroke="black"></path>
+                <path d="M 112,160 L 112,448" fill="none" stroke="black"></path>
+                <path d="M 352,160 L 352,448" fill="none" stroke="black"></path>
+                <path d="M 392,160 L 392,448" fill="none" stroke="black"></path>
+                <path d="M 416,48 L 416,512" fill="none" stroke="black"></path>
+                <path d="M 440,464 L 440,512" fill="none" stroke="black"></path>
+                <path d="M 48,64 L 120,64" fill="none" stroke="black"></path>
+                <path d="M 176,64 L 408,64" fill="none" stroke="black"></path>
+                <path d="M 56,80 L 120,80" fill="none" stroke="black"></path>
+                <path d="M 208,80 L 416,80" fill="none" stroke="black"></path>
+                <path d="M 48,96 L 120,96" fill="none" stroke="black"></path>
+                <path d="M 232,96 L 408,96" fill="none" stroke="black"></path>
+                <path d="M 56,112 L 120,112" fill="none" stroke="black"></path>
+                <path d="M 224,112 L 416,112" fill="none" stroke="black"></path>
+                <path d="M 80,176 L 112,176" fill="none" stroke="black"></path>
+                <path d="M 352,176 L 384,176" fill="none" stroke="black"></path>
+                <path d="M 72,208 L 104,208" fill="none" stroke="black"></path>
+                <path d="M 360,208 L 392,208" fill="none" stroke="black"></path>
+                <path d="M 112,222 L 168,222" fill="none" stroke="black"></path>
+                <path d="M 112,226 L 168,226" fill="none" stroke="black"></path>
+                <path d="M 248,222 L 344,222" fill="none" stroke="black"></path>
+                <path d="M 248,226 L 344,226" fill="none" stroke="black"></path>
+                <path d="M 352,240 L 384,240" fill="none" stroke="black"></path>
+                <path d="M 360,256 L 392,256" fill="none" stroke="black"></path>
+                <path d="M 120,270 L 168,270" fill="none" stroke="black"></path>
+                <path d="M 120,274 L 168,274" fill="none" stroke="black"></path>
+                <path d="M 248,270 L 352,270" fill="none" stroke="black"></path>
+                <path d="M 248,274 L 352,274" fill="none" stroke="black"></path>
+                <path d="M 80,288 L 112,288" fill="none" stroke="black"></path>
+                <path d="M 72,336 L 104,336" fill="none" stroke="black"></path>
+                <path d="M 112,352 L 208,352" fill="none" stroke="black"></path>
+                <path d="M 248,352 L 344,352" fill="none" stroke="black"></path>
+                <path d="M 360,368 L 392,368" fill="none" stroke="black"></path>
+                <path d="M 120,416 L 216,416" fill="none" stroke="black"></path>
+                <path d="M 256,416 L 352,416" fill="none" stroke="black"></path>
+                <path d="M 48,480 L 120,480" fill="none" stroke="black"></path>
+                <path d="M 288,480 L 408,480" fill="none" stroke="black"></path>
+                <path d="M 56,496 L 120,496" fill="none" stroke="black"></path>
+                <path d="M 288,496 L 416,496" fill="none" stroke="black"></path>
+                <path d="M 440,496 L 464,496" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="416,480 404,474.4 404,485.6" fill="black" transform="rotate(0,408,480)"></polygon>
+                <polygon class="arrowhead" points="416,96 404,90.4 404,101.6" fill="black" transform="rotate(0,408,96)"></polygon>
+                <polygon class="arrowhead" points="416,64 404,58.4 404,69.6" fill="black" transform="rotate(0,408,64)"></polygon>
+                <polygon class="arrowhead" points="392,240 380,234.4 380,245.6" fill="black" transform="rotate(0,384,240)"></polygon>
+                <polygon class="arrowhead" points="392,176 380,170.4 380,181.6" fill="black" transform="rotate(0,384,176)"></polygon>
+                <polygon class="arrowhead" points="368,368 356,362.4 356,373.6" fill="black" transform="rotate(180,360,368)"></polygon>
+                <polygon class="arrowhead" points="368,256 356,250.4 356,261.6" fill="black" transform="rotate(180,360,256)"></polygon>
+                <polygon class="arrowhead" points="368,208 356,202.4 356,213.6" fill="black" transform="rotate(180,360,208)"></polygon>
+                <polygon class="arrowhead" points="352,352 340,346.4 340,357.6" fill="black" transform="rotate(0,344,352)"></polygon>
+                <polygon class="arrowhead" points="352,224 340,218.4 340,229.6" fill="black" transform="rotate(0,344,224)"></polygon>
+                <polygon class="arrowhead" points="128,416 116,410.4 116,421.6" fill="black" transform="rotate(180,120,416)"></polygon>
+                <polygon class="arrowhead" points="128,272 116,266.4 116,277.6" fill="black" transform="rotate(180,120,272)"></polygon>
+                <polygon class="arrowhead" points="112,336 100,330.4 100,341.6" fill="black" transform="rotate(0,104,336)"></polygon>
+                <polygon class="arrowhead" points="112,208 100,202.4 100,213.6" fill="black" transform="rotate(0,104,208)"></polygon>
+                <polygon class="arrowhead" points="88,288 76,282.4 76,293.6" fill="black" transform="rotate(180,80,288)"></polygon>
+                <polygon class="arrowhead" points="88,176 76,170.4 76,181.6" fill="black" transform="rotate(180,80,176)"></polygon>
+                <polygon class="arrowhead" points="64,496 52,490.4 52,501.6" fill="black" transform="rotate(180,56,496)"></polygon>
+                <polygon class="arrowhead" points="64,112 52,106.4 52,117.6" fill="black" transform="rotate(180,56,112)"></polygon>
+                <polygon class="arrowhead" points="64,80 52,74.4 52,85.6" fill="black" transform="rotate(180,56,80)"></polygon>
                 <g class="text">
-                  <text x="40" y="36">Initiator</text>
-                  <text x="472" y="36">Responder</text>
-                  <text x="20" y="68">1.</text>
-                  <text x="260" y="68">[INIT]</text>
-                  <text x="260" y="84">[INIT-ACK]</text>
-                  <text x="232" y="100">[COOKIE</text>
-                  <text x="288" y="100">ECHO]</text>
-                  <text x="492" y="100">2.</text>
-                  <text x="20" y="116">3.</text>
-                  <text x="240" y="116">[COOKIE</text>
-                  <text x="292" y="116">ACK]</text>
-                  <text x="72" y="148">Key</text>
-                  <text x="120" y="148">Manager</text>
-                  <text x="180" y="148">Client</text>
-                  <text x="328" y="148">Key</text>
-                  <text x="376" y="148">Manager</text>
-                  <text x="436" y="148">Server</text>
-                  <text x="20" y="180">4.</text>
-                  <text x="104" y="180">TLS</text>
-                  <text x="144" y="180">START</text>
-                  <text x="352" y="180">TLS</text>
-                  <text x="392" y="180">START</text>
-                  <text x="192" y="212">[DATA(TLS</text>
-                  <text x="260" y="212">Client</text>
-                  <text x="320" y="212">Hello)]</text>
-                  <text x="452" y="212">5.</text>
-                  <text x="60" y="244">7.</text>
-                  <text x="128" y="244">&lt;-[DATA(TLS</text>
-                  <text x="204" y="244">Server</text>
-                  <text x="256" y="244">Hello</text>
-                  <text x="296" y="244">...</text>
-                  <text x="356" y="244">Finished)]</text>
-                  <text x="452" y="244">6.</text>
-                  <text x="60" y="260">8.</text>
-                  <text x="136" y="260">[DATA(TLS</text>
-                  <text x="224" y="260">Certificate</text>
-                  <text x="288" y="260">...</text>
-                  <text x="348" y="260">Finished)]</text>
-                  <text x="452" y="260">9.</text>
-                  <text x="448" y="276">10.</text>
-                  <text x="56" y="292">12.</text>
-                  <text x="172" y="292">[DATA(Protection</text>
-                  <text x="296" y="292">Established)]</text>
-                  <text x="448" y="292">11.</text>
-                  <text x="16" y="340">13.</text>
-                  <text x="160" y="340">[DTLS</text>
-                  <text x="244" y="340">CHUNK(DATA(APP</text>
-                  <text x="336" y="340">DATA))]</text>
-                  <text x="528" y="340">APP</text>
-                  <text x="564" y="340">DATA</text>
-                  <text x="160" y="356">[DTLS</text>
-                  <text x="244" y="356">CHUNK(DATA(APP</text>
-                  <text x="336" y="356">DATA))]</text>
-                  <text x="256" y="372">...</text>
+                  <text x="48" y="36">Initiator</text>
+                  <text x="416" y="36">Responder</text>
+                  <text x="28" y="68">1.</text>
+                  <text x="148" y="68">[INIT]</text>
+                  <text x="164" y="84">[INIT-ACK]</text>
+                  <text x="152" y="100">[COOKIE</text>
+                  <text x="208" y="100">ECHO]</text>
+                  <text x="436" y="100">2.</text>
+                  <text x="28" y="116">3.</text>
+                  <text x="152" y="116">[COOKIE</text>
+                  <text x="204" y="116">ACK]</text>
+                  <text x="72" y="148">TLS</text>
+                  <text x="124" y="148">client</text>
+                  <text x="164" y="148">KM</text>
+                  <text x="316" y="148">server</text>
+                  <text x="356" y="148">KM</text>
+                  <text x="392" y="148">TLS</text>
+                  <text x="28" y="180">4.</text>
+                  <text x="160" y="180">connect()</text>
+                  <text x="308" y="180">accept()</text>
+                  <text x="460" y="180">5.</text>
+                  <text x="188" y="228">[TLS</text>
+                  <text x="228" y="228">rec]</text>
+                  <text x="460" y="228">6.</text>
+                  <text x="188" y="276">[TLS</text>
+                  <text x="228" y="276">rec]</text>
+                  <text x="168" y="308">(repeat</text>
+                  <text x="224" y="308">until</text>
+                  <text x="288" y="308">complete)</text>
+                  <text x="28" y="340">7.</text>
+                  <text x="140" y="340">READ</text>
+                  <text x="200" y="340">installed</text>
+                  <text x="228" y="356">[PE]</text>
+                  <text x="464" y="356">8b.</text>
+                  <text x="464" y="372">8a.</text>
+                  <text x="144" y="388">(wait</text>
+                  <text x="184" y="388">for</text>
+                  <text x="220" y="388">done</text>
+                  <text x="248" y="388">+</text>
+                  <text x="284" y="388">client</text>
+                  <text x="328" y="388">PE)</text>
+                  <text x="188" y="404">(install</text>
+                  <text x="244" y="404">R+W,</text>
+                  <text x="300" y="404">enforce)</text>
+                  <text x="236" y="420">[PE]</text>
+                  <text x="28" y="436">9.</text>
+                  <text x="152" y="436">WRITE</text>
+                  <text x="220" y="436">installed,</text>
+                  <text x="296" y="436">enforce</text>
+                  <text x="432" y="468">-</text>
+                  <text x="24" y="484">10.</text>
+                  <text x="164" y="484">[protected</text>
+                  <text x="224" y="484">APP</text>
+                  <text x="264" y="484">DATA]</text>
+                  <text x="464" y="484">APP</text>
+                  <text x="164" y="500">[protected</text>
+                  <text x="224" y="500">APP</text>
+                  <text x="264" y="500">DATA]</text>
+                  <text x="208" y="516">...</text>
+                  <text x="32" y="564">Legend:</text>
+                  <text x="80" y="564">TLS</text>
+                  <text x="104" y="564">=</text>
+                  <text x="136" y="564">local</text>
+                  <text x="176" y="564">TLS</text>
+                  <text x="224" y="564">engine;</text>
+                  <text x="284" y="564">client</text>
+                  <text x="352" y="564">KM/server</text>
+                  <text x="404" y="564">KM</text>
+                  <text x="424" y="564">=</text>
+                  <text x="488" y="564">client/server</text>
+                  <text x="560" y="564">key</text>
+                  <text x="612" y="564">manager;</text>
+                  <text x="76" y="580">connect()/accept()</text>
+                  <text x="160" y="580">=</text>
+                  <text x="280" y="580">SSL_connect()/SSL_accept();</text>
+                  <text x="408" y="580">TLS</text>
+                  <text x="440" y="580">rec</text>
+                  <text x="464" y="580">=</text>
+                  <text x="488" y="580">TLS</text>
+                  <text x="536" y="580">records</text>
+                  <text x="32" y="596">relayed</text>
+                  <text x="96" y="596">between</text>
+                  <text x="144" y="596">the</text>
+                  <text x="176" y="596">key</text>
+                  <text x="232" y="596">managers;</text>
+                  <text x="284" y="596">PE</text>
+                  <text x="304" y="596">=</text>
+                  <text x="356" y="596">Protection</text>
+                  <text x="448" y="596">Established</text>
+                  <text x="528" y="596">control</text>
+                  <text x="36" y="612">message;</text>
+                  <text x="88" y="612">R+W</text>
+                  <text x="112" y="612">=</text>
+                  <text x="140" y="612">read</text>
+                  <text x="176" y="612">and</text>
+                  <text x="216" y="612">write</text>
+                  <text x="264" y="612">keys.</text>
                 </g>
               </svg><a href="#section-6.1-1.1.1" class="pilcrow">¶</a>
 </div>
@@ -2142,88 +2305,84 @@ sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</
 <a href="#name-initial-establishment-2" class="selfRef">Initial Establishment</a>
           </figcaption></figure>
 </div>
-<p id="section-6.1-2">The diagram <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> shows the case
-where SCTP Initiator ends up with the Key Manager client role.
-The opposite case is identical but with inverted roles among
-Key Managers. In the following procedure we use Initiator
-and Responder referring to SCTP, Client and Server referring
-to Keymanager role, and implicitly TLS roles.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">The diagram <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> shows the case where SCTP
+  Initiator ends up with the Key Manager client role. The opposite case is
+  identical but with inverted roles among Key Managers. In the following
+  procedure we use Initiator and Responder referring to SCTP, Client and Server
+  referring to Keymanager role, and implicitly TLS roles. The key managers drive
+  TLS solely through the TLS user API and relay the resulting TLS records; they
+  do not need to parse TLS messages.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.1-3">The procedure is as follows:<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.1-4">
 <li id="section-6.1-4.1">
-            <p id="section-6.1-4.1.1">The Initiator sends INIT containing the DTLS Key Management
-Parameter (Section 4.1 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>)
-with this method's identifier (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) in its
-preference-ordered list.<a href="#section-6.1-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.1.1">The Initiator sends INIT containing the DTLS Key Management Parameter
+   (Section 4.1 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) with this
+   method's identifier (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) in its preference-ordered list.<a href="#section-6.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.2">
-            <p id="section-6.1-4.2.1">The Responder enters ESTABLISHED state.  It retrieves the agreed
-DTLS Key Management Method and role from the SCTP stack (e.g.,
-using the "Get Agreed DTLS Key Management Method and Role" API
-defined in Section 7.2 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>)
-and verifies that the selected method matches the one defined in
-this document (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and gets the assigned role
-as key manager client or server (in the example depicted in
-<a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> it is server).<a href="#section-6.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.2.1">The Responder enters ESTABLISHED state. It retrieves the agreed DTLS
+   Key Management Method and role from the SCTP stack (e.g., using
+   the "Get Agreed DTLS Key Management Method and Role" API defined in
+   Section 7.2 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and verifies that
+   the selected method matches the one defined in this document
+   (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and gets the assigned role as key manager client or
+   server (in the example depicted in <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a>
+   it is server).<a href="#section-6.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.3">
-            <p id="section-6.1-4.3.1">The Initiator enters ESTABLISHED state.  It performs the same
-retrieval and verification as the Responder, confirming the
-assigned role as key manager client or server (in the example
-depicted in <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> it is client).<a href="#section-6.1-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.3.1">The Initiator enters ESTABLISHED state. It performs the same retrieval and
+   verification as the Responder, confirming the assigned role as key manager
+   client or server (in the example depicted in
+   <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> it is client).<a href="#section-6.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.4">
-            <p id="section-6.1-4.4.1">The client key manager starts a TLS 1.3 handshake, limiting
-offered cipher suites to those supported by the DTLS Chunk
-Protection Operator, and sends TLS ClientHello per
-<a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.1-4.4.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.4.1">The client key manager starts a TLS 1.3 handshake, limiting offered cipher
+   suites to those supported by the DTLS Chunk Protection Operator, and relays
+   the resulting flight of TLS records to the server key manager per
+   <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.1-4.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.5">
-            <p id="section-6.1-4.5.1">The server key manager receives the TLS ClientHello.  If a
-HelloRetryRequest is needed, an additional round-trip occurs
-before proceeding.<a href="#section-6.1-4.5.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.5.1">The server key manager starts a TLS 1.3 server and is read to relay any
+   received TLS records received to the TLS server and forward any produced TLS
+   records by the TLS server to the client key manager per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.1-4.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.6">
-            <p id="section-6.1-4.6.1">The server key manager sends its TLS ServerHello through Finished
-messages.<a href="#section-6.1-4.6.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.6.1">The client key manager and the server key manager relay TLS records to and
+   from their local TLS, repeating until the TLS handshake completes. If a
+   HelloRetryRequest is needed, an additional round-trip occurs before
+   proceeding.<a href="#section-6.1-4.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.7">
-            <p id="section-6.1-4.7.1">The client key manager receives the TLS ServerHello message,
-exports all Primary and Restart DKC keys, and installs the server to client
-key material as its read (receive) key.<a href="#section-6.1-4.7.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.7.1">The client key manager's TLS handshake completes. It exports all Primary
+   and Restart DKC keys, installs the server to client key material as its read
+   (receive) key, and sends a Protection Established control message
+   (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the server key manager.<a href="#section-6.1-4.7.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.8">
-            <p id="section-6.1-4.8.1">The client key manager sends its TLS
-Certificate/CertificateVerify/Finished.<a href="#section-6.1-4.8.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.8.1">The server key manager proceeds only after both its own TLS handshake has
+   completed (8a) and it has received the client key manager's Protection
+   Established control message (8b). Once both conditions are met, it exports
+   both direction key material for both the Primary and Restart DKCs, installs
+   both the read (receive) key and the write (send) key, calls Require Protected
+   SCTP Packets to enforce DTLS chunk protection for all future packets, informs
+   the ULP that the association is protected, and sends a Protection Established
+   control message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.1-4.8.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.9">
-            <p id="section-6.1-4.9.1">The server key manager receives
-Certificate/CertificateVerify/Finished, it exports both direction
-key material for both the Primary and Restart DKCs, and installs both
-read (receive) keys and as its write (send) keys.<a href="#section-6.1-4.9.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.9.1">The client key manager receives the Protection Established control
+   message, installs the client key material as its write (send) key, calls
+   Require Protected SCTP Packets to enforce DTLS chunk protection for all
+   future packets, and informs the ULP that the association is protected.<a href="#section-6.1-4.9.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-4.10">
-            <p id="section-6.1-4.10.1">The server key manager calls Require Protected SCTP Packets to
-enforce DTLS chunk protection for all future packets and informs
-the ULP that the association is protected.<a href="#section-6.1-4.10.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-6.1-4.11">
-            <p id="section-6.1-4.11.1">The server key manager sends a Protection Established control
-message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.1-4.11.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-6.1-4.12">
-            <p id="section-6.1-4.12.1">The client key manager receives the Protection Established control
-message, and installs the client key material as its write (send)
-key, calls Require Protected SCTP Packets to enforce DTLS chunk
-protection for all future packets, and informs the ULP that the
-association is protected.<a href="#section-6.1-4.12.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-6.1-4.13">
-            <p id="section-6.1-4.13.1">Application traffic can begin.<a href="#section-6.1-4.13.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-4.10.1">Protected application traffic can begin.<a href="#section-6.1-4.10.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-6.1-5">If the TLS handshake fails, the SCTP association MUST be aborted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.1-6">After key installation, the TLS connection SHOULD be closed promptly.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.1-5">If the TLS handshake fails and the error cause indicates that it can't be
+  addressed, the SCTP association MUST be aborted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.1-6">After key installation, the TLS connection SHOULD be closed promptly. When
+ session resumption is supported, closure follows the procedure in
+ <a href="#session-resumption" class="auto internal xref">Section 3.5</a>.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekeying">
@@ -2256,139 +2415,289 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
           <h4 id="name-procedure">
 <a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-procedure" class="section-name selfRef">Procedure</a>
           </h4>
+<p id="section-6.2.2-1">The client key manager and the server key manager keep the same
+  key-management roles for the entire lifetime of the SCTP association:
+  the client key manager is always the TLS client and the server key
+  manager is always the TLS server, for the initial handshake and for
+  every rekeying.  Consequently, only the client key manager ever
+  initiates a TLS handshake.  This allows an endpoint holding only the
+  client role to implement only a TLS client, and an endpoint holding
+  only the server role to implement only a TLS server.<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-2">Either endpoint may need to rekey.  The need is acted upon as follows:<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2.2-3.1">
+              <p id="section-6.2.2-3.1.1">If the client key manager needs to rekey, it directly initiates a
+rekeying TLS handshake.<a href="#section-6.2.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.2.2-3.2">
+              <p id="section-6.2.2-3.2.1">If the server key manager needs to rekey, it cannot initiate a TLS
+handshake itself.  Instead it sends a Rekey Request control message
+(<a href="#rekey-request" class="auto internal xref">Section 4.1.2</a>) to the client key manager, which then initiates
+the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.2.2-4">Because the key management messages are carried on SCTP stream 0 with
+  reliable, in-order delivery, the Rekey Request and all handshake
+  messages are guaranteed to be delivered and are not lost; no
+  key-management-level retransmission is required.<a href="#section-6.2.2-4" class="pilcrow">¶</a></p>
 <span id="name-rekeying-procedure"></span><div id="rekey-diagram">
 <figure id="figure-5">
-            <div id="section-6.2.2-1.1">
-              <div class="alignCenter art-svg artwork" id="section-6.2.2-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="288" width="504" viewBox="0 0 504 288" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 40,48 L 40,256" fill="none" stroke="black"></path>
-                  <path d="M 80,112 L 80,176" fill="none" stroke="black"></path>
-                  <path d="M 416,112 L 416,176" fill="none" stroke="black"></path>
-                  <path d="M 464,48 L 464,256" fill="none" stroke="black"></path>
-                  <path d="M 80,128 L 152,128" fill="none" stroke="black"></path>
-                  <path d="M 352,128 L 408,128" fill="none" stroke="black"></path>
-                  <path d="M 400,144 L 416,144" fill="none" stroke="black"></path>
-                  <path d="M 80,160 L 96,160" fill="none" stroke="black"></path>
-                  <path d="M 392,160 L 408,160" fill="none" stroke="black"></path>
-                  <path d="M 88,176 L 104,176" fill="none" stroke="black"></path>
-                  <path d="M 352,176 L 416,176" fill="none" stroke="black"></path>
-                  <polygon class="arrowhead" points="416,160 404,154.4 404,165.6" fill="black" transform="rotate(0,408,160)"></polygon>
-                  <polygon class="arrowhead" points="416,128 404,122.4 404,133.6" fill="black" transform="rotate(0,408,128)"></polygon>
-                  <polygon class="arrowhead" points="96,176 84,170.4 84,181.6" fill="black" transform="rotate(180,88,176)"></polygon>
+            <div id="section-6.2.2-5.1">
+              <div class="alignCenter art-svg artwork" id="section-6.2.2-5.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="640" width="592" viewBox="0 0 592 640" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 48,48 L 48,496" fill="none" stroke="black"></path>
+                  <path d="M 72,96 L 72,472" fill="none" stroke="black"></path>
+                  <path d="M 112,96 L 112,144" fill="none" stroke="black"></path>
+                  <path d="M 112,176 L 112,464" fill="none" stroke="black"></path>
+                  <path d="M 352,96 L 352,144" fill="none" stroke="black"></path>
+                  <path d="M 352,176 L 352,464" fill="none" stroke="black"></path>
+                  <path d="M 392,96 L 392,464" fill="none" stroke="black"></path>
+                  <path d="M 416,48 L 416,496" fill="none" stroke="black"></path>
+                  <path d="M 120,128 L 184,128" fill="none" stroke="black"></path>
+                  <path d="M 280,128 L 352,128" fill="none" stroke="black"></path>
+                  <path d="M 80,176 L 112,176" fill="none" stroke="black"></path>
+                  <path d="M 352,176 L 384,176" fill="none" stroke="black"></path>
+                  <path d="M 72,208 L 104,208" fill="none" stroke="black"></path>
+                  <path d="M 360,208 L 392,208" fill="none" stroke="black"></path>
+                  <path d="M 112,222 L 168,222" fill="none" stroke="black"></path>
+                  <path d="M 112,226 L 168,226" fill="none" stroke="black"></path>
+                  <path d="M 248,222 L 344,222" fill="none" stroke="black"></path>
+                  <path d="M 248,226 L 344,226" fill="none" stroke="black"></path>
+                  <path d="M 352,240 L 384,240" fill="none" stroke="black"></path>
+                  <path d="M 360,256 L 392,256" fill="none" stroke="black"></path>
+                  <path d="M 120,270 L 168,270" fill="none" stroke="black"></path>
+                  <path d="M 120,274 L 168,274" fill="none" stroke="black"></path>
+                  <path d="M 248,270 L 352,270" fill="none" stroke="black"></path>
+                  <path d="M 248,274 L 352,274" fill="none" stroke="black"></path>
+                  <path d="M 80,288 L 112,288" fill="none" stroke="black"></path>
+                  <path d="M 72,336 L 104,336" fill="none" stroke="black"></path>
+                  <path d="M 112,352 L 192,352" fill="none" stroke="black"></path>
+                  <path d="M 232,352 L 344,352" fill="none" stroke="black"></path>
+                  <path d="M 360,368 L 392,368" fill="none" stroke="black"></path>
+                  <path d="M 120,432 L 192,432" fill="none" stroke="black"></path>
+                  <path d="M 232,432 L 352,432" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="392,240 380,234.4 380,245.6" fill="black" transform="rotate(0,384,240)"></polygon>
+                  <polygon class="arrowhead" points="392,176 380,170.4 380,181.6" fill="black" transform="rotate(0,384,176)"></polygon>
+                  <polygon class="arrowhead" points="368,368 356,362.4 356,373.6" fill="black" transform="rotate(180,360,368)"></polygon>
+                  <polygon class="arrowhead" points="368,256 356,250.4 356,261.6" fill="black" transform="rotate(180,360,256)"></polygon>
+                  <polygon class="arrowhead" points="368,208 356,202.4 356,213.6" fill="black" transform="rotate(180,360,208)"></polygon>
+                  <polygon class="arrowhead" points="352,352 340,346.4 340,357.6" fill="black" transform="rotate(0,344,352)"></polygon>
+                  <polygon class="arrowhead" points="352,224 340,218.4 340,229.6" fill="black" transform="rotate(0,344,224)"></polygon>
+                  <polygon class="arrowhead" points="128,432 116,426.4 116,437.6" fill="black" transform="rotate(180,120,432)"></polygon>
+                  <polygon class="arrowhead" points="128,272 116,266.4 116,277.6" fill="black" transform="rotate(180,120,272)"></polygon>
+                  <polygon class="arrowhead" points="128,128 116,122.4 116,133.6" fill="black" transform="rotate(180,120,128)"></polygon>
+                  <polygon class="arrowhead" points="112,336 100,330.4 100,341.6" fill="black" transform="rotate(0,104,336)"></polygon>
+                  <polygon class="arrowhead" points="112,208 100,202.4 100,213.6" fill="black" transform="rotate(0,104,208)"></polygon>
+                  <polygon class="arrowhead" points="88,288 76,282.4 76,293.6" fill="black" transform="rotate(180,80,288)"></polygon>
+                  <polygon class="arrowhead" points="88,176 76,170.4 76,181.6" fill="black" transform="rotate(180,80,176)"></polygon>
                   <g class="text">
-                    <text x="40" y="36">Initiator</text>
-                    <text x="464" y="36">Responder</text>
-                    <text x="92" y="68">(traffic</text>
-                    <text x="168" y="68">continues</text>
-                    <text x="232" y="68">using</text>
-                    <text x="280" y="68">epoch</text>
-                    <text x="312" y="68">N</text>
-                    <text x="340" y="68">DKC)</text>
-                    <text x="84" y="100">Client</text>
-                    <text x="128" y="100">Key</text>
-                    <text x="176" y="100">Manager</text>
-                    <text x="320" y="100">Key</text>
-                    <text x="368" y="100">Manager</text>
-                    <text x="428" y="100">Server</text>
-                    <text x="60" y="132">1.</text>
-                    <text x="192" y="132">[DATA(TLS</text>
-                    <text x="260" y="132">Client</text>
-                    <text x="320" y="132">Hello)]</text>
-                    <text x="436" y="132">2.</text>
-                    <text x="60" y="148">4.</text>
-                    <text x="128" y="148">&lt;-[DATA(TLS</text>
-                    <text x="204" y="148">Server</text>
-                    <text x="256" y="148">Hello</text>
-                    <text x="296" y="148">...</text>
-                    <text x="356" y="148">Finished)]</text>
-                    <text x="436" y="148">3.</text>
-                    <text x="60" y="164">5.</text>
-                    <text x="136" y="164">[DATA(TLS</text>
-                    <text x="224" y="164">Certificate</text>
-                    <text x="288" y="164">...</text>
-                    <text x="348" y="164">Finished)]</text>
-                    <text x="436" y="164">6.</text>
-                    <text x="60" y="180">8.</text>
-                    <text x="172" y="180">[DATA(Protection</text>
-                    <text x="296" y="180">Established)]</text>
-                    <text x="436" y="180">7.</text>
-                    <text x="92" y="212">(traffic</text>
-                    <text x="176" y="212">transitions</text>
-                    <text x="236" y="212">to</text>
-                    <text x="272" y="212">epoch</text>
-                    <text x="312" y="212">N+1</text>
-                    <text x="348" y="212">DKC)</text>
-                    <text x="84" y="244">(after</text>
-                    <text x="152" y="244">draining,</text>
-                    <text x="220" y="244">remove</text>
-                    <text x="272" y="244">epoch</text>
-                    <text x="304" y="244">N</text>
-                    <text x="332" y="244">DKC)</text>
+                    <text x="48" y="36">Initiator</text>
+                    <text x="416" y="36">Responder</text>
+                    <text x="100" y="52">(traffic</text>
+                    <text x="176" y="52">continues</text>
+                    <text x="240" y="52">using</text>
+                    <text x="288" y="52">epoch</text>
+                    <text x="320" y="52">N</text>
+                    <text x="348" y="52">DKC)</text>
+                    <text x="72" y="84">TLS</text>
+                    <text x="120" y="84">cliKM</text>
+                    <text x="344" y="84">srvKM</text>
+                    <text x="392" y="84">TLS</text>
+                    <text x="160" y="116">(server</text>
+                    <text x="216" y="116">needs</text>
+                    <text x="252" y="116">to</text>
+                    <text x="296" y="116">rekey:)</text>
+                    <text x="28" y="132">2.</text>
+                    <text x="212" y="132">[Rekey</text>
+                    <text x="260" y="132">Req]</text>
+                    <text x="444" y="132">1.</text>
+                    <text x="120" y="164">(client</text>
+                    <text x="184" y="164">rekeys,</text>
+                    <text x="228" y="164">or</text>
+                    <text x="256" y="164">got</text>
+                    <text x="296" y="164">Rekey</text>
+                    <text x="344" y="164">Req:)</text>
+                    <text x="28" y="180">3.</text>
+                    <text x="160" y="180">connect()</text>
+                    <text x="308" y="180">accept()</text>
+                    <text x="444" y="180">4.</text>
+                    <text x="188" y="228">[TLS</text>
+                    <text x="228" y="228">rec]</text>
+                    <text x="444" y="228">5.</text>
+                    <text x="188" y="276">[TLS</text>
+                    <text x="228" y="276">rec]</text>
+                    <text x="168" y="308">(repeat</text>
+                    <text x="224" y="308">until</text>
+                    <text x="288" y="308">complete)</text>
+                    <text x="28" y="340">6.</text>
+                    <text x="140" y="340">READ</text>
+                    <text x="188" y="340">(epoch</text>
+                    <text x="236" y="340">N+1)</text>
+                    <text x="212" y="356">[PE]</text>
+                    <text x="448" y="356">7b.</text>
+                    <text x="448" y="372">7a.</text>
+                    <text x="152" y="388">(wait</text>
+                    <text x="192" y="388">own</text>
+                    <text x="228" y="388">done</text>
+                    <text x="256" y="388">+</text>
+                    <text x="280" y="388">cli</text>
+                    <text x="312" y="388">PE)</text>
+                    <text x="164" y="404">(install</text>
+                    <text x="216" y="404">R+W</text>
+                    <text x="252" y="404">N+1,</text>
+                    <text x="300" y="404">drain,</text>
+                    <text x="172" y="420">TX-&gt;N+1)</text>
+                    <text x="212" y="436">[PE]</text>
+                    <text x="28" y="452">8.</text>
+                    <text x="152" y="452">WRITE</text>
+                    <text x="196" y="452">N+1,</text>
+                    <text x="244" y="452">drain,</text>
+                    <text x="304" y="452">TX-&gt;N+1</text>
+                    <text x="100" y="484">(traffic</text>
+                    <text x="184" y="484">transitions</text>
+                    <text x="244" y="484">to</text>
+                    <text x="280" y="484">epoch</text>
+                    <text x="320" y="484">N+1</text>
+                    <text x="356" y="484">DKC)</text>
+                    <text x="92" y="500">(after</text>
+                    <text x="160" y="500">draining,</text>
+                    <text x="228" y="500">remove</text>
+                    <text x="280" y="500">epoch</text>
+                    <text x="312" y="500">N</text>
+                    <text x="340" y="500">DKC)</text>
+                    <text x="32" y="548">Legend:</text>
+                    <text x="80" y="548">TLS</text>
+                    <text x="104" y="548">=</text>
+                    <text x="136" y="548">local</text>
+                    <text x="176" y="548">TLS</text>
+                    <text x="224" y="548">engine;</text>
+                    <text x="304" y="548">cliKM/srvKM</text>
+                    <text x="360" y="548">=</text>
+                    <text x="424" y="548">client/server</text>
+                    <text x="496" y="548">key</text>
+                    <text x="548" y="548">manager;</text>
+                    <text x="24" y="564">Rekey</text>
+                    <text x="64" y="564">Req</text>
+                    <text x="88" y="564">=</text>
+                    <text x="120" y="564">Rekey</text>
+                    <text x="176" y="564">Request</text>
+                    <text x="240" y="564">control</text>
+                    <text x="308" y="564">message;</text>
+                    <text x="420" y="564">connect()/accept()</text>
+                    <text x="504" y="564">=</text>
+                    <text x="112" y="580">SSL_connect()/SSL_accept();</text>
+                    <text x="240" y="580">TLS</text>
+                    <text x="272" y="580">rec</text>
+                    <text x="296" y="580">=</text>
+                    <text x="320" y="580">TLS</text>
+                    <text x="368" y="580">records</text>
+                    <text x="432" y="580">relayed</text>
+                    <text x="496" y="580">between</text>
+                    <text x="544" y="580">the</text>
+                    <text x="576" y="580">key</text>
+                    <text x="40" y="596">managers;</text>
+                    <text x="92" y="596">PE</text>
+                    <text x="112" y="596">=</text>
+                    <text x="164" y="596">Protection</text>
+                    <text x="256" y="596">Established</text>
+                    <text x="336" y="596">control</text>
+                    <text x="404" y="596">message;</text>
+                    <text x="456" y="596">R+W</text>
+                    <text x="480" y="596">=</text>
+                    <text x="508" y="596">read</text>
+                    <text x="544" y="596">and</text>
+                    <text x="24" y="612">write</text>
+                    <text x="72" y="612">keys;</text>
+                    <text x="108" y="612">N,</text>
+                    <text x="136" y="612">N+1</text>
+                    <text x="160" y="612">=</text>
+                    <text x="184" y="612">old</text>
+                    <text x="216" y="612">and</text>
+                    <text x="248" y="612">new</text>
+                    <text x="292" y="612">epoch;</text>
+                    <text x="352" y="612">TX-&gt;N+1</text>
+                    <text x="392" y="612">=</text>
+                    <text x="428" y="612">switch</text>
+                    <text x="488" y="612">sending</text>
+                    <text x="532" y="612">to</text>
+                    <text x="560" y="612">the</text>
+                    <text x="24" y="628">epoch</text>
+                    <text x="64" y="628">N+1</text>
+                    <text x="100" y="628">DKC.</text>
                   </g>
-                </svg><a href="#section-6.2.2-1.1.1" class="pilcrow">¶</a>
+                </svg><a href="#section-6.2.2-5.1.1" class="pilcrow">¶</a>
 </div>
 </div>
 <figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-rekeying-procedure" class="selfRef">Rekeying Procedure</a>
             </figcaption></figure>
 </div>
-<p id="section-6.2.2-2">The diagram <a href="#rekey-diagram" class="auto internal xref">Figure 5</a> shows the case where SCTP Initiator is
-initiating the rekeying.  The opposite case where the Responder
-initates rekeying is identical but inverts which key manager role that
-executes the various steps between Client and Server temporarly for
-this exchange only. The initially determined Key manager roles are
-only used to handle the case both sides initiate a rekey
-simultanously, see <a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-6.2.2-3">Either endpoint may initiate rekeying.  The procedure is as follows:<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6.2.2-4">
-<li id="section-6.2.2-4.1">
-              <p id="section-6.2.2-4.1.1">The peer willing to rekey becomes the TLS client for this rekey
-procedure.  It sends a TLS ClientHello in a key management message
-using epoch N+1. The key management messages are carried inside
-DTLS chunks (the association is already protected).<a href="#section-6.2.2-4.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-6">The diagram <a href="#rekey-diagram" class="auto internal xref">Figure 5</a> shows both triggers.  Steps 1 and 2 (the
+  Rekey Request) are present only when the server key manager is the one
+  that needs to rekey; when the client key manager needs to rekey it
+  starts directly at step 3.  As in initial establishment, the key
+  managers drive TLS solely through the TLS user API and relay the
+  resulting TLS records; they do not parse TLS messages.  The procedure
+  is as follows:<a href="#section-6.2.2-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2.2-7">
+<li id="section-6.2.2-7.1">
+              <p id="section-6.2.2-7.1.1">If the server key manager needs to rekey, it sends a Rekey Request
+control message (<a href="#rekey-request" class="auto internal xref">Section 4.1.2</a>) to the client key manager.  The
+server key manager does not start a TLS handshake.<a href="#section-6.2.2-7.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.2">
-              <p id="section-6.2.2-4.2.1">The other peer becomes the TLS server for this rekey procedure.  It
-receives and processes the ClientHello for the key management epoch
-N+1.<a href="#section-6.2.2-4.2.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.2">
+              <p id="section-6.2.2-7.2.1">The client key manager receives the Rekey Request.  If it is not
+already rekeying, it proceeds to initiate a rekeying TLS handshake
+(step 3).  If it is already rekeying, it ignores the Rekey Request
+(see <a href="#sim-rekeying" class="auto internal xref">Section 6.2.4</a>).<a href="#section-6.2.2-7.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.3">
-              <p id="section-6.2.2-4.3.1">The server sends its TLS ServerHello through Finished messages to
-the client.<a href="#section-6.2.2-4.3.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.3">
+              <p id="section-6.2.2-7.3.1">The client key manager starts a rekeying TLS handshake for epoch
+N+1 and relays the resulting flight of TLS records to the server key manager
+per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.2.2-7.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.4">
-              <p id="section-6.2.2-4.4.1">The client receives the TLS ServerHello message, exports all
-Primary and Restart DKC keys, and installs server to client key
-material as its read (receive) key.<a href="#section-6.2.2-4.4.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.4">
+              <p id="section-6.2.2-7.4.1">The server key manager await rekeying TLS handshake as TLS
+server.<a href="#section-6.2.2-7.4.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.5">
-              <p id="section-6.2.2-4.5.1">The client sends its TLS Certificate/CertificateVerify/Finished
-encrypted with the old keys.<a href="#section-6.2.2-4.5.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.5">
+              <p id="section-6.2.2-7.5.1">The client key manager and the server key manager relay TLS records
+to and from their local TLS, repeating until the TLS handshake
+completes.<a href="#section-6.2.2-7.5.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.6">
-              <p id="section-6.2.2-4.6.1">The server receives and process the TLS message, exports and
-installs the client key material for both the Primary and Restart
-DKCs as its read (receive) key and the server key material as write
-(send) key.  Then it starts the drain timer to remove the old
-(epoch N) DKC.  From now on the server uses new keys.<a href="#section-6.2.2-4.6.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.6">
+              <p id="section-6.2.2-7.6.1">The client key manager's TLS handshake completes.  It exports all
+Primary and Restart DKC keys for epoch N+1, installs the server to
+client key material as its read (receive) key, and sends a
+Protection Established control message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>)
+to the server key manager.<a href="#section-6.2.2-7.6.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.7">
-              <p id="section-6.2.2-4.7.1">The server key manager sends a Protection Established control
-message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.<a href="#section-6.2.2-4.7.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.7">
+              <p id="section-6.2.2-7.7.1">The server key manager proceeds only after both its own TLS
+handshake has completed (7a) and it has received the client key
+manager's Protection Established control message (7b).  Once both
+conditions are met, it exports both direction key material for
+both the Primary and Restart DKCs for epoch N+1, installs both
+the read (receive) key and the write (send) key, starts the drain
+timer to remove the old (epoch N) DKC, and switches sending to
+the epoch N+1 DKC. The server key manager sends a Protection
+Established control message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the
+client key manager.<a href="#section-6.2.2-7.7.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.2.2-4.8">
-              <p id="section-6.2.2-4.8.1">The client key manager receives the Protection Established
-control message, exports the client Primary and Restart DKC keys,
-and installs the client key material as its write (send) key,
-and starts the drain timer to remove the old (epoch N) DKC.
-From now on the client uses new keys.<a href="#section-6.2.2-4.8.1" class="pilcrow">¶</a></p>
+            <li id="section-6.2.2-7.8">
+              <p id="section-6.2.2-7.8.1">The client key manager receives the Protection Established
+     control message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>), installs the client
+     key material as its write (send) key, starts the drain timer to
+     remove the old (epoch N) DKC, and switches sending to the epoch
+     N+1 DKC.<a href="#section-6.2.2-7.8.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.2.2-5">The new DKCs use epoch N+1 (where N is the current epoch).  Both old
-(epoch N) and new (epoch N+1) DKCs coexist temporarily until the
-drain timer expires (see <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-5" class="pilcrow">¶</a></p>
-<p id="section-6.2.2-6">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
-NOT be used.<a href="#section-6.2.2-6" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-8">The new DKCs use epoch N+1 (where N is the current epoch when
+  initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
+  coexist temporarily until the drain timer expires (see
+  <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-8" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-9">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
+  NOT be used.<a href="#section-6.2.2-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="drain-timer">
@@ -2431,194 +2740,21 @@ delivery of the final rekeying message has not been confirmed.<a href="#section-
 </div>
 <div id="sim-rekeying">
 <section id="section-6.2.4">
-          <h4 id="name-simultaneous-rekey-resoluti">
-<a href="#section-6.2.4" class="section-number selfRef">6.2.4. </a><a href="#name-simultaneous-rekey-resoluti" class="section-name selfRef">Simultaneous Rekey Resolution</a>
+          <h4 id="name-concurrent-rekey-requests">
+<a href="#section-6.2.4" class="section-number selfRef">6.2.4. </a><a href="#name-concurrent-rekey-requests" class="section-name selfRef">Concurrent Rekey Requests</a>
           </h4>
-<p id="section-6.2.4-1">As either endpoint can initiate a TLS handshake at the same time,
-either endpoint may receive a TLS ClientHello when it has already sent
-its own.  In this case, the ClientHello from the endpoint with the
-initial keymanager client role SHALL be processed, and the other SHALL be
-dropped.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="key-transition-state-machine">
-<section id="section-6.2.5">
-          <h4 id="name-key-transition-state-machin">
-<a href="#section-6.2.5" class="section-number selfRef">6.2.5. </a><a href="#name-key-transition-state-machin" class="section-name selfRef">Key Transition State Machine</a>
-          </h4>
-<p id="section-6.2.5-1">This specification allows up to 2 Primary DKCs to be active at the
-same time.  The following state machine governs the transition:<a href="#section-6.2.5-1" class="pilcrow">¶</a></p>
-<span id="name-state-diagram-for-rekeying"></span><div id="dtls-rekeying-state-diagram">
-<figure id="figure-6">
-            <div id="section-6.2.5-2.1">
-              <div class="alignCenter art-svg artwork" id="section-6.2.5-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="624" width="496" viewBox="0 0 496 624" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 8,208 L 8,592" fill="none" stroke="black"></path>
-                  <path d="M 24,224 L 24,560" fill="none" stroke="black"></path>
-                  <path d="M 96,32 L 96,64" fill="none" stroke="black"></path>
-                  <path d="M 96,192 L 96,240" fill="none" stroke="black"></path>
-                  <path d="M 96,320 L 96,368" fill="none" stroke="black"></path>
-                  <path d="M 96,480 L 96,528" fill="none" stroke="black"></path>
-                  <path d="M 136,64 L 136,184" fill="none" stroke="black"></path>
-                  <path d="M 136,240 L 136,312" fill="none" stroke="black"></path>
-                  <path d="M 136,368 L 136,472" fill="none" stroke="black"></path>
-                  <path d="M 144,528 L 144,560" fill="none" stroke="black"></path>
-                  <path d="M 160,144 L 160,184" fill="none" stroke="black"></path>
-                  <path d="M 176,32 L 176,64" fill="none" stroke="black"></path>
-                  <path d="M 176,192 L 176,240" fill="none" stroke="black"></path>
-                  <path d="M 176,320 L 176,368" fill="none" stroke="black"></path>
-                  <path d="M 176,480 L 176,528" fill="none" stroke="black"></path>
-                  <path d="M 240,480 L 240,528" fill="none" stroke="black"></path>
-                  <path d="M 288,432 L 288,472" fill="none" stroke="black"></path>
-                  <path d="M 288,528 L 288,592" fill="none" stroke="black"></path>
-                  <path d="M 296,320 L 296,368" fill="none" stroke="black"></path>
-                  <path d="M 320,480 L 320,528" fill="none" stroke="black"></path>
-                  <path d="M 336,368 L 336,432" fill="none" stroke="black"></path>
-                  <path d="M 344,224 L 344,312" fill="none" stroke="black"></path>
-                  <path d="M 376,320 L 376,368" fill="none" stroke="black"></path>
-                  <path d="M 384,480 L 384,528" fill="none" stroke="black"></path>
-                  <path d="M 424,352 L 424,472" fill="none" stroke="black"></path>
-                  <path d="M 464,480 L 464,528" fill="none" stroke="black"></path>
-                  <path d="M 96,32 L 176,32" fill="none" stroke="black"></path>
-                  <path d="M 96,64 L 176,64" fill="none" stroke="black"></path>
-                  <path d="M 160,144 L 304,144" fill="none" stroke="black"></path>
-                  <path d="M 96,192 L 176,192" fill="none" stroke="black"></path>
-                  <path d="M 8,208 L 88,208" fill="none" stroke="black"></path>
-                  <path d="M 24,224 L 88,224" fill="none" stroke="black"></path>
-                  <path d="M 176,224 L 344,224" fill="none" stroke="black"></path>
-                  <path d="M 96,240 L 176,240" fill="none" stroke="black"></path>
-                  <path d="M 96,320 L 176,320" fill="none" stroke="black"></path>
-                  <path d="M 296,320 L 376,320" fill="none" stroke="black"></path>
-                  <path d="M 184,352 L 296,352" fill="none" stroke="black"></path>
-                  <path d="M 376,352 L 424,352" fill="none" stroke="black"></path>
-                  <path d="M 96,368 L 176,368" fill="none" stroke="black"></path>
-                  <path d="M 296,368 L 376,368" fill="none" stroke="black"></path>
-                  <path d="M 288,432 L 336,432" fill="none" stroke="black"></path>
-                  <path d="M 96,480 L 176,480" fill="none" stroke="black"></path>
-                  <path d="M 240,480 L 320,480" fill="none" stroke="black"></path>
-                  <path d="M 384,480 L 464,480" fill="none" stroke="black"></path>
-                  <path d="M 96,528 L 176,528" fill="none" stroke="black"></path>
-                  <path d="M 240,528 L 320,528" fill="none" stroke="black"></path>
-                  <path d="M 384,528 L 464,528" fill="none" stroke="black"></path>
-                  <path d="M 24,560 L 144,560" fill="none" stroke="black"></path>
-                  <path d="M 8,592 L 288,592" fill="none" stroke="black"></path>
-                  <polygon class="arrowhead" points="432,472 420,466.4 420,477.6" fill="black" transform="rotate(90,424,472)"></polygon>
-                  <polygon class="arrowhead" points="352,312 340,306.4 340,317.6" fill="black" transform="rotate(90,344,312)"></polygon>
-                  <polygon class="arrowhead" points="296,472 284,466.4 284,477.6" fill="black" transform="rotate(90,288,472)"></polygon>
-                  <polygon class="arrowhead" points="192,352 180,346.4 180,357.6" fill="black" transform="rotate(180,184,352)"></polygon>
-                  <polygon class="arrowhead" points="168,184 156,178.4 156,189.6" fill="black" transform="rotate(90,160,184)"></polygon>
-                  <polygon class="arrowhead" points="144,472 132,466.4 132,477.6" fill="black" transform="rotate(90,136,472)"></polygon>
-                  <polygon class="arrowhead" points="144,312 132,306.4 132,317.6" fill="black" transform="rotate(90,136,312)"></polygon>
-                  <polygon class="arrowhead" points="144,184 132,178.4 132,189.6" fill="black" transform="rotate(90,136,184)"></polygon>
-                  <polygon class="arrowhead" points="96,224 84,218.4 84,229.6" fill="black" transform="rotate(0,88,224)"></polygon>
-                  <polygon class="arrowhead" points="96,208 84,202.4 84,213.6" fill="black" transform="rotate(0,88,208)"></polygon>
-                  <g class="text">
-                    <text x="132" y="52">INIT</text>
-                    <text x="240" y="52">Association</text>
-                    <text x="320" y="52">started</text>
-                    <text x="204" y="68">No</text>
-                    <text x="232" y="68">TLS</text>
-                    <text x="264" y="68">H/S</text>
-                    <text x="296" y="68">yet</text>
-                    <text x="156" y="100">1.</text>
-                    <text x="184" y="100">TLS</text>
-                    <text x="232" y="100">initial</text>
-                    <text x="280" y="100">H/S</text>
-                    <text x="208" y="116">completed</text>
-                    <text x="360" y="148">Association</text>
-                    <text x="440" y="148">Restart</text>
-                    <text x="136" y="212">YOUNG</text>
-                    <text x="364" y="260">3.</text>
-                    <text x="400" y="260">Aging</text>
-                    <text x="448" y="260">event</text>
-                    <text x="156" y="276">2.</text>
-                    <text x="196" y="276">Client</text>
-                    <text x="248" y="276">Hello</text>
-                    <text x="372" y="276">Send</text>
-                    <text x="420" y="276">Client</text>
-                    <text x="472" y="276">Hello</text>
-                    <text x="188" y="292">from</text>
-                    <text x="228" y="292">peer</text>
-                    <text x="204" y="324">4.</text>
-                    <text x="244" y="324">Client</text>
-                    <text x="280" y="324">H</text>
-                    <text x="404" y="324">5.</text>
-                    <text x="432" y="324">TLS</text>
-                    <text x="464" y="324">H/S</text>
-                    <text x="132" y="340">REMOTE</text>
-                    <text x="248" y="340">tie-break</text>
-                    <text x="336" y="340">LOCAL</text>
-                    <text x="440" y="340">Timeout</text>
-                    <text x="132" y="356">AGED</text>
-                    <text x="332" y="356">AGED</text>
-                    <text x="44" y="420">7.</text>
-                    <text x="92" y="420">Finished</text>
-                    <text x="212" y="420">6.</text>
-                    <text x="252" y="420">Server</text>
-                    <text x="304" y="420">Hello</text>
-                    <text x="132" y="500">REMOTE</text>
-                    <text x="280" y="500">LOCAL</text>
-                    <text x="424" y="500">ABORT</text>
-                    <text x="128" y="516">OLD</text>
-                    <text x="280" y="516">OLD</text>
-                    <text x="44" y="548">8.</text>
-                    <text x="80" y="548">Flush</text>
-                    <text x="44" y="580">9.</text>
-                    <text x="80" y="580">Flush</text>
-                  </g>
-                </svg><a href="#section-6.2.5-2.1.1" class="pilcrow">¶</a>
-</div>
-</div>
-<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
-<a href="#name-state-diagram-for-rekeying" class="selfRef">State Diagram for Rekeying</a>
-            </figcaption></figure>
-</div>
-<span class="break"></span><dl class="dlParallel" id="section-6.2.5-3">
-            <dt id="section-6.2.5-3.1">INIT:</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.5-3.2">
-              <p id="section-6.2.5-3.2.1">Initial state.  Only event 1 (TLS handshake completed) transitions
-to YOUNG.<a href="#section-6.2.5-3.2.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.5-3.3">YOUNG:</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.5-3.4">
-              <p id="section-6.2.5-3.4.1">Only the Current DKC is populated.  Event 2 (peer ClientHello)
-transitions to REMOTE OLD; event 3 (aging) transitions to LOCAL
-AGED.<a href="#section-6.2.5-3.4.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.5-3.5">LOCAL AGED:</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.5-3.6">
-              <p id="section-6.2.5-3.6.1">A supervision timer runs.  Event 5 (timeout) causes the key manager to check
-for local aging expire, in that case ABORT otherwise return to YOUNG.  Event
-4 (peer ClientHello with tie-break yielding server role) transitions
-to REMOTE OLD.  Event 6 (ServerHello received) transitions to LOCAL
-OLD.<a href="#section-6.2.5-3.6.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.5-3.7">LOCAL AGED:</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.5-3.8">
-              <p id="section-6.2.5-3.8.1">TLS handshake happens in this state. Local keys are installed.
-Event 7 (peer sends Certificate..Finished enable transition to REMOTE_OLD)<a href="#section-6.2.5-3.8.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.5-3.9">REMOTE OLD:</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.5-3.10">
-              <p id="section-6.2.5-3.10.1">Both Old and Current DKCs exist.  Old DKC is used for sending until
-Protection Established control message is sent.
-Event 8 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.10.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.5-3.11">LOCAL OLD:</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.5-3.12">
-              <p id="section-6.2.5-3.12.1">Both Old and Current DKCs exist.  Old DKC is used for sending,
-until Protection Established control message is received.
-Event 9 (flush timer expires) transitions to YOUNG.<a href="#section-6.2.5-3.12.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-</dl>
-<p id="section-6.2.5-4">In REMOTE OLD and LOCAL OLD, if a new ClientHello or Aging event
-arrives, the flushing timer is cleared and behavior is as in YOUNG.<a href="#section-6.2.5-4" class="pilcrow">¶</a></p>
+<p id="section-6.2.4-1">Because only the client key manager ever initiates a TLS handshake,
+two ClientHellos cannot cross and no tie-breaker is needed.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.2.4-2">The only concurrency to resolve is when the server key manager sends a
+Rekey Request while the client key manager has already initiated (or is
+about to initiate) a rekeying to epoch N+1.  Since both the direct
+client trigger and the server's Rekey Request lead to the same outcome
+— a single client-initiated rekeying to epoch N+1 — the client key
+manager treats an incoming Rekey Request as redundant and ignores it
+while a rekeying is already in progress.<a href="#section-6.2.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.2.4-3">Similarly, if the server key manager needs to rekey while a
+client-initiated rekeying is already in progress, it does not send a
+Rekey Request, as the in-progress rekeying already satisfies the need.<a href="#section-6.2.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2656,92 +2792,84 @@ DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶<
 <a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-restart-procedure" class="section-name selfRef">Restart Procedure</a>
           </h4>
 <span id="name-sctp-restart-procedure"></span><div id="restart-diagram">
-<figure id="figure-7">
+<figure id="figure-6">
             <div id="section-6.3.2-1.1">
               <div class="alignCenter art-svg artwork" id="section-6.3.2-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="584" viewBox="0 0 584 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 40,48 L 40,320" fill="none" stroke="black"></path>
-                  <path d="M 464,48 L 464,320" fill="none" stroke="black"></path>
-                  <path d="M 496,96 L 496,112" fill="none" stroke="black"></path>
-                  <path d="M 496,160 L 496,176" fill="none" stroke="black"></path>
-                  <path d="M 40,96 L 240,96" fill="none" stroke="black"></path>
-                  <path d="M 280,96 L 456,96" fill="none" stroke="black"></path>
-                  <path d="M 48,112 L 224,112" fill="none" stroke="black"></path>
-                  <path d="M 296,112 L 464,112" fill="none" stroke="black"></path>
-                  <path d="M 496,112 L 552,112" fill="none" stroke="black"></path>
-                  <path d="M 40,160 L 144,160" fill="none" stroke="black"></path>
-                  <path d="M 352,160 L 456,160" fill="none" stroke="black"></path>
-                  <path d="M 48,176 L 144,176" fill="none" stroke="black"></path>
-                  <path d="M 344,176 L 464,176" fill="none" stroke="black"></path>
-                  <path d="M 496,176 L 576,176" fill="none" stroke="black"></path>
-                  <path d="M 48,256 L 128,256" fill="none" stroke="black"></path>
-                  <path d="M 376,256 L 464,256" fill="none" stroke="black"></path>
-                  <path d="M 40,288 L 136,288" fill="none" stroke="black"></path>
-                  <path d="M 368,288 L 456,288" fill="none" stroke="black"></path>
-                  <path d="M 48,304 L 136,304" fill="none" stroke="black"></path>
-                  <path d="M 368,304 L 464,304" fill="none" stroke="black"></path>
-                  <path d="M 480,80 C 488.83064,80 496,87.16936 496,96" fill="none" stroke="black"></path>
-                  <path d="M 480,128 C 488.83064,128 496,120.83064 496,112" fill="none" stroke="black"></path>
-                  <path d="M 480,144 C 488.83064,144 496,151.16936 496,160" fill="none" stroke="black"></path>
-                  <path d="M 480,192 C 488.83064,192 496,184.83064 496,176" fill="none" stroke="black"></path>
-                  <polygon class="arrowhead" points="464,288 452,282.4 452,293.6" fill="black" transform="rotate(0,456,288)"></polygon>
-                  <polygon class="arrowhead" points="464,160 452,154.4 452,165.6" fill="black" transform="rotate(0,456,160)"></polygon>
-                  <polygon class="arrowhead" points="464,96 452,90.4 452,101.6" fill="black" transform="rotate(0,456,96)"></polygon>
-                  <polygon class="arrowhead" points="56,304 44,298.4 44,309.6" fill="black" transform="rotate(180,48,304)"></polygon>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="480" viewBox="0 0 480 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 40,48 L 40,272" fill="none" stroke="black"></path>
+                  <path d="M 368,48 L 368,272" fill="none" stroke="black"></path>
+                  <path d="M 392,80 L 392,176" fill="none" stroke="black"></path>
+                  <path d="M 40,96 L 112,96" fill="none" stroke="black"></path>
+                  <path d="M 168,96 L 360,96" fill="none" stroke="black"></path>
+                  <path d="M 48,112 L 112,112" fill="none" stroke="black"></path>
+                  <path d="M 200,112 L 368,112" fill="none" stroke="black"></path>
+                  <path d="M 392,112 L 432,112" fill="none" stroke="black"></path>
+                  <path d="M 40,144 L 88,144" fill="none" stroke="black"></path>
+                  <path d="M 248,144 L 360,144" fill="none" stroke="black"></path>
+                  <path d="M 48,160 L 88,160" fill="none" stroke="black"></path>
+                  <path d="M 240,160 L 368,160" fill="none" stroke="black"></path>
+                  <path d="M 392,160 L 448,160" fill="none" stroke="black"></path>
+                  <path d="M 40,240 L 88,240" fill="none" stroke="black"></path>
+                  <path d="M 304,240 L 360,240" fill="none" stroke="black"></path>
+                  <path d="M 48,256 L 88,256" fill="none" stroke="black"></path>
+                  <path d="M 304,256 L 368,256" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="368,240 356,234.4 356,245.6" fill="black" transform="rotate(0,360,240)"></polygon>
+                  <polygon class="arrowhead" points="368,144 356,138.4 356,149.6" fill="black" transform="rotate(0,360,144)"></polygon>
+                  <polygon class="arrowhead" points="368,96 356,90.4 356,101.6" fill="black" transform="rotate(0,360,96)"></polygon>
                   <polygon class="arrowhead" points="56,256 44,250.4 44,261.6" fill="black" transform="rotate(180,48,256)"></polygon>
-                  <polygon class="arrowhead" points="56,176 44,170.4 44,181.6" fill="black" transform="rotate(180,48,176)"></polygon>
+                  <polygon class="arrowhead" points="56,160 44,154.4 44,165.6" fill="black" transform="rotate(180,48,160)"></polygon>
                   <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
                   <g class="text">
                     <text x="40" y="36">Initiator</text>
-                    <text x="464" y="36">Responder</text>
+                    <text x="368" y="36">Responder</text>
                     <text x="20" y="68">1.</text>
-                    <text x="92" y="68">(install</text>
-                    <text x="160" y="68">restart</text>
-                    <text x="212" y="68">keys</text>
-                    <text x="252" y="68">from</text>
-                    <text x="308" y="68">storage)</text>
+                    <text x="84" y="68">(install</text>
+                    <text x="152" y="68">Restart</text>
+                    <text x="200" y="68">DKC</text>
+                    <text x="236" y="68">from</text>
+                    <text x="292" y="68">storage)</text>
+                    <text x="384" y="84">-</text>
                     <text x="20" y="100">2.</text>
-                    <text x="260" y="100">INIT</text>
-                    <text x="528" y="100">Plain</text>
+                    <text x="140" y="100">[INIT]</text>
+                    <text x="424" y="100">Plain</text>
                     <text x="20" y="116">3.</text>
-                    <text x="260" y="116">INIT-ACK</text>
-                    <text x="20" y="164">4.</text>
-                    <text x="168" y="164">[DTLS</text>
-                    <text x="244" y="164">CHUNK(COOKIE</text>
-                    <text x="324" y="164">ECHO)]</text>
-                    <text x="544" y="164">Protected</text>
-                    <text x="20" y="180">5.</text>
-                    <text x="168" y="180">[DTLS</text>
-                    <text x="244" y="180">CHUNK(COOKIE</text>
-                    <text x="320" y="180">ACK)]</text>
-                    <text x="20" y="196">6.</text>
-                    <text x="20" y="212">7.</text>
-                    <text x="76" y="228">(TLS</text>
-                    <text x="136" y="228">handshake</text>
-                    <text x="192" y="228">for</text>
-                    <text x="224" y="228">new</text>
-                    <text x="264" y="228">keys,</text>
-                    <text x="312" y="228">steps</text>
-                    <text x="360" y="228">8-13)</text>
-                    <text x="16" y="260">15.</text>
-                    <text x="196" y="260">[DATA(Protection</text>
-                    <text x="320" y="260">Established)]</text>
-                    <text x="488" y="260">14.</text>
-                    <text x="16" y="276">16.</text>
-                    <text x="16" y="292">17.</text>
-                    <text x="160" y="292">[DTLS</text>
-                    <text x="244" y="292">CHUNK(DATA(APP</text>
-                    <text x="336" y="292">DATA))]</text>
-                    <text x="504" y="292">APP</text>
-                    <text x="540" y="292">DATA</text>
-                    <text x="160" y="308">[DTLS</text>
-                    <text x="244" y="308">CHUNK(DATA(APP</text>
-                    <text x="336" y="308">DATA))]</text>
+                    <text x="156" y="116">[INIT-ACK]</text>
+                    <text x="384" y="132">-</text>
+                    <text x="20" y="148">4.</text>
+                    <text x="140" y="148">[DTLS(COOKIE</text>
+                    <text x="220" y="148">ECHO)]</text>
+                    <text x="440" y="148">Protected</text>
+                    <text x="20" y="164">5.</text>
+                    <text x="140" y="164">[DTLS(COOKIE</text>
+                    <text x="216" y="164">ACK)]</text>
+                    <text x="20" y="180">6.</text>
+                    <text x="384" y="180">-</text>
+                    <text x="68" y="196">(TLS</text>
+                    <text x="128" y="196">handshake</text>
+                    <text x="184" y="196">for</text>
+                    <text x="216" y="196">new</text>
+                    <text x="256" y="196">keys,</text>
+                    <text x="80" y="212">steps</text>
+                    <text x="128" y="212">7-12,</text>
+                    <text x="164" y="212">as</text>
+                    <text x="188" y="212">in</text>
+                    <text x="232" y="212">initial</text>
+                    <text x="292" y="212">setup)</text>
+                    <text x="16" y="244">13.</text>
+                    <text x="152" y="244">[DTLS(protected</text>
+                    <text x="232" y="244">APP</text>
+                    <text x="276" y="244">DATA)]</text>
+                    <text x="400" y="244">APP</text>
+                    <text x="436" y="244">DATA</text>
+                    <text x="152" y="260">[DTLS(protected</text>
+                    <text x="232" y="260">APP</text>
+                    <text x="276" y="260">DATA)]</text>
+                    <text x="200" y="276">...</text>
                   </g>
                 </svg><a href="#section-6.3.2-1.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
 <a href="#name-sctp-restart-procedure" class="selfRef">SCTP Restart Procedure</a>
             </figcaption></figure>
 </div>
@@ -2769,86 +2897,57 @@ the Restart DKC (R bit set).<a href="#section-6.3.2-2.4.1" class="pilcrow">¶</a
 the Restart DKC (R bit set).<a href="#section-6.3.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.6">
-              <p id="section-6.3.2-2.6.1">Both endpoints have a new established association.  Each endpoint
-immediately calls Require Protected SCTP Packets to enforce DTLS
-chunk protection (using the Restart DKC), then retrieves the
-agreed DTLS Key Management Method and role from the SCTP stack
-(e.g., using the "Get Agreed DTLS Key Management Method and Role"
-API defined in Section 7.2 of
-<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and verifies that the
-selected method matches the one defined in this document (see
-<a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and that the assigned role is as expected.<a href="#section-6.3.2-2.6.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.7">
-              <p id="section-6.3.2-2.7.1">The ULP MAY be informed that the association is protected at this
-point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-2.7.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.8">
-              <p id="section-6.3.2-2.8.1">The client key manager starts a TLS 1.3 handshake, limiting
-offered cipher suites to those supported by the DTLS Chunk
-Protection Operator, and sends TLS ClientHello per
-<a href="#tls-user-message" class="auto internal xref">Section 4</a>, protected by the Restart DKC.<a href="#section-6.3.2-2.8.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.9">
-              <p id="section-6.3.2-2.9.1">The server key manager receives the TLS ClientHello. If a
-HelloRetryRequest is needed, an additional round-trip occurs before
-proceeding.<a href="#section-6.3.2-2.9.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.10">
-              <p id="section-6.3.2-2.10.1">The server key manager sends its TLS ServerHello through Finished
-messages.<a href="#section-6.3.2-2.10.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.11">
-              <p id="section-6.3.2-2.11.1">The client key manager receives the TLS ServerHello message,
-exports all Primary DKC keys, and installs the server key material as
-its read (receive) key for the Primary DKC.<a href="#section-6.3.2-2.11.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.12">
-              <p id="section-6.3.2-2.12.1">The client key manager sends its TLS
-Certificate/CertificateVerify/Finished.<a href="#section-6.3.2-2.12.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.13">
-              <p id="section-6.3.2-2.13.1">The server key manager receives
-Certificate/CertificateVerify/Finished, it exports the client and
-server key material for the Primary DKC, and installs client key
-as its read (receive) key and the server key as its write (send)
-key.<a href="#section-6.3.2-2.13.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.14">
-              <p id="section-6.3.2-2.14.1">The server key manager sends a Protection Established control
-message (<a href="#protection-established" class="auto internal xref">Section 4.1.1</a>) to the client key manager.
-The server endpoint export and install the new Restart DKC key
-material (both send and receive directions), remove the old
-Restart DKC, and commit the new Restart DKC to persistent secure
-storage.<a href="#section-6.3.2-2.14.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.15">
-              <p id="section-6.3.2-2.15.1">The client key manager receives the Protection Established control
-message. Installs the primary client Key as its write (send) key.<a href="#section-6.3.2-2.15.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.16">
-              <p id="section-6.3.2-2.16.1">The client key manager export and install the new Restart DKC key
-material (both send and receive directions), remove the old
-Restart DKC, and commit the new Restart DKC to persistent secure
-storage.<a href="#section-6.3.2-2.16.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.17">
-              <p id="section-6.3.2-2.17.1">Application traffic uses to the new Primary DKC.<a href="#section-6.3.2-2.17.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.6.1">Both endpoints have a restarted association, whose state is
+as described in Section 5.2.4.1 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, with two differences
+specific to this document: DTLS chunk protection is enforced using
+the Restart DKC (the COOKIE ECHO and COOKIE ACK were exchanged
+protected with it), and the DTLS Key Management Client and Server
+roles may differ from those of the previous instance of the
+association, since the new INIT handshake re-runs role determination.
+The ULP MAY be informed that the association is restarted at this
+point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-2.6.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.2-3">After restart, the new Primary DKC MUST use epoch 3 (the epoch
-resets).<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-4">The Responder MUST NOT change the Restart DKC during the restart
+<p id="section-6.3.2-3">Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
+correspond one-to-one to steps 4 to 9 of the initial establishment
+procedure (<a href="#initial-establishment" class="auto internal xref">Section 6.1</a>).  They differ only as follows:<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3.2-4.1">
+              <p id="section-6.3.2-4.1.1">all key management messages are carried inside DTLS chunks protected
+with the Restart DKC;<a href="#section-6.3.2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.3.2-4.2">
+              <p id="section-6.3.2-4.2.1">in addition to the Primary DKC, each endpoint exports, installs, and
+commits the new Restart DKC to persistent secure storage, removing
+the old one;<a href="#section-6.3.2-4.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.3.2-4.3">
+              <p id="section-6.3.2-4.3.1">at the key transition (steps 11 and 12), each endpoint switches the
+active DTLS key context from the Restart DKC to the new Primary DKC
+after the Protection Established exchange completes (the Protection
+Established messages themselves are protected with the Restart DKC),
+rather than enforcing protection for the first time; the ULP was
+already informed at step 6.<a href="#section-6.3.2-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.2-5">
+<li id="section-6.3.2-5.1">
+              <p id="section-6.3.2-5.1.1">Protected application traffic uses the new Primary DKC.<a href="#section-6.3.2-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.3.2-6">After restart, the new Primary DKC MUST use epoch 3 (the epoch
+resets).<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-7">The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
-removed.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-5">It is RECOMMENDED to complete the TLS handshake and install new DKCs
+removed.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-8">It is RECOMMENDED to complete the TLS handshake and install new DKCs
 as soon as possible after restart, to minimize the window during
-which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-6">Note: There MAY exist a short time gap after association establishment
+which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-8" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-9">Note: There MAY exist a short time gap after association establishment
 where no Restart DKC is yet installed.  If an SCTP restart is
 initiated during that time, it will fail.  However, this is unlikely
 as the restarting endpoint sends INIT multiple times with exponential
-back-off.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
+back-off.<a href="#section-6.3.2-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2864,12 +2963,23 @@ back-off.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
 handshake error occurs, the TLS alert is sent in an SCTP user message
 (see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the DTLS Key Management Messages PPID
 (4242).<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">If a TLS handshake fails during initial establishment, the SCTP
-association MUST be aborted.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">If a TLS handshake fails during rekeying, and the current DKC has not
+<p id="section-7-2">If a TLS handshake fails during initial establishment and the
+implementation determines that it can address the cause of the error
+(for example, by retrying with different parameters, as long as doing
+so does not compromise security), it SHOULD retry
+the TLS handshake.  Otherwise, the SCTP association MUST be aborted.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">If a TLS handshake fails during rekeying, there is no need to end the
+association immediately, since traffic can continue to be protected
+with the current DKC.  As long as the current DKC has not yet reached
+its usage limits, the implementation MAY retry the TLS handshake
+multiple times in an attempt to resolve the error.  However, the
+current DKC will eventually become inappropriate to use: if the error
+cannot be fixed and the current DKC is aged beyond policy limits or
+reaches its usage limits, the association MUST be aborted.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
 handshake.  If retry is not possible or the current DKC is aged
-beyond limits, the association MUST be aborted.<a href="#section-7-3" class="pilcrow">¶</a></p>
+beyond limits, the association MUST be aborted.<a href="#section-7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -2908,6 +3018,12 @@ confidentiality, TLS for DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">It is RECOMMENDED that implementations of this key-management
+method is not allowing the ULP to exchange any data beyond the
+key-management information following this specification until
+the peer is authenticated and local endpoint and the remote
+has entered Protection Established. This to avoid any information
+leakage from the ULP to none intended parties.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3048,7 +3164,7 @@ Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="ANSSI-DAT-NT-003">[ANSSI-DAT-NT-003]</dt>
         <dd>
-<span class="refAuthor">Agence nationale de la sécurité des systèmes d'information</span>, <span class="refTitle">"Recommendations for securing networks with IPsec"</span>, <span class="seriesInfo">ANSSI Technical Report DAT-NT-003 </span>, <time datetime="2015-08" class="refDate">August 2015</time>, <span>&lt;<a href="&lt;https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf&gt;">&lt;https://www.ssi.gouv.fr/uploads/2015/09/NT_IPsec_EN.pdf&gt;</a>&gt;</span>. </dd>
+<span class="refAuthor">Agence nationale de la sécurité des systèmes d'information</span>, <span class="refTitle">"Recommendations for securing networks with IPsec"</span>, <span class="seriesInfo">ANSSI Technical Report DAT-NT-003 </span>, <time datetime="2015-08" class="refDate">August 2015</time>, <span>&lt;<a href="&lt;https://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf&gt;">&lt;https://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf&gt;</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="KTH-NCSA">[KTH-NCSA]</dt>
       <dd>
