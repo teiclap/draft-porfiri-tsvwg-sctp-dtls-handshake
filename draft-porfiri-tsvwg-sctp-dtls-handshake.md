@@ -549,15 +549,10 @@ sequence numbers and replay window.
      |                                             |
      | TLS  client KM               server KM  TLS |
      |  |    |                             |    |  |
-  4. |  |<---+ connect()          accept() +--->|  |    5.
+  4. |  |<---+ TLSconnect()    TLSaccept() +--->|  |    5.
      |  |    |                             |    |  |
-     |  +--->|                             |<---+  |
-     |  |    +=======[TLS rec]============>|    |  |    6.
-     |  |    |                             +--->|  |
-     |  |    |                             |<---+  |
-     |  |    |<======[TLS rec]=============+    |  |
-     |  |<---+                             |    |  |
-     |  |    |   (repeat until complete)   |    |  |
+     |  +--->|                             |<---+  |    6.
+     |  |    |                             |    |  |
      |  |    |                             |    |  |
   7. |  +--->| READ installed              |    |  |
      |  |    +------------[PE]------------>|    |  |    8b.
@@ -619,10 +614,7 @@ message; R+W = read and write keys.
    received TLS records received to the TLS server and forward any produced TLS
    records by the TLS server to the client key manager per {{tls-user-message}}.
 
-  6. The client key manager and the server key manager relay TLS records to and
-   from their local TLS, repeating until the TLS handshake completes. If a
-   HelloRetryRequest is needed, an additional round-trip occurs before
-   proceeding.
+  6. TLS primitives returns after successful handshake is completed.
 
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
@@ -703,13 +695,7 @@ including:
      |  |  (client rekeys, or got Rekey Req:)   |  |
   3. |  |<---+ connect()          accept() +--->|  |  4.
      |  |    |                             |    |  |
-     |  +--->|                             |<---+  |
-     |  |    +=======[TLS rec]============>|    |  |  5.
-     |  |    |                             +--->|  |
-     |  |    |                             |<---+  |
-     |  |    |<======[TLS rec]=============+    |  |
-     |  |<---+                             |    |  |
-     |  |    |   (repeat until complete)   |    |  |
+     |  +--->|                             |<---+  |  5.
      |  |    |                             |    |  |
   6. |  +--->| READ (epoch N+1)            |    |  |
      |  |    +----------[PE]-------------->|    |  |  7b.
@@ -757,9 +743,7 @@ epoch N+1 DKC.
   4. The server key manager await rekeying TLS handshake as TLS
      server.
 
-  5. The client key manager and the server key manager relay TLS records
-     to and from their local TLS, repeating until the TLS handshake
-     completes.
+  5. TLS primitives returns after successful handshake is completed.
 
   6. The client key manager's TLS handshake completes.  It exports all
      Primary and Restart DKC keys for epoch N+1, installs the server to
