@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-20T02:57:32.116421+00:00",
+  "timestamp": "2026-09-27T03:12:33.805870+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -55,7 +55,7 @@
       "id": "I_kwDORGnINM8AAAABE4tsYQ",
       "title": "Need to clarify TLS errors like authentication error",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/5",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -64,8 +64,8 @@
       "labels": [],
       "body": "In some cases errors should likely result in SCTP assocation abort. But should it always? Are there cases where a new TLS connection requrest can succeed?",
       "createdAt": "2026-06-09T14:28:46Z",
-      "updatedAt": "2026-09-10T12:55:06Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-24T14:46:57Z",
+      "closedAt": "2026-09-24T14:46:57Z",
       "comments": [
         {
           "author": "gloinul",
@@ -113,16 +113,24 @@
       "id": "I_kwDORGnINM8AAAABHUL7mQ",
       "title": "Mostly Theoretical deadlock in Key Initation procedure",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/10",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "In the intial procedures we currently have these steps: \n`9. The server key manager receives Certificate/CertificateVerify/Finished,\n   it exports the server key\n   material for both the Primary and Restart DKCs, and installs it\n   as its read (receive) key and as its write (send) key.\n\n10. The server key manager calls Require Protected SCTP Packets to\n    enforce DTLS chunk protection for all future packets and informs\n    the ULP that the association is protected.\n\n11. The server key manager sends a Protection Established control\n    message ({{protection-established}}) to the client key manager.\n\n12. The client key manager receives the Protection Established\n    control message, exports all Primary and Restart DKC keys,\n    and installs the server key material as its write (send) key,\n    calls Require Protected SCTP Packets to enforce\n    DTLS chunk protection for all future packets, and informs the\n    ULP that the association is protected.`\n\nIn this procedure there exists a potential for deadlock that is uncertain if you even can make it trigger. But the case that exist here is the following:\n\nWhen step 10 is completed the server only accepts protected packets. Then in step 11 it sends a encrypted Protection Established (PE) message to the client. At this point the client doesn't have a write key installed, only the read key. The server requires the client to send encrypted packets for them to reach the server and actually be processed. This situation lasts until the client receives the PE message, which triggers it to install the write key and also enable protection following step 12. \n\nSo if the a SCTP packet carrying the PE message (or part of it) is lost between the server and the client, the client can't send any SACK that will actually reach the server. However, if the server does not receive the PE message its retransmission timer will fire and retransmit the non acked PE message. Thus, a true deadlock can only occur if the SCTP association at this stage would require a SACK message or some other control message to complete the transmission of the PE. \n\nSo the question here is if this very unlikely situation needs to be addressed? \n\nOne way of addressing this is to add additional control messages:\n10. Server sends Protection Ready (Encrypted) -> Client\n11. Client installs write key and sets Protection Required\n12. Client sends Protection Established (Encrypted) -> Server\n13. Server receives and sets Protection Required. Notifies ULP\n14. Server sends Protection Established (Encrypted) -> Client\n15. Client receives Protection Established, sets Protection Required and Notifies ULP\n\nThis procedure adds one RTT at minimal. Steps 14 and 15 is there to ensure that there are coordination of the ULP activation. It may be possible to skip 14 and 15 and instead have the client activate ULP at the end of step 12. But, that puts implementation requirements on server to prevent unprotected data to be delivered to ULP while delivering protected. \n  ",
       "createdAt": "2026-07-01T13:16:17Z",
-      "updatedAt": "2026-07-01T13:16:17Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-09-25T08:37:55Z",
+      "closedAt": "2026-09-25T08:37:55Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is overtaken by events. And as noted one can rely on retransmission timeouts to resend the packet. ",
+          "createdAt": "2026-09-25T08:37:55Z",
+          "updatedAt": "2026-09-25T08:37:55Z"
+        }
+      ]
     },
     {
       "number": 12,
@@ -181,7 +189,7 @@
       "id": "I_kwDORGnINM8AAAABO7nFEw",
       "title": "Comments from Russ Housley",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/17",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -190,8 +198,8 @@
       "labels": [],
       "body": "Here are my thought on draft-porfiri-tsvwg-sctp-dtls-handshake.\n\nFirst, I want to note that draft-ietf-tls-extended-key-update, once it is finished, offers a better way to get fresh subsequent keys.  It can be used with resumption so that the TLS session does not need to be kept open.\n\nSection 1: Use the new TLS 1.3 RFC, not the original one.\n\nSection 3.2: It would be better to eliminate the double negative in the first sentence:\n\nIt is RECOMMENDED that only parameters marked as \"Y\" in the \"Recommended\" column of TLS registries are supported.\n\nSection 3.4: Is \"policy\" the right word? It is certainly quite different that certificate policies. I wonder if you are really asking for a configuration setting.  The rekey should happen whenever the time has passed _or_ the amount of data is about to be exceeded.\n\nSection 3.4: In the multi-homed situation, can more than one TLS session be needed by an endpoint?\n\n",
       "createdAt": "2026-08-31T06:05:27Z",
-      "updatedAt": "2026-09-10T12:44:55Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-25T08:16:10Z",
+      "closedAt": "2026-09-25T08:16:10Z",
       "comments": [
         {
           "author": "teiclap",
@@ -207,7 +215,7 @@
       "id": "I_kwDORGnINM8AAAABRjQhWQ",
       "title": "Improving the initial handshake procedure",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/20",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -216,8 +224,8 @@
       "labels": [],
       "body": "During the latest meeting with  @tuexen we discussed some aspect of the draft initial procedure and potential for improvements.\n\nTwo main insights came from that discussion.\n- The current process kind of assumes that the KeyManager method do understand TLS messages, i.e. need to parse them to know where TLS is in the process to trigger the right steps.\n- The current process is poorly addressing if an endpoint only want to be client, and thus should be sufficient to be only using a TLS client implementation, rather than having to have both server and client. \n\nThus, some exploration of improvement of how the procedure works and how it interacts with the TLS session. ",
       "createdAt": "2026-09-16T09:38:48Z",
-      "updatedAt": "2026-09-16T13:18:31Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-25T07:48:08Z",
+      "closedAt": "2026-09-25T07:48:08Z",
       "comments": [
         {
           "author": "gloinul",
@@ -240,7 +248,7 @@
       "id": "I_kwDORGnINM8AAAABRjUtRQ",
       "title": "Triggering of Rekeying by server",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/21",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -249,8 +257,68 @@
       "labels": [],
       "body": "During the discussion with @tuexen about potential improvements in regards to rekeying the important aspect was the need to not require both server and client TLS implementation when SCTP key management method has arrived at roles. Thus modification of the process should be done so that a client role should be sufficient to have only have a TLS client. This will require the server to use some other method than initiating a new TLS session to trigger the client instead initiating the TLS session. \n\nThe suggestion we have a new key managment method level message that the server can send to the client role and have it initiate the TLS session used for rekeying. \n",
       "createdAt": "2026-09-16T09:45:17Z",
-      "updatedAt": "2026-09-16T15:21:28Z",
+      "updatedAt": "2026-09-24T14:40:36Z",
+      "closedAt": "2026-09-24T14:40:36Z",
+      "comments": []
+    },
+    {
+      "number": 25,
+      "id": "I_kwDORGnINM8AAAABTABN_w",
+      "title": "Rework KM message identification",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/25",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tuexen"
+      ],
+      "labels": [],
+      "body": "Use PPID to identify KM messages and another for TLS messages.",
+      "createdAt": "2026-09-24T14:41:47Z",
+      "updatedAt": "2026-09-25T08:38:49Z",
       "closedAt": null,
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This also should take care of taking over the relevant PPID registration from the DTLS Chunk draft. ",
+          "createdAt": "2026-09-25T08:38:49Z",
+          "updatedAt": "2026-09-25T08:38:49Z"
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "id": "I_kwDORGnINM8AAAABTACsDA",
+      "title": "Update figures to indicate all three PPIDs",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/26",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-09-24T14:43:40Z",
+      "updatedAt": "2026-09-24T14:43:40Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 27,
+      "id": "I_kwDORGnINM8AAAABTJtwpA",
+      "title": "Update sequence diagrams for hiding internal TLS stuffs",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/27",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "teiclap"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-09-25T08:18:51Z",
+      "updatedAt": "2026-09-25T08:29:15Z",
+      "closedAt": "2026-09-25T08:29:15Z",
       "comments": []
     }
   ],
@@ -725,24 +793,26 @@
       "id": "PR_kwDORGnINM8AAAABDdv7Jg",
       "title": "Implemented issue5",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/18",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-09-14T14:32:46Z",
-      "updatedAt": "2026-09-17T10:22:20Z",
+      "updatedAt": "2026-09-24T14:46:56Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue5",
       "headRefOid": "fa1c122c21eaa0381284ea26f851b39b023b47c4",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-24T14:46:56Z",
+      "mergedAt": "2026-09-24T14:46:56Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "28a9884601311efa520ac7d1f523b8f3f6835b6f"
+      },
       "comments": [
         {
           "author": "emanjon",
@@ -780,24 +850,26 @@
       "id": "PR_kwDORGnINM8AAAABDd0RzQ",
       "title": "Issue17",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/19",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-09-14T14:40:23Z",
-      "updatedAt": "2026-09-17T14:11:04Z",
+      "updatedAt": "2026-09-25T08:16:13Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
-      "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
+      "baseRefOid": "4e0c6644bb0c7244a33cc6da9415cd2ba7ee743f",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue17",
-      "headRefOid": "6aab3e4dab87416163869b762283663cc148ade2",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "3d23c9fbb250943993a1c482ae869e78a127118f",
+      "closedAt": "2026-09-25T08:16:09Z",
+      "mergedAt": "2026-09-25T08:16:09Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "960a2468d3b9dcd3f6669b11c21e2b6e194eb0b1"
+      },
       "comments": [],
       "reviews": [
         {
@@ -933,24 +1005,26 @@
       "id": "PR_kwDORGnINM8AAAABDwmxQA",
       "title": "Replaced parsing with TLS API",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/22",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This change addresses the problem of parsing TLS message in KM; the parsing is not needed and information between KM and TLS are via the upper layer API of TLS now.",
       "createdAt": "2026-09-16T11:51:39Z",
-      "updatedAt": "2026-09-18T07:30:23Z",
+      "updatedAt": "2026-09-25T07:48:12Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
-      "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
+      "baseRefOid": "28a9884601311efa520ac7d1f523b8f3f6835b6f",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue20",
-      "headRefOid": "79d8c95e4f8b145c57c0a9aad403f0a3fd27435c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "e59150153a6dada533f67a478f43547657f4794f",
+      "closedAt": "2026-09-25T07:48:06Z",
+      "mergedAt": "2026-09-25T07:48:06Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "4e0c6644bb0c7244a33cc6da9415cd2ba7ee743f"
+      },
       "comments": [],
       "reviews": [
         {
@@ -965,6 +1039,19 @@
           "createdAt": "2026-09-17T09:59:50Z",
           "updatedAt": "2026-09-17T09:59:50Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABPDerYw",
+          "commit": {
+            "abbreviatedOid": "79d8c95"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-24T13:42:22Z",
+          "updatedAt": "2026-09-24T13:42:22Z",
+          "comments": []
         }
       ]
     },
@@ -973,24 +1060,26 @@
       "id": "PR_kwDORGnINM8AAAABDydkBg",
       "title": "Rekey fixed according to issue #21",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/23",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "The rekay mechanism has been changed to reflect the request from issue21. Partially depends on fixes from issue20.",
       "createdAt": "2026-09-16T15:18:44Z",
-      "updatedAt": "2026-09-17T13:57:40Z",
+      "updatedAt": "2026-09-24T14:40:35Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue21",
       "headRefOid": "c6cc2aca5aba5d81d899f738603dfcf588f1e365",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-24T14:40:35Z",
+      "mergedAt": "2026-09-24T14:40:35Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "38dbf77c7cb62a755631eaaaf7ba02e5030fec85"
+      },
       "comments": [
         {
           "author": "gloinul",
@@ -1089,6 +1178,76 @@
           ]
         }
       ]
+    },
+    {
+      "number": 24,
+      "id": "PR_kwDORGnINM8AAAABE42XsA",
+      "title": "Updated figure to clarify that TLS is a component of the Key Manageme\u2026",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/24",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\u2026nt Method.",
+      "createdAt": "2026-09-24T07:35:16Z",
+      "updatedAt": "2026-09-24T14:43:11Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "6a7a0c590fd11e87cf1a4c81e2d7bc2662814204",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "fix-figure",
+      "headRefOid": "cd55bee5f33d2ddd5e99d9106f22fc000137a95b",
+      "closedAt": "2026-09-24T14:43:11Z",
+      "mergedAt": "2026-09-24T14:43:11Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "b40b5e5e4f7639c9bca8c1bcd8b707908f05daa5"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABO_rd5g",
+          "commit": {
+            "abbreviatedOid": "cd55bee"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-24T07:37:45Z",
+          "updatedAt": "2026-09-24T07:37:45Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "id": "PR_kwDORGnINM8AAAABFFJhJg",
+      "title": "Pictures are simplified",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/28",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-09-25T08:28:33Z",
+      "updatedAt": "2026-09-25T08:29:19Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "960a2468d3b9dcd3f6669b11c21e2b6e194eb0b1",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue27",
+      "headRefOid": "e027264079e7fbd5cb7f696083b61809863958f8",
+      "closedAt": "2026-09-25T08:29:14Z",
+      "mergedAt": "2026-09-25T08:29:14Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "63ee938d80e8f8ddbb0e24e0b3c842d09165d932"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
