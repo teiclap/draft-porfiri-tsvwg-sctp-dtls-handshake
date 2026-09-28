@@ -549,7 +549,7 @@ sequence numbers and replay window.
      |                                             |
      | TLS  client KM               server KM  TLS |
      |  |    |                             |    |  |
-  4. |  |<---+ TLSconnect()    TLSaccept() +--->|  |    5.
+  4. |  |<---+ SSL_connect()  SSL_accept() +--->|  |    5.
      |  |    |                             |    |  |
      |  +--->|                             |<---+  |    6.
      |  |    |                             |    |  |
@@ -567,15 +567,12 @@ sequence numbers and replay window.
      +<--------[protected APP DATA]----------------+  +---
      |                  ...                        |  |
 
-
-Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
-connect()/accept() = SSL_connect()/SSL_accept(); TLS rec = TLS records
-relayed between the key managers; PE = Protection Established control
-message; R+W = read and write keys.
-
-
 ~~~~~~~~~~~
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
+
+Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
+TLS rec = TLS records relayed between the key managers;
+PE = Protection Established control message; R+W = read and write keys.
 
   The diagram {{initial-establishment-diagram}} shows the case where SCTP
   Initiator ends up with the Key Manager client role. The opposite case is
@@ -693,7 +690,7 @@ including:
   2. |  |    |<--------[Rekey Req]---------+    |  |  1.
      |  |    |                             |    |  |
      |  |  (client rekeys, or got Rekey Req:)   |  |
-  3. |  |<---+ connect()          accept() +--->|  |  4.
+  3. |  |<---+ SSL_connect()  SSL_accept() +--->|  |  4.
      |  |    |                             |    |  |
      |  +--->|                             |<---+  |  5.
      |  |    |                             |    |  |
@@ -709,15 +706,15 @@ including:
      |  (traffic transitions to epoch N+1 DKC)     |
      |  (after draining, remove epoch N DKC)       |
 
-
-Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
-Rekey Req = Rekey Request control message; connect()/accept() =
-SSL_connect()/SSL_accept(); TLS rec = TLS records relayed between the key
-managers; PE = Protection Established control message; R+W = read and
-write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
-epoch N+1 DKC.
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
+
+Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+Rekey Req = Rekey Request control message;
+TLS rec = TLS records relayed between the key managers;
+PE = Protection Established control message; R+W = read and
+write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
+epoch N+1 DKC.
 
   The diagram {{rekey-diagram}} shows both triggers.  Steps 1 and 2 (the
   Rekey Request) are present only when the server key manager is the one
