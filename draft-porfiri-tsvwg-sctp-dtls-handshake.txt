@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 29 March 2027                                          Ericsson
-                                                       25 September 2026
+Expires: 1 April 2027                                           Ericsson
+                                                       28 September 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 March 2027.
+   This Internet-Draft will expire on 1 April 2027.
 
 Copyright Notice
 
@@ -576,40 +576,39 @@ Table of Contents
 
 6.1.  Initial Establishment
 
- Initiator                                     Responder
-     |                                             |
-  1. +---------[INIT]----------------------------->|
-     |<--------[INIT-ACK]--------------------------+
-     +---------[COOKIE ECHO]---------------------->| 2.
-  3. |<--------[COOKIE ACK]------------------------+
-     |                                             |
-     | TLS  client KM               server KM  TLS |
-     |  |    |                             |    |  |
-  4. |  |<---+ TLSconnect()    TLSaccept() +--->|  |    5.
-     |  |    |                             |    |  |
-     |  +--->|                             |<---+  |    6.
-     |  |    |                             |    |  |
-     |  |    |                             |    |  |
-  7. |  +--->| READ installed              |    |  |
-     |  |    +------------[PE]------------>|    |  |    8b.
-     |  |    |                             |<---+  |    8a.
-     |  |    | (wait for done + client PE) |    |  |
-     |  |    |     (install R+W, enforce)  |    |  |
-     |  |    |<------------[PE]------------+    |  |
-  9. |  |    |  WRITE installed, enforce   |    |  |
-     |  |    |                             |    |  |
-     |                                             | -.
- 10. +---------[protected APP DATA]--------------->|  | APP
-     +<--------[protected APP DATA]----------------+  +---
-     |                  ...                        |  |
+         Initiator                                     Responder
+             |                                             |
+          1. +---------[INIT]----------------------------->|
+             |<--------[INIT-ACK]--------------------------+
+             +---------[COOKIE ECHO]---------------------->| 2.
+          3. |<--------[COOKIE ACK]------------------------+
+             |                                             |
+             | TLS  client KM               server KM  TLS |
+             |  |    |                             |    |  |
+          4. |  |<---+ SSL_connect()  SSL_accept() +--->|  |    5.
+             |  |    |                             |    |  |
+             |  +--->|                             |<---+  |    6.
+             |  |    |                             |    |  |
+             |  |    |                             |    |  |
+          7. |  +--->| READ installed              |    |  |
+             |  |    +------------[PE]------------>|    |  |    8b.
+             |  |    |                             |<---+  |    8a.
+             |  |    | (wait for done + client PE) |    |  |
+             |  |    |     (install R+W, enforce)  |    |  |
+             |  |    |<------------[PE]------------+    |  |
+          9. |  |    |  WRITE installed, enforce   |    |  |
+             |  |    |                             |    |  |
+             |                                             | -.
+         10. +---------[protected APP DATA]--------------->|  | APP
+             +<--------[protected APP DATA]----------------+  +---
+             |                  ...                        |  |
 
+                      Figure 4: Initial Establishment
 
-Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
-connect()/accept() = SSL_connect()/SSL_accept(); TLS rec = TLS records
-relayed between the key managers; PE = Protection Established control
-message; R+W = read and write keys.
-
-                   Figure 4: Initial Establishment
+   Legend: TLS = local TLS engine; client KM/server KM = client/server
+   key manager; TLS rec = TLS records relayed between the key managers;
+   PE = Protection Established control message; R+W = read and write
+   keys.
 
    The diagram Figure 4 shows the case where SCTP Initiator ends up with
    the Key Manager client role.  The opposite case is identical but with
@@ -724,40 +723,38 @@ message; R+W = read and write keys.
    messages are guaranteed to be delivered and are not lost; no key-
    management-level retransmission is required.
 
- Initiator                                     Responder
-     |  (traffic continues using epoch N DKC)      |
-     |                                             |
-     | TLS  cliKM                       srvKM  TLS |
-     |  |    |                             |    |  |
-     |  |    |  (server needs to rekey:)   |    |  |
-  2. |  |    |<--------[Rekey Req]---------+    |  |  1.
-     |  |    |                             |    |  |
-     |  |  (client rekeys, or got Rekey Req:)   |  |
-  3. |  |<---+ connect()          accept() +--->|  |  4.
-     |  |    |                             |    |  |
-     |  +--->|                             |<---+  |  5.
-     |  |    |                             |    |  |
-  6. |  +--->| READ (epoch N+1)            |    |  |
-     |  |    +----------[PE]-------------->|    |  |  7b.
-     |  |    |                             |<---+  |  7a.
-     |  |    |  (wait own done + cli PE)   |    |  |
-     |  |    |  (install R+W N+1, drain,   |    |  |
-     |  |    |   TX->N+1)                  |    |  |
-     |  |    |<---------[PE]---------------+    |  |
-  8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
-     |  |    |                             |    |  |
-     |  (traffic transitions to epoch N+1 DKC)     |
-     |  (after draining, remove epoch N DKC)       |
+          Initiator                                     Responder
+              |  (traffic continues using epoch N DKC)      |
+              |                                             |
+              | TLS  cliKM                       srvKM  TLS |
+              |  |    |                             |    |  |
+              |  |    |  (server needs to rekey:)   |    |  |
+           2. |  |    |<--------[Rekey Req]---------+    |  |  1.
+              |  |    |                             |    |  |
+              |  |  (client rekeys, or got Rekey Req:)   |  |
+           3. |  |<---+ SSL_connect()  SSL_accept() +--->|  |  4.
+              |  |    |                             |    |  |
+              |  +--->|                             |<---+  |  5.
+              |  |    |                             |    |  |
+           6. |  +--->| READ (epoch N+1)            |    |  |
+              |  |    +----------[PE]-------------->|    |  |  7b.
+              |  |    |                             |<---+  |  7a.
+              |  |    |  (wait own done + cli PE)   |    |  |
+              |  |    |  (install R+W N+1, drain,   |    |  |
+              |  |    |   TX->N+1)                  |    |  |
+              |  |    |<---------[PE]---------------+    |  |
+           8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
+              |  |    |                             |    |  |
+              |  (traffic transitions to epoch N+1 DKC)     |
+              |  (after draining, remove epoch N DKC)       |
 
+                        Figure 5: Rekeying Procedure
 
-Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
-Rekey Req = Rekey Request control message; connect()/accept() =
-SSL_connect()/SSL_accept(); TLS rec = TLS records relayed between the key
-managers; PE = Protection Established control message; R+W = read and
-write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
-epoch N+1 DKC.
-
-                     Figure 5: Rekeying Procedure
+   Legend: TLS = local TLS engine; cliKM/srvKM = client/server key
+   manager; Rekey Req = Rekey Request control message; TLS rec = TLS
+   records relayed between the key managers; PE = Protection Established
+   control message; R+W = read and write keys; N, N+1 = old and new
+   epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
 
    The diagram Figure 5 shows both triggers.  Steps 1 and 2 (the Rekey
    Request) are present only when the server key manager is the one that
