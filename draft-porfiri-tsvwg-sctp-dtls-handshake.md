@@ -137,7 +137,7 @@ DTLS Key Context (DKC):
   tuple of (SCTP Association, restart indicator, DTLS epoch).
 
 Initiator:
-: The endpoint initiating the SCTP association. In case of simultanous open
+: The endpoint initiating the SCTP association. In case of simultaneous open,
   both SCTP endpoints may have started as Initiator.
 
 
@@ -303,8 +303,8 @@ role MUST still present the same authenticated identity.
 
 ## Rekeying Considerations {#rekey-strategy}
 
-Implementations need to implement criterias for when to initiate
-rekeying.  Implementations are RECOMMENDED rekey at least every hour
+Implementations need to implement criteria for when to initiate
+rekeying.  Implementations are RECOMMENDED to rekey at least every hour
 and every 100 GB of data, which matches what is specified for IPsec in
 {{ANSSI-DAT-NT-003}}.
 
@@ -376,7 +376,7 @@ Other SCTP user messages MUST NOT use this PPID.
 ## Control Messages {#control-messages}
 
 Control messages are sent as SCTP user messages and MUST use PPID 4243
-and contain a single byte identifying the type as show in the following
+and contain a single byte identifying the type as shown in the following
 {{control-message-format}}.
 Other user messages MUST NOT use this PPID.
 
@@ -581,11 +581,11 @@ RKI = Read Key Installed control message; R+W = read and write keys.
    the resulting flight of TLS records to the server key manager per
    {{tls-user-message}}.
 
-  5. The server key manager starts a TLS 1.3 server and is read to relay any
-   received TLS records received to the TLS server and forward any produced TLS
-   records by the TLS server to the client key manager per {{tls-user-message}}.
+  5. The server key manager starts a TLS 1.3 server and is ready to relay any
+   received TLS records to the TLS server and to forward any TLS records
+   produced by the TLS server to the client key manager per {{tls-user-message}}.
 
-  6. TLS primitives returns after successful handshake is completed.
+  6. The TLS primitives return after the handshake has completed successfully.
 
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
@@ -711,10 +711,10 @@ epoch N+1 DKC.
      N+1 and relays the resulting flight of TLS records to the server key manager
      per {{tls-user-message}}.
 
-  4. The server key manager await rekeying TLS handshake as TLS
+  4. The server key manager awaits the rekeying TLS handshake as a TLS
      server.
 
-  5. TLS primitives returns after successful handshake is completed.
+  5. The TLS primitives return after the handshake has completed successfully.
 
   6. The client key manager's TLS handshake completes.  It exports all
      Primary and Restart DKC keys for epoch N+1, installs the server to
@@ -964,7 +964,7 @@ method do not allow the ULP to exchange any data beyond the
 key-management information following this specification until
 the peer is authenticated and the local endpoint and the remote
 have both installed read and write keys and enforced protection. This is to avoid any information
-leakage from the ULP to none intended parties.
+leakage from the ULP to unintended parties.
 
 
 # IANA Considerations {#iana-considerations}
