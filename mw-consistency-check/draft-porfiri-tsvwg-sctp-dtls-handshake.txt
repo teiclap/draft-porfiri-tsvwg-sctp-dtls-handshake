@@ -366,19 +366,14 @@ Table of Contents
       security by forcing an adversary to break them in sequence
       [KTH-NCSA].
 
-   Both ticket delivery mechanisms of TLS 1.3 may be used.  The server
-   MAY send NewSessionTicket messages unsolicited at any time after its
-   handshake has completed [RFC9846], and the client MAY request a
-   specific number of tickets using the ticket_request extension
-   [RFC9149] in its ClientHello.  As with all handshake traffic, these
-   TLS messages are carried between the key managers as TLS records per
-   Section 4; no additional key-management control message is involved.
-
-   To ensure the client has the opportunity to obtain a ticket before
-   the TLS connection is torn down, the client key manager SHOULD
-   initiate the closure of the TLS connection, and the server key
-   manager SHOULD NOT close the TLS connection before the client has had
-   the opportunity to obtain the tickets it requested.
+   Session resumption tickets are delivered using the standard TLS 1.3
+   mechanisms: the server MAY send tickets unsolicited [RFC9846], and
+   the client MAY request them [RFC9149].  To ensure the client has the
+   opportunity to obtain a ticket before the TLS connection is torn
+   down, the client key manager SHOULD initiate the closure of the TLS
+   connection, and the server key manager SHOULD NOT close the TLS
+   connection before the client has had the opportunity to obtain the
+   tickets it requested.
 
 4.  TLS-based Key Management Messages
 
