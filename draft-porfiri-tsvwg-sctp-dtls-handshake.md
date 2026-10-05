@@ -267,7 +267,8 @@ key-exchange MUST NOT be supported.
 The cipher suites negotiated in the key-management TLS connection
 MUST only include those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
-suites (see Section 7.3 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
+suites (the "Cipher Suite Capabilities" API of
+{{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 
 ## Authentication and Identity {#tls-auth}
 
@@ -417,7 +418,8 @@ is already in progress, in which case the Rekey Request is ignored (see
 ## Role Determination {#role-determination}
 
 Role determination and method selection follow the procedure defined
-in Section 5.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.  After
+in the "Establishment of a Protected Association" section of
+{{I-D.ietf-tsvwg-sctp-dtls-chunk}}.  After
 the SCTP association is established, the key-management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
 (Client or Server), the selected DTLS Key
@@ -438,8 +440,8 @@ the concatenation of the following fields:
 | Client KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Client |
 | Server KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Server |
 
-Each DTLS Key Management Parameter (Section 4.1 of
-{{I-D.ietf-tsvwg-sctp-dtls-chunk}}) is included as the
+Each DTLS Key Management Parameter (the "DTLS Key Management Parameter"
+of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) is included as the
 sequence of bytes sent on the wire, including the parameter header
 and excluding padding.
 
@@ -536,13 +538,13 @@ RKI = Read Key Installed control message; R+W = read and write keys.
   The procedure is as follows:
 
   1. The Initiator sends INIT containing the DTLS Key Management Parameter
-   (Section 4.1 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) with this
+   (the "DTLS Key Management Parameter" of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) with this
    method's identifier (see {{sec-iana-psi}}) in its preference-ordered list.
 
   2. The Responder enters ESTABLISHED state. It retrieves the agreed DTLS
    Key Management Method and role from the SCTP stack (e.g., using
    the "Get Agreed DTLS Key Management Method and Role" API defined in
-   Section 7.2 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) and verifies that
+   the "Abstract API" section of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) and verifies that
    the selected method matches the one defined in this document
    (see {{sec-iana-psi}}) and gets the assigned role as key manager client or
    server (in the example depicted in {{initial-establishment-diagram}}
@@ -782,8 +784,8 @@ For protected SCTP restart to succeed:
 
 * Both endpoints MUST have a valid Restart DKC.
 * The Restart DKC MUST be stored securely and persistently to
-  survive crash events (see
-  Section 10.4 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
+  survive crash events (see the "Persistent Secure Storage of Restart
+  Key Context" section of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 * Both endpoints MUST have indicated restart support (R bit) in the
   DTLS Key Management Parameter.
 
