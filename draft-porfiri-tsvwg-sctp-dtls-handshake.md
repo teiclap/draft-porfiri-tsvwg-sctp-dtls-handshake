@@ -359,7 +359,7 @@ There are two classes of these key management messages:
 * SCTP user messages containing TLS records.
 * SCTP user messages containing control information.
 
-These two classes are identified by using a specific PPID.
+These two classes are identified by using a specific PPID each.
 
 ## TLS Records
 
@@ -369,7 +369,7 @@ Other SCTP user messages MUST NOT use this PPID.
 
 ## Control Messages {#control-messages}
 
-Control messages are sent as SCTP user messages and MUST use PPID 4243
+Control messages are sent as SCTP user messages, they MUST use PPID 4243
 and contain a single byte identifying the type as shown in the following
 {{control-message-format}}.
 Other user messages MUST NOT use this PPID.
@@ -413,9 +413,9 @@ key manager initiate a rekeying TLS handshake (see {{rekeying}}).
 Because only the client key manager initiates a TLS handshake, the
 server key manager uses this message when it determines that rekeying
 is needed (per its own criteria in {{rekey-strategy}}).  This division of
-roles allows an endpoint holding only the client role to implement only
-a TLS client, and an endpoint holding only the server role to implement
-only a TLS server.
+roles allows an endpoint holding only the client role to implement
+a TLS client only, and an endpoint holding only the server role to implement
+a TLS server only.
 
 Upon receiving a Rekey Request, the client key manager initiates a
 rekeying TLS handshake as described in {{rekeying}}, unless a rekeying
@@ -528,7 +528,7 @@ consistent view of sequence numbers and replay window.
      |  |    | (wait for done + client RKI)|    |  |
      |  |    |     (install R+W, enforce)  |    |  |
      |  |    |<-----------[RKI]------------+    |  |
-  9. |  |    |  WRITE installed, enforce   |    |  |
+  9. |  |    |   READ installed, enforce   |    |  |
      |  |    |                             |    |  |
      |                                             | -.
  10. +---------[protected APP DATA]--------------->|  | APP
@@ -539,7 +539,6 @@ consistent view of sequence numbers and replay window.
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
 
 Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
-TLS rec = TLS records relayed between the key managers;
 RKI = Read Key Installed control message; R+W = read and write keys.
 
   The diagram {{initial-establishment-diagram}} shows the case where SCTP
@@ -547,8 +546,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.
   identical but with inverted roles among Key Managers. In the following
   procedure we use Initiator and Responder referring to SCTP, Client and Server
   referring to Keymanager role, and implicitly TLS roles. The key managers drive
-  TLS solely through the TLS user API and relay the resulting TLS records; they
-  do not need to parse TLS messages.
+  TLS solely through the TLS user API.
 
   The procedure is as follows:
 
@@ -656,7 +654,8 @@ including:
      |  |    |  (server needs to rekey:)   |    |  |
   2. |  |    |<--------[Rekey Req]---------+    |  |  1.
      |  |    |                             |    |  |
-     |  |  (client rekeys, or got Rekey Req:)   |  |
+     |  |    |     (client rekeys,         |    |  |
+     |  |    |      or got Rekey Req:)     |    |  |
   3. |  |<---+ SSL_connect()  SSL_accept() +--->|  |  4.
      |  |    |                             |    |  |
      |  +--->|                             |<---+  |  5.
@@ -668,7 +667,7 @@ including:
      |  |    |  (install R+W N+1, drain,   |    |  |
      |  |    |   TX->N+1)                  |    |  |
      |  |    |<--------[RKI]---------------+    |  |
-  8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
+  8. |  |    |   READ N+1, drain, TX->N+1  |    |  |
      |  |    |                             |    |  |
      |  (traffic transitions to epoch N+1 DKC)     |
      |  (after draining, remove epoch N DKC)       |
@@ -678,18 +677,17 @@ including:
 
 Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
 Rekey Req = Rekey Request control message;
-TLS rec = TLS records relayed between the key managers;
 RKI = Read Key Installed control message; R+W = read and
 write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
 epoch N+1 DKC.
 
-  The diagram {{rekey-diagram}} shows both triggers.  Steps 1 and 2 (the
+  The diagram in {{rekey-diagram}} shows both triggers.  Steps 1 and 2 (the
   Rekey Request) are present only when the server key manager is the one
   that needs to rekey; when the client key manager needs to rekey it
   starts directly at step 3.  As in initial establishment, the key
-  managers drive TLS solely through the TLS user API and relay the
-  resulting TLS records; they do not parse TLS messages.  The procedure
-  is as follows:
+  managers drive TLS solely through the TLS user API.
+
+  The procedure is as follows:
 
   1. If the server key manager needs to rekey, it sends a Rekey Request
      control message ({{rekey-request}}) to the client key manager.  The
@@ -814,17 +812,18 @@ For protected SCTP restart to succeed:
      |                                        |
   1. | (install Restart DKC from storage)     |
      |                                        | -.
-  2. +---------[INIT]------------------------>|  | Plain
-  3. |<--------[INIT-ACK]---------------------+  +-----
+  2. +---------[INIT]------------------------>|   | Plain
+  3. |<--------[INIT-ACK]---------------------+   +------
+     |                                        | -'
      |                                        | -.
-  4. +------[DTLS(COOKIE ECHO)]-------------->|  | Protected
-  5. |<-----[DTLS(COOKIE ACK)]----------------+  +-------
+  4. +------[DTLS(COOKIE ECHO)]-------------->|   | Protected
+  5. |<-----[DTLS(COOKIE ACK)]----------------+   +----------
   6. |                                        | -'
      | (TLS handshake for new keys,           |
      |  steps 7-12, as in initial setup)      |
      |                                        |
  13. +------[DTLS(protected APP DATA)]------->|  APP DATA
-     +<-----[DTLS(protected APP DATA)]--------+
+     |<-----[DTLS(protected APP DATA)]--------+
      |                  ...                   |
 
 
@@ -860,24 +859,25 @@ For protected SCTP restart to succeed:
    The ULP MAY be informed that the association is restarted at this
    point.  ULP traffic MAY begin immediately using the Restart DKC.
 
-Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
+7. Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
 correspond one-to-one to steps 4 to 9 of the initial establishment
 procedure ({{initial-establishment}}).  They differ only as follows:
 
-* all key management messages are carried inside DTLS chunks protected
+   * all key management messages are carried inside DTLS chunks protected
   with the Restart DKC;
 
-* in addition to the Primary DKC, each endpoint exports, installs, and
+   * in addition to the Primary DKC, each endpoint exports, installs, and
   commits the new Restart DKC to persistent secure storage, removing
   the old one;
 
-* at the key transition (steps 11 and 12), each endpoint switches the
+   * at the key transition (steps 11 and 12), each endpoint switches the
   active DTLS key context from the Restart DKC to the new Primary DKC
   after the Read Key Installed exchange completes (the Read Key
   Installed messages themselves are protected with the Restart DKC),
   rather than enforcing protection for the first time; the ULP was
   already informed at step 6.
 
+{:start="13"}
 13. Protected application traffic uses the new Primary DKC.
 
 After restart, the new Primary DKC MUST use epoch 3 (the epoch
@@ -910,15 +910,6 @@ implementation determines that it can address the cause of the error
 (for example, by retrying with different parameters, as long as doing
 so does not compromise security), it SHOULD retry
 the TLS handshake.  Otherwise, the SCTP association MUST be aborted.
-
-If a TLS handshake fails during rekeying, there is no need to end the
-association immediately, since traffic can continue to be protected
-with the current DKC.  As long as the current DKC has not yet reached
-its usage limits, the implementation MAY retry the TLS handshake
-multiple times in an attempt to resolve the error.  However, the
-current DKC will eventually become inappropriate to use: if the error
-cannot be fixed and the current DKC is aged beyond policy limits or
-reaches its usage limits, the association MUST be aborted.
 
 If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
