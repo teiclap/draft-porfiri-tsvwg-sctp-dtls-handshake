@@ -287,9 +287,18 @@ associations can use multiple IP addresses per endpoint, DTLS records
 may arrive from different source IP addresses than those originally
 authenticated.
 
+The authenticated peer identity MUST remain stable across every TLS
+connection established for the lifetime of the SCTP association,
+including the connections used for rekeying ({{rekeying}}) and the
+connection established after an SCTP restart ({{sctp-restart}}).
 Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
+
+This requirement is independent of the key-management role: the Client
+and Server roles are re-derived from the SCTP handshake and MAY differ
+after an SCTP restart ({{sctp-restart}}), but an endpoint that changes
+role MUST still present the same authenticated identity.
 
 ## Rekeying Considerations {#rekey-strategy}
 
@@ -843,6 +852,8 @@ For protected SCTP restart to succeed:
    protected with it), and the DTLS Key Management Client and Server
    roles may differ from those of the previous instance of the
    association, since the new INIT handshake re-runs role determination.
+   The authenticated peer identity, however, MUST remain the same as in
+   the previous instance of the association (see {{tls-auth}}).
    The ULP MAY be informed that the association is restarted at this
    point.  ULP traffic MAY begin immediately using the Restart DKC.
 
