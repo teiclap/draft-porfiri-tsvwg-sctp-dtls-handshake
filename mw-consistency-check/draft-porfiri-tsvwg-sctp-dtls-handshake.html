@@ -1670,9 +1670,17 @@ identity, not on its transport layer identity.  Since SCTP
 associations can use multiple IP addresses per endpoint, DTLS records
 may arrive from different source IP addresses than those originally
 authenticated.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
-<p id="section-3.3-4">Clients and servers MUST NOT accept a change of identity during the
+<p id="section-3.3-4">The authenticated peer identity MUST remain stable across every TLS
+connection established for the lifetime of the SCTP association,
+including the connections used for rekeying (<a href="#rekeying" class="auto internal xref">Section 6.2</a>) and the
+connection established after an SCTP restart (<a href="#sctp-restart" class="auto internal xref">Section 6.3</a>).
+Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+<p id="section-3.3-5">This requirement is independent of the key-management role: the Client
+and Server roles are re-derived from the SCTP handshake and MAY differ
+after an SCTP restart (<a href="#sctp-restart" class="auto internal xref">Section 6.3</a>), but an endpoint that changes
+role MUST still present the same authenticated identity.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekey-strategy">
@@ -1720,14 +1728,19 @@ provides the following benefits:<a href="#section-3.5-1" class="pilcrow">¶</a><
  <span>[<a href="#KTH-NCSA" class="cite xref">KTH-NCSA</a>]</span>.<a href="#section-3.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-3.5-3">Session resumption tickets MAY be pushed by the server key manager at
-any point after the TLS handshake has completed, or they MAY be
-explicitly requested by the client key manager from the server key
-manager. To ensure the client key manager has the opportunity to
-request a ticket before the TLS connection is torn down, the client key
-manager SHOULD initiate the closure of the TLS connection, and the
-server key manager SHOULD NOT close the TLS connection before the
-client has had the opportunity to send a ticket request.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
+<p id="section-3.5-3">Both ticket delivery mechanisms of TLS 1.3 may be used.  The server
+MAY send NewSessionTicket messages unsolicited at any time after its
+handshake has completed <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, and the client MAY request a
+specific number of tickets using the ticket_request extension
+<span>[<a href="#RFC9149" class="cite xref">RFC9149</a>]</span> in its ClientHello.  As with all handshake traffic, these
+TLS messages are carried between the key managers as TLS records per
+<a href="#tls-user-message" class="auto internal xref">Section 4</a>; no additional key-management control message is
+involved.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
+<p id="section-3.5-4">To ensure the client has the opportunity to obtain a ticket before the
+TLS connection is torn down, the client key manager SHOULD initiate the
+closure of the TLS connection, and the server key manager SHOULD NOT
+close the TLS connection before the client has had the opportunity to
+obtain the tickets it requested.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2666,6 +2679,8 @@ the Restart DKC (the COOKIE ECHO and COOKIE ACK were exchanged
 protected with it), and the DTLS Key Management Client and Server
 roles may differ from those of the previous instance of the
 association, since the new INIT handshake re-runs role determination.
+The authenticated peer identity, however, MUST remain the same as in
+the previous instance of the association (see <a href="#tls-auth" class="auto internal xref">Section 3.3</a>).
 The ULP MAY be informed that the association is restarted at this
 point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-2.6.1" class="pilcrow">¶</a></p>
 </li>
@@ -2960,6 +2975,10 @@ Identifiers" registry for the PPID 4243 as depicted in
 <dt id="RFC5705">[RFC5705]</dt>
         <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"Keying Material Exporters for Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 5705</span>, <span class="seriesInfo">DOI 10.17487/RFC5705</span>, <time datetime="2010-03" class="refDate">March 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5705">https://www.rfc-editor.org/info/rfc5705</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9149">[RFC9149]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, and <span class="refAuthor">C.A. Wood</span>, <span class="refTitle">"TLS Ticket Requests"</span>, <span class="seriesInfo">RFC 9149</span>, <span class="seriesInfo">DOI 10.17487/RFC9149</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9149">https://www.rfc-editor.org/info/rfc9149</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9525">[RFC9525]</dt>
         <dd>
