@@ -602,8 +602,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.
 
   10. Protected application traffic can begin.
 
-  If the TLS handshake fails and the error cause indicates that it can't be
-  addressed, the SCTP association MUST be aborted.
+  If the TLS handshake fails in step 6, it SHOULD be retried according to {{error-handling}}.
 
  After key installation, the TLS connection SHOULD be closed promptly. When
  session resumption is supported, closure follows the procedure in
@@ -732,6 +731,9 @@ epoch N+1 DKC.
      key material as its write (send) key, starts the drain timer to
      remove the old (epoch N) DKC, and switches sending to the epoch
      N+1 DKC.
+
+  If the TLS handshake fails in step 5, it SHOULD be retried according to {{error-handling}}.
+
 
   The new DKCs use epoch N+1 (where N is the current epoch when
   initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
