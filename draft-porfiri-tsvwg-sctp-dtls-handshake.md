@@ -883,7 +883,7 @@ back-off.
 
 TLS has its own error reporting via TLS alert messages.  When a TLS
 handshake error occurs, the TLS alert is sent in an SCTP user message
-(see {{tls-user-message}}) with the DTLS Key Management Messages PPID
+(see {{tls-user-message}}) with the TLS for DTLS in SCTP TLS Records PPID
 (4242).
 
 If a TLS handshake fails during initial establishment and the
@@ -978,6 +978,6 @@ Identifiers" registry for the PPID 4243 as depicted in
 {{iana-payload-protection-id}}.
 
 | ID Value | SCTP Payload Protocol Identifier | Reference |
-| 4242     | TLS                              | RFC-To-Be |
-| 4243     | DTLS Chunk Key Management        | RFC-To-Be |
+| 4242     | TLS for DTLS in SCTP TLS Records | RFC-To-Be |
+| 4243     | TLS for DTLS in SCTP Control     | RFC-To-Be |
 {: #iana-payload-protection-id title="Payload Protocol Identifier" cols="r l l"}
