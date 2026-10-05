@@ -2226,8 +2226,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.<a href="#se
             <p id="section-6.1-5.10.1">Protected application traffic can begin.<a href="#section-6.1-5.10.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-6.1-6">If the TLS handshake fails and the error cause indicates that it can't be
-  addressed, the SCTP association MUST be aborted.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.1-6">If the TLS handshake fails in step 6, it SHOULD be retried according to <a href="#error-handling" class="auto internal xref">Section 7</a>.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
 <p id="section-6.1-7">After key installation, the TLS connection SHOULD be closed promptly. When
  session resumption is supported, closure follows the procedure in
  <a href="#session-resumption" class="auto internal xref">Section 3.5</a>.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
@@ -2462,12 +2461,13 @@ remove the old (epoch N) DKC, and switches sending to the epoch
 N+1 DKC.<a href="#section-6.2.2-8.8.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.2.2-9">The new DKCs use epoch N+1 (where N is the current epoch when
+<p id="section-6.2.2-9">If the TLS handshake fails in step 5, it SHOULD be retried according to <a href="#error-handling" class="auto internal xref">Section 7</a>.<a href="#section-6.2.2-9" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-10">The new DKCs use epoch N+1 (where N is the current epoch when
   initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
   coexist temporarily until the drain timer expires (see
-  <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-9" class="pilcrow">¶</a></p>
-<p id="section-6.2.2-10">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
-  NOT be used.<a href="#section-6.2.2-10" class="pilcrow">¶</a></p>
+  <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-10" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-11">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
+  NOT be used.<a href="#section-6.2.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="drain-timer">
