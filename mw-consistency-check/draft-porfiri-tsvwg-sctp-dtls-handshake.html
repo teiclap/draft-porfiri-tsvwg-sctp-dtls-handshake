@@ -2009,13 +2009,18 @@ supported) DKCs:<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.4-3">The first DKC established for any SCTP association MUST use DTLS
-epoch 3.  Each subsequent Primary DKC uses the next consecutive
-epoch.  After an SCTP restart, the epoch resets to 3.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
-<p id="section-5.4-4">If SCTP Restart is supported the endpoint MUST generate Restart DKC
-for each epoch where a Primary DKC is generated.  The Restart DKC MUST
-be maintained in a well-defined state (initialized but never used for
-regular traffic) so that both endpoints have a consistent view of
-sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
+epoch 3.  Each subsequent Primary DKC, together with its paired
+Restart DKC, uses the next consecutive epoch.  After an SCTP restart,
+the epoch resets to 3.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-4">If SCTP Restart is supported the endpoint MUST generate a Restart DKC
+for each epoch where a Primary DKC is generated.  The Restart DKC uses
+the same DTLS epoch as the Primary DKC generated alongside it; the two
+are distinguished not by epoch but by the restart indicator (the R bit
+in the DTLS chunk, see <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and by the
+Key role field of the exporter context (<a href="#exporter-context" class="auto internal xref">Section 5.2</a>).  The
+Restart DKC MUST be maintained in a well-defined state (initialized but
+never used for regular traffic) so that both endpoints have a
+consistent view of sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
