@@ -383,7 +383,7 @@ The following control message type is defined:
   | 0x02      | Rekey Request      | Requests the client key manager to initiate a rekeying TLS handshake |
 {: #control-message-types title="Control Message Types"}
 
-### Read Key Installed {#protection-established}
+### Read Key Installed {#read-key-installed}
 
 The Read Key Installed control message (Ctrl Type = 0x01) is sent
 by a key manager to its peer key manager for indicating that it has
@@ -506,11 +506,11 @@ sequence numbers and replay window.
      |  |    |                             |    |  |
      |  |    |                             |    |  |
   7. |  +--->| READ installed              |    |  |
-     |  |    +------------[PE]------------>|    |  |    8b.
+     |  |    +-----------[RKI]------------>|    |  |    8b.
      |  |    |                             |<---+  |    8a.
-     |  |    | (wait for done + client PE) |    |  |
+     |  |    | (wait for done + client RKI)|    |  |
      |  |    |     (install R+W, enforce)  |    |  |
-     |  |    |<------------[PE]------------+    |  |
+     |  |    |<-----------[RKI]------------+    |  |
   9. |  |    |  WRITE installed, enforce   |    |  |
      |  |    |                             |    |  |
      |                                             | -.
@@ -523,7 +523,7 @@ sequence numbers and replay window.
 
 Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 TLS rec = TLS records relayed between the key managers;
-PE = Protection Established control message; R+W = read and write keys.
+RKI = Read Key Installed control message; R+W = read and write keys.
 
   The diagram {{initial-establishment-diagram}} shows the case where SCTP
   Initiator ends up with the Key Manager client role. The opposite case is
@@ -567,18 +567,18 @@ PE = Protection Established control message; R+W = read and write keys.
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
    (receive) key, and sends a Read Key Installed control message
-   ({{protection-established}}) to the server key manager.
+   ({{read-key-installed}}) to the server key manager.
 
   8. The server key manager proceeds only after both its own TLS handshake has
-   completed (8a) and it has received the client key manager's Protection
-   Established control message (8b). Once both conditions are met, it exports
+   completed (8a) and it has received the client key manager's Read Key
+   Installed control message (8b). Once both conditions are met, it exports
    both direction key material for both the Primary and Restart DKCs, installs
    both the read (receive) key and the write (send) key, calls Require Protected
    SCTP Packets to enforce DTLS chunk protection for all future packets, informs
    the ULP that the association is protected, and sends a Read Key Installed
-   control message ({{protection-established}}) to the client key manager.
+   control message ({{read-key-installed}}) to the client key manager.
 
-  9. The client key manager receives the Protection Established control
+  9. The client key manager receives the Read Key Installed control
    message, installs the client key material as its write (send) key, calls
    Require Protected SCTP Packets to enforce DTLS chunk protection for all
    future packets, and informs the ULP that the association is protected.
@@ -646,12 +646,12 @@ including:
      |  +--->|                             |<---+  |  5.
      |  |    |                             |    |  |
   6. |  +--->| READ (epoch N+1)            |    |  |
-     |  |    +----------[PE]-------------->|    |  |  7b.
+     |  |    +---------[RKI]-------------->|    |  |  7b.
      |  |    |                             |<---+  |  7a.
-     |  |    |  (wait own done + cli PE)   |    |  |
+     |  |    |  (wait own done + cli RKI)  |    |  |
      |  |    |  (install R+W N+1, drain,   |    |  |
      |  |    |   TX->N+1)                  |    |  |
-     |  |    |<---------[PE]---------------+    |  |
+     |  |    |<--------[RKI]---------------+    |  |
   8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
      |  |    |                             |    |  |
      |  (traffic transitions to epoch N+1 DKC)     |
@@ -663,7 +663,7 @@ including:
 Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
 Rekey Req = Rekey Request control message;
 TLS rec = TLS records relayed between the key managers;
-PE = Protection Established control message; R+W = read and
+RKI = Read Key Installed control message; R+W = read and
 write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
 epoch N+1 DKC.
 
@@ -696,22 +696,22 @@ epoch N+1 DKC.
   6. The client key manager's TLS handshake completes.  It exports all
      Primary and Restart DKC keys for epoch N+1, installs the server to
      client key material as its read (receive) key, and sends a
-     Read Key Installed control message ({{protection-established}})
+     Read Key Installed control message ({{read-key-installed}})
      to the server key manager.
 
   7. The server key manager proceeds only after both its own TLS
      handshake has completed (7a) and it has received the client key
-     manager's Protection Established control message (7b).  Once both
+     manager's Read Key Installed control message (7b).  Once both
      conditions are met, it exports both direction key material for
      both the Primary and Restart DKCs for epoch N+1, installs both
      the read (receive) key and the write (send) key, starts the drain
      timer to remove the old (epoch N) DKC, and switches sending to
      the epoch N+1 DKC. The server key manager sends a Read Key
-     Installed control message ({{protection-established}}) to the
+     Installed control message ({{read-key-installed}}) to the
      client key manager.
 
   8. The client key manager receives the Read Key Installed
-     control message ({{protection-established}}), installs the client
+     control message ({{read-key-installed}}), installs the client
      key material as its write (send) key, starts the drain timer to
      remove the old (epoch N) DKC, and switches sending to the epoch
      N+1 DKC.
@@ -852,8 +852,8 @@ procedure ({{initial-establishment}}).  They differ only as follows:
 
 * at the key transition (steps 11 and 12), each endpoint switches the
   active DTLS key context from the Restart DKC to the new Primary DKC
-  after the Protection Established exchange completes (the Protection
-  Established messages themselves are protected with the Restart DKC),
+  after the Read Key Installed exchange completes (the Read Key
+  Installed messages themselves are protected with the Restart DKC),
   rather than enforcing protection for the first time; the ULP was
   already informed at step 6.
 
@@ -935,10 +935,10 @@ attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.
 
 It is RECOMMENDED that implementations of this key-management
-method is not allowing the ULP to exchange any data beyond the
+method do not allow the ULP to exchange any data beyond the
 key-management information following this specification until
-the peer is authenticated and local endpoint and the remote
-has entered Protection Established. This to avoid any information
+the peer is authenticated and the local endpoint and the remote
+have both installed read and write keys and enforced protection. This is to avoid any information
 leakage from the ULP to none intended parties.
 
 
