@@ -338,98 +338,57 @@ server key manager SHOULD NOT close the TLS connection before the
 client has had the opportunity to send a ticket request.
 
 
-# TLS Message Transport {#tls-user-message}
+# TLS-based Key Management Messages {#tls-user-message}
 
-TLS records and control messages for key-management are sent as SCTP
-user messages using reliable in-order delivery on stream 0 with the
-DTLS Key Management Messages PPID (4242)
-{{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+All TLS-based key management messages MUST be sent as SCTP user messages
+using reliable in-order delivery on stream 0.
 
-The key-management method defined in this document is the only user of
-the DTLS Key Management Messages PPID (4242); no other user data is
-sent with this PPID.  All messages exchanged by the key managers are of
-one of the following three types:
+There are two classes of these key management messages:
 
-* TLS message (T=0): the payload encapsulates one or more TLS records
-  (see {{sctp-dtls-user-message}}).
-* Protection Established (T=1, Ctrl Type = 0x01): a control message
-  (see {{protection-established}}).
-* Rekey Request (T=1, Ctrl Type = 0x02): a control message
-  (see {{rekey-request}}).
+* SCTP user messages containing TLS records.
+* SCTP user messages containing control information.
 
-The message type is encoded by the T bit and, for control messages, the
-Ctrl Type field, as defined below.
+These two classes are identified by using a specific PPID.
 
-Each SCTP user message uses the format defined in
-{{sctp-dtls-user-message}}.
+## TLS Records
 
-~~~~~~~~~~~ aasvg
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|T|   Epoch     |                                               |
-+-+-+-+-+-+-+-+-+            Payload                            |
-|                                                               |
-|                               +-------------------------------+
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-~~~~~~~~~~~
-{: #sctp-dtls-user-message title="Key Management User Message Structure" artwork-align="center"}
-
-T (Message Type): 1 bit
-: Indicates the type of payload carried in this user message.
-  A value of 0 indicates that the payload contains TLS records.
-  A value of 1 indicates that the payload is a control message
-  (see {{control-messages}}).
-
-Epoch: 7 bits
-: The 7 lowest bits of the DTLS Key Context epoch that this
-  message corresponds to — i.e., the DKC that will be created from
-  this handshake, or that already exists.  The receiver uses this
-  field to associate incoming data with the correct key-management
-  session.
-
-Payload: variable length
-: When T=0, one or more complete TLS records.  When T=1, a control
-  message as defined in {{control-messages}}.
+One or more complete TLS records are sent as an SCTP user message.
+These user messages MUST use PPID 4242.
+Other SCTP user messages MUST NOT use this PPID.
 
 ## Control Messages {#control-messages}
 
-When the T bit is set to 1, the payload of the user message is a
-control message with the following format:
+Control messages are sent as SCTP user messages and MUST use PPID 4243
+and contain a single byte identifying the type as show in the following
+{{control-message-format}}.
+Other user messages MUST NOT use this PPID.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|T| Ctrl Type   |         Control Data (variable)               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Ctrl Type   |
++-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
 {: #control-message-format title="Control Message Format" artwork-align="center"}
 
-Ctrl Type: 7 bits
+Ctrl Type: 8 bits
 : Identifies the control message type.
-
-Control Data: variable length
-: Type-specific data.  May be empty.
 
 The following control message type is defined:
 
-  | Ctrl Type | Name                    | Description                        |
-  |-----------|-------------------------|------------------------------------|
-  | 0x01      | Protection Established  | Signals that DTLS chunk protection has been enforced |
-  | 0x02      | Rekey Request           | Requests the client key manager to initiate a rekeying TLS handshake |
+  | Ctrl Type | Name               | Description                                                          |
+  |-----------|--------------------|----------------------------------------------------------------------|
+  | 0x01      | Read Key Installed | Notifies the peer that the read key is installed                     |
+  | 0x02      | Rekey Request      | Requests the client key manager to initiate a rekeying TLS handshake |
 {: #control-message-types title="Control Message Types"}
 
-### Protection Established {#protection-established}
+### Read Key Installed {#protection-established}
 
-The Protection Established control message (Ctrl Type = 0x01) is sent
+The Read Key Installed control message (Ctrl Type = 0x01) is sent
 by a key manager to its peer key manager for indicating that it has
-set the read key material. This enables the receiving peer to set its
-write key upon reception of this control messages.
-
-This message carries no Control Data (the payload following the Ctrl
-Type byte is empty).
+set the read key material.
+This enables the peer receiving this message to set its write key.
 
 The message is also used during rekeying in the same way as in the
 initial handshake.
@@ -452,14 +411,6 @@ rekeying TLS handshake as described in {{rekeying}}, unless a rekeying
 is already in progress, in which case the Rekey Request is ignored (see
 {{sim-rekeying}}).
 
-Because key management messages are carried on SCTP stream 0 with
-reliable, in-order delivery, the Rekey Request is guaranteed to be
-delivered; no key-management-level retransmission of it is required.
-
-This message carries no Control Data (the payload following the Ctrl
-Type byte is empty).  It is carried in a key management message with the
-epoch field set to the epoch of the DKC that will be created by the
-requested rekeying (epoch N+1).
 
 # Key Derivation {#dtls-key-derivation}
 
@@ -615,7 +566,7 @@ PE = Protection Established control message; R+W = read and write keys.
 
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
-   (receive) key, and sends a Protection Established control message
+   (receive) key, and sends a Read Key Installed control message
    ({{protection-established}}) to the server key manager.
 
   8. The server key manager proceeds only after both its own TLS handshake has
@@ -624,7 +575,7 @@ PE = Protection Established control message; R+W = read and write keys.
    both direction key material for both the Primary and Restart DKCs, installs
    both the read (receive) key and the write (send) key, calls Require Protected
    SCTP Packets to enforce DTLS chunk protection for all future packets, informs
-   the ULP that the association is protected, and sends a Protection Established
+   the ULP that the association is protected, and sends a Read Key Installed
    control message ({{protection-established}}) to the client key manager.
 
   9. The client key manager receives the Protection Established control
@@ -745,7 +696,7 @@ epoch N+1 DKC.
   6. The client key manager's TLS handshake completes.  It exports all
      Primary and Restart DKC keys for epoch N+1, installs the server to
      client key material as its read (receive) key, and sends a
-     Protection Established control message ({{protection-established}})
+     Read Key Installed control message ({{protection-established}})
      to the server key manager.
 
   7. The server key manager proceeds only after both its own TLS
@@ -755,11 +706,11 @@ epoch N+1 DKC.
      both the Primary and Restart DKCs for epoch N+1, installs both
      the read (receive) key and the write (send) key, starts the drain
      timer to remove the old (epoch N) DKC, and switches sending to
-     the epoch N+1 DKC. The server key manager sends a Protection
-     Established control message ({{protection-established}}) to the
+     the epoch N+1 DKC. The server key manager sends a Read Key
+     Installed control message ({{protection-established}}) to the
      client key manager.
 
-  8.  The client key manager receives the Protection Established
+  8. The client key manager receives the Read Key Installed
      control message ({{protection-established}}), installs the client
      key material as its write (send) key, starts the drain timer to
      remove the old (epoch N) DKC, and switches sending to the epoch
@@ -1013,3 +964,18 @@ Comment.
 | Value | DTLS-OK | Recommended |
 | EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
 {: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
+
+## SCTP Payload Protocol Identifier {#sec-iana-ppid}
+
+In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Payload Protocol Identifiers" registry, IANA is requested to update the
+name and reference for the PPID 4242 as depicted in
+{{iana-payload-protection-id}}.
+Furthermore, IANA is requested to add an entry in the "Payload Protocol
+Identifiers" registry for the PPID 4243 as depicted in
+{{iana-payload-protection-id}}.
+
+| ID Value | SCTP Payload Protocol Identifier | Reference |
+| 4242     | TLS                              | RFC-To-Be |
+| 4243     | DTLS Chunk Key Management        | RFC-To-Be |
+{: #iana-payload-protection-id title="Payload Protocol Identifier" cols="r l l"}
