@@ -33,6 +33,7 @@ author:
 
 informative:
   RFC5705:
+  RFC9149:
   RFC9525:
 
   ANSSI-DAT-NT-003:
@@ -338,14 +339,20 @@ provides the following benefits:
    security by forcing an adversary to break them in sequence
    {{KTH-NCSA}}.
 
-Session resumption tickets MAY be pushed by the server key manager at
-any point after the TLS handshake has completed, or they MAY be
-explicitly requested by the client key manager from the server key
-manager. To ensure the client key manager has the opportunity to
-request a ticket before the TLS connection is torn down, the client key
-manager SHOULD initiate the closure of the TLS connection, and the
-server key manager SHOULD NOT close the TLS connection before the
-client has had the opportunity to send a ticket request.
+Both ticket delivery mechanisms of TLS 1.3 may be used.  The server
+MAY send NewSessionTicket messages unsolicited at any time after its
+handshake has completed {{RFC9846}}, and the client MAY request a
+specific number of tickets using the ticket_request extension
+{{RFC9149}} in its ClientHello.  As with all handshake traffic, these
+TLS messages are carried between the key managers as TLS records per
+{{tls-user-message}}; no additional key-management control message is
+involved.
+
+To ensure the client has the opportunity to obtain a ticket before the
+TLS connection is torn down, the client key manager SHOULD initiate the
+closure of the TLS connection, and the server key manager SHOULD NOT
+close the TLS connection before the client has had the opportunity to
+obtain the tickets it requested.
 
 
 # TLS-based Key Management Messages {#tls-user-message}
