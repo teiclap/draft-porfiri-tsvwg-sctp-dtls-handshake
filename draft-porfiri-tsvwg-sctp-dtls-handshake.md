@@ -30,16 +30,6 @@ author:
    name: Claudio Porfiri
    org: Ericsson
    email: claudio.porfiri@ericsson.com
--
-   ins: M. Tüxen
-   name: Michael Tüxen
-   org: Münster University of Applied Sciences
-   abbrev: Münster Univ. of Appl. Sciences
-   street: Stegerwaldstrasse 39
-   code: 48565
-   city: Steinfurt
-   country: Germany
-   email: tuexen@fh-muenster.de
 
 informative:
   RFC5705:
