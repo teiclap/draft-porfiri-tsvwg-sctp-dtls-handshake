@@ -1053,7 +1053,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 8 April 2027</td>
+<td class="center">Expires 10 April 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1066,12 +1066,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-05" class="published">5 October 2026</time>
+<time datetime="2026-10-07" class="published">7 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-08">8 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-04-10">10 April 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 10 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1649,8 +1649,7 @@ key-exchange MUST NOT be supported.<a href="#section-3.2-1" class="pilcrow">¶</
 <p id="section-3.2-2">The cipher suites negotiated in the key-management TLS connection
 MUST only include those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
-suites (the "Cipher Suite Capabilities" API of
-<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+suites (see Section 7.3 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="tls-auth">
@@ -1915,7 +1914,7 @@ is already in progress, in which case the Rekey Request is ignored (see
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-role-determination" class="section-name selfRef">Role Determination</a>
         </h3>
 <p id="section-5.1-1">Role determination and method selection follow the procedure defined
-in the "Establishment of a Protected Association" section of
+in Section 5.1 of
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.  After
 the SCTP association is established, the key-management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
@@ -1969,8 +1968,8 @@ the concatenation of the following fields:<a href="#section-5.2-1" class="pilcro
             </tr>
           </tbody>
         </table>
-<p id="section-5.2-3">Each DTLS Key Management Parameter (the "DTLS Key Management Parameter"
-of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) is included as the
+<p id="section-5.2-3">Each DTLS Key Management Parameter (Section 4.1 of
+<span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) is included as the
 sequence of bytes sent on the wire, including the parameter header
 and excluding padding.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.2-4">This construction ensures that any modification to the DTLS Key
@@ -2165,14 +2164,14 @@ RKI = Read Key Installed control message; R+W = read and write keys.<a href="#se
 <ol start="1" type="1" class="normal type-1" id="section-6.1-5">
 <li id="section-6.1-5.1">
             <p id="section-6.1-5.1.1">The Initiator sends INIT containing the DTLS Key Management Parameter
-   (the "DTLS Key Management Parameter" of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) with this
+   (Section 4.1 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) with this
    method's identifier (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) in its preference-ordered list.<a href="#section-6.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.2">
             <p id="section-6.1-5.2.1">The Responder enters ESTABLISHED state. It retrieves the agreed DTLS
    Key Management Method and role from the SCTP stack (e.g., using
    the "Get Agreed DTLS Key Management Method and Role" API defined in
-   the "Abstract API" section of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and verifies that
+   Section 7.2 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and verifies that
    the selected method matches the one defined in this document
    (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and gets the assigned role as key manager client or
    server (in the example depicted in <a href="#initial-establishment-diagram" class="auto internal xref">Figure 3</a>
@@ -2540,8 +2539,7 @@ Rekey Request, as the in-progress rekeying already satisfies the need.<a href="#
 </li>
             <li class="normal" id="section-6.3.1-2.2">
               <p id="section-6.3.1-2.2.1">The Restart DKC MUST be stored securely and persistently to
-survive crash events (see the "Persistent Secure Storage of Restart
-Key Context" section of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-6.3.1-2.2.1" class="pilcrow">¶</a></p>
+survive crash events (see Section 10.4 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-6.3.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-2.3">
               <p id="section-6.3.1-2.3.1">Both endpoints MUST have indicated restart support (R bit) in the

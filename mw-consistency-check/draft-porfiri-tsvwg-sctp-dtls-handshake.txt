@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 8 April 2027                                           Ericsson
-                                                          5 October 2026
+Expires: 10 April 2027                                          Ericsson
+                                                          7 October 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 April 2027.
+   This Internet-Draft will expire on 10 April 2027.
 
 Copyright Notice
 
@@ -296,8 +296,7 @@ Table of Contents
    The cipher suites negotiated in the key-management TLS connection
    MUST only include those supported by the DTLS Chunk Protection
    Operator.  The DTLS Chunk provides an API to query supported cipher
-   suites (the "Cipher Suite Capabilities" API of
-   [I-D.ietf-tsvwg-sctp-dtls-chunk]).
+   suites (see Section 7.3 of [I-D.ietf-tsvwg-sctp-dtls-chunk]).
 
 3.3.  Authentication and Identity
 
@@ -458,13 +457,12 @@ Table of Contents
 5.1.  Role Determination
 
    Role determination and method selection follow the procedure defined
-   in the "Establishment of a Protected Association" section of
-   [I-D.ietf-tsvwg-sctp-dtls-chunk].  After the SCTP association is
-   established, the key-management function retrieves from the SCTP
-   stack's DTLS chunk API the assigned role (Client or Server), the
-   selected DTLS Key Management Method, and the downgrade prevention
-   data (both endpoints' DTLS Key Management Parameters) used as input
-   to key derivation.
+   in Section 5.1 of [I-D.ietf-tsvwg-sctp-dtls-chunk].  After the SCTP
+   association is established, the key-management function retrieves
+   from the SCTP stack's DTLS chunk API the assigned role (Client or
+   Server), the selected DTLS Key Management Method, and the downgrade
+   prevention data (both endpoints' DTLS Key Management Parameters) used
+   as input to key derivation.
 
 5.2.  Exporter Context
 
@@ -492,10 +490,10 @@ Table of Contents
 
                                   Table 2
 
-   Each DTLS Key Management Parameter (the "DTLS Key Management
-   Parameter" of [I-D.ietf-tsvwg-sctp-dtls-chunk]) is included as the
-   sequence of bytes sent on the wire, including the parameter header
-   and excluding padding.
+   Each DTLS Key Management Parameter (Section 4.1 of
+   [I-D.ietf-tsvwg-sctp-dtls-chunk]) is included as the sequence of
+   bytes sent on the wire, including the parameter header and excluding
+   padding.
 
    This construction ensures that any modification to the DTLS Key
    Management Parameter during the SCTP handshake (a downgrade attack)
@@ -591,18 +589,18 @@ Table of Contents
    The procedure is as follows:
 
    1.   The Initiator sends INIT containing the DTLS Key Management
-        Parameter (the "DTLS Key Management Parameter" of
-        [I-D.ietf-tsvwg-sctp-dtls-chunk]) with this method's identifier
-        (see Section 9.1) in its preference-ordered list.
+        Parameter (Section 4.1 of [I-D.ietf-tsvwg-sctp-dtls-chunk]) with
+        this method's identifier (see Section 9.1) in its preference-
+        ordered list.
 
    2.   The Responder enters ESTABLISHED state.  It retrieves the agreed
         DTLS Key Management Method and role from the SCTP stack (e.g.,
         using the "Get Agreed DTLS Key Management Method and Role" API
-        defined in the "Abstract API" section of
-        [I-D.ietf-tsvwg-sctp-dtls-chunk]) and verifies that the selected
-        method matches the one defined in this document (see
-        Section 9.1) and gets the assigned role as key manager client or
-        server (in the example depicted in Figure 3 it is server).
+        defined in Section 7.2 of [I-D.ietf-tsvwg-sctp-dtls-chunk]) and
+        verifies that the selected method matches the one defined in
+        this document (see Section 9.1) and gets the assigned role as
+        key manager client or server (in the example depicted in
+        Figure 3 it is server).
 
    3.   The Initiator enters ESTABLISHED state.  It performs the same
         retrieval and verification as the Responder, confirming the
@@ -846,8 +844,8 @@ Table of Contents
    *  Both endpoints MUST have a valid Restart DKC.
 
    *  The Restart DKC MUST be stored securely and persistently to
-      survive crash events (see the "Persistent Secure Storage of
-      Restart Key Context" section of [I-D.ietf-tsvwg-sctp-dtls-chunk]).
+      survive crash events (see Section 10.4 of
+      [I-D.ietf-tsvwg-sctp-dtls-chunk]).
 
    *  Both endpoints MUST have indicated restart support (R bit) in the
       DTLS Key Management Parameter.
