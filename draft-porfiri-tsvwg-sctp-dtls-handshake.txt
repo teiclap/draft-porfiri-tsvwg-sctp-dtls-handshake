@@ -5,8 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 8 April 2027                                           Ericsson
-                                                          5 October 2026
+Expires: 10 April 2027                                          Ericsson
+                                                                M. Tüxen
+                                         Münster Univ. of Appl. Sciences
+                                                          7 October 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -55,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 April 2027.
+   This Internet-Draft will expire on 10 April 2027.
 
 Copyright Notice
 
@@ -1115,3 +1117,11 @@ Authors' Addresses
    Claudio Porfiri
    Ericsson
    Email: claudio.porfiri@ericsson.com
+
+
+   Michael Tüxen
+   Münster University of Applied Sciences
+   Stegerwaldstrasse 39
+   48565 Steinfurt
+   Germany
+   Email: tuexen@fh-muenster.de
