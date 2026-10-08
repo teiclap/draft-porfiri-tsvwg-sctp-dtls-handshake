@@ -790,8 +790,8 @@ two ClientHellos cannot cross and no tie-breaker is needed.
 The only concurrency to resolve is when the server key manager sends a
 Rekey Request while the client key manager has already initiated (or is
 about to initiate) a rekeying to epoch N+1.  Since both the direct
-client trigger and the server's Rekey Request lead to the same outcome
-— a single client-initiated rekeying to epoch N+1 — the client key
+client trigger and the server's Rekey Request lead to the same outcome, 
+a single client-initiated rekeying to epoch N+1, the client key
 manager treats an incoming Rekey Request as redundant and ignores it
 while a rekeying is already in progress.
 
