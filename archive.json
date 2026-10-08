@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-06T04:25:43.465630+00:00",
+  "timestamp": "2026-10-08T04:04:58.502716+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -299,15 +299,15 @@
       "id": "I_kwDORGnINM8AAAABTACsDA",
       "title": "Update figures to indicate all three PPIDs",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/26",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-09-24T14:43:40Z",
-      "updatedAt": "2026-09-24T14:43:40Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-07T10:58:32Z",
+      "closedAt": "2026-10-07T10:58:32Z",
       "comments": []
     },
     {
@@ -349,7 +349,7 @@
       "id": "I_kwDORGnINM8AAAABVGyjkg",
       "title": "TLS handshake success/failure",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/33",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -358,7 +358,55 @@
       "labels": [],
       "body": "In the diagrams we assume that TLS handshake is always successful, that doesn't reflect the reality.\nWe have written that if the TLS handshake fails and the error cannot be addressed, we must ABORT the Association.\nThis is a bit weak as we go deeper in Error Handling section.\nWe should align the figure with Error Handling.",
       "createdAt": "2026-10-05T11:43:04Z",
-      "updatedAt": "2026-10-05T11:43:10Z",
+      "updatedAt": "2026-10-07T08:09:51Z",
+      "closedAt": "2026-10-07T08:09:51Z",
+      "comments": []
+    },
+    {
+      "number": 34,
+      "id": "I_kwDORGnINM8AAAABVW65fA",
+      "title": "Add Michael T\u00fcxen as author",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/34",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-06T12:22:52Z",
+      "updatedAt": "2026-10-07T08:08:09Z",
+      "closedAt": "2026-10-07T08:08:09Z",
+      "comments": []
+    },
+    {
+      "number": 36,
+      "id": "I_kwDORGnINM8AAAABVjlPIA",
+      "title": "Name of PPIDs",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/36",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Need to discuss the names of the PPIDs. \n\nThe names was updated in #31 to be:\nID Value \tSCTP Payload Protocol Identifier \tReference\n4242 \tTLS for DTLS in SCTP TLS Records \tRFC-To-Be\n4243 \tTLS for DTLS in SCTP Control \tRFC-To-Be\n\nThis based on the motivation that they should not be generic, and especially just TLS was to wide as it didn't contain a purpose for this TLS. \n",
+      "createdAt": "2026-10-07T08:03:55Z",
+      "updatedAt": "2026-10-07T08:03:55Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 37,
+      "id": "I_kwDORGnINM8AAAABVmTTLg",
+      "title": "Cleanup figure 2 - Control Message",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/37",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As the basis for the control message is a 8-bit type and then an optional field value this figure should be fixed so show the later possibility.",
+      "createdAt": "2026-10-07T11:50:07Z",
+      "updatedAt": "2026-10-07T11:50:07Z",
       "closedAt": null,
       "comments": []
     }
@@ -1350,24 +1398,26 @@
       "id": "PR_kwDORGnINM8AAAABGq1pkg",
       "title": "Figure with two PPIDs one for TLS one for the KM Method.",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/30",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Resolve #26 ",
       "createdAt": "2026-10-05T09:00:10Z",
-      "updatedAt": "2026-10-05T09:03:01Z",
+      "updatedAt": "2026-10-07T10:58:39Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "4a0647c3fa853bce06dc19ba7adaa136ede122bb",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "ppid-figure",
       "headRefOid": "e4d993fdfe3aef6662dac36d308a6c606a643af9",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-10-07T10:58:31Z",
+      "mergedAt": "2026-10-07T10:58:30Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "942bdef79214a023b725cedc4b1c0f3b2336aa5b"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1382,6 +1432,19 @@
           "createdAt": "2026-10-05T09:03:01Z",
           "updatedAt": "2026-10-05T09:03:01Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABRFLMIA",
+          "commit": {
+            "abbreviatedOid": "e4d993f"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-07T10:55:07Z",
+          "updatedAt": "2026-10-07T10:55:07Z",
+          "comments": []
         }
       ]
     },
@@ -1390,25 +1453,35 @@
       "id": "PR_kwDORGnINM8AAAABGrp61A",
       "title": "AI based Consistency fix",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/31",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Have had the AI find a number of consistency issues. These are varied and across the whole draft. But I do think this PR represents a better point of reviewing all the latest changes. So I do suggest that we merge it and then do manual review and fixes. ",
       "createdAt": "2026-10-05T10:17:17Z",
-      "updatedAt": "2026-10-05T19:20:32Z",
+      "updatedAt": "2026-10-07T08:09:59Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "4a0647c3fa853bce06dc19ba7adaa136ede122bb",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "mw-consistency-check",
-      "headRefOid": "69609ccd59837db1a3adbbb0b2b0644d852a59dd",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "59cbb5a7ef479c16f1b4597245cc473bc56994c6",
+      "closedAt": "2026-10-07T08:09:50Z",
+      "mergedAt": "2026-10-07T08:09:50Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "0ebb12256fd3130d4d8d1f944bdcafd27d16b262"
+      },
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I have reverted the Section X.Y style reference change. I left the PPID names in, and created an issue #36 to discuss the other comments. Thus, I think this is fine to merge. ",
+          "createdAt": "2026-10-07T08:06:15Z",
+          "updatedAt": "2026-10-07T08:06:15Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDORGnINM8AAAABQrHAuw",
@@ -1555,6 +1628,196 @@
               "updatedAt": "2026-10-05T19:20:32Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABQ1m72g",
+          "commit": {
+            "abbreviatedOid": "69609cc"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-06T07:05:29Z",
+          "updatedAt": "2026-10-06T07:05:29Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "No, it doesn't. Only internal section have clickable links, and the reference link goes to the reference table. There was some changes to the section numbering in DTLS chunk that needs upgrading. But, maybe we should go back to Section X.Y style. ",
+              "createdAt": "2026-10-06T07:05:29Z",
+              "updatedAt": "2026-10-06T07:05:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABQ1oUWQ",
+          "commit": {
+            "abbreviatedOid": "69609cc"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-06T07:08:02Z",
+          "updatedAt": "2026-10-06T07:08:02Z",
+          "comments": [
+            {
+              "originalPosition": 474,
+              "body": "So I think TLS is to unspecific. This TLS is for the purpose of KM for SCTP DTLS Chunk. And in this case we are specific to what we call this specification. If we want a middle ground to enable this TLS for any KM, I think we need a name like TLS for SCTP DTLS Key-Management.",
+              "createdAt": "2026-10-06T07:08:02Z",
+              "updatedAt": "2026-10-06T07:08:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABQ1orlg",
+          "commit": {
+            "abbreviatedOid": "69609cc"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-06T07:08:41Z",
+          "updatedAt": "2026-10-06T07:08:42Z",
+          "comments": [
+            {
+              "originalPosition": 475,
+              "body": "They are specific to this specification that are actually called \"DTLS in SCTP\"",
+              "createdAt": "2026-10-06T07:08:41Z",
+              "updatedAt": "2026-10-06T07:08:42Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 35,
+      "id": "PR_kwDORGnINM8AAAABG6ONPA",
+      "title": "Added Micheal as author",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/35",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-06T12:26:25Z",
+      "updatedAt": "2026-10-07T08:11:23Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "4a0647c3fa853bce06dc19ba7adaa136ede122bb",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue34",
+      "headRefOid": "1092b1462191dc03ee86d8690da006782402fd23",
+      "closedAt": "2026-10-07T08:08:08Z",
+      "mergedAt": "2026-10-07T08:08:08Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "23d097a8932c01383e3928bbb89d14a1b352a632"
+      },
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "If you are accepting co-authorship @tuexen then just approve and merge this PR.",
+          "createdAt": "2026-10-07T08:04:45Z",
+          "updatedAt": "2026-10-07T08:04:45Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABRDYwyw",
+          "commit": {
+            "abbreviatedOid": "1092b14"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-07T08:04:17Z",
+          "updatedAt": "2026-10-07T08:04:17Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "id": "PR_kwDORGnINM8AAAABHHMH2A",
+      "title": "Fixing Initial Procedure Step 6",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/38",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses #32 \r\n\r\nChanges the figure to indicate that TLS endpoints exchange necessary messages between each other to complete handshake.\r\n",
+      "createdAt": "2026-10-07T11:57:59Z",
+      "updatedAt": "2026-10-07T12:01:16Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "942bdef79214a023b725cedc4b1c0f3b2336aa5b",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue32",
+      "headRefOid": "8c34443edbeaa5148e548fd90d467239fc669604",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABRF2zWA",
+          "commit": {
+            "abbreviatedOid": "8c34443"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-07T12:01:16Z",
+          "updatedAt": "2026-10-07T12:01:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "id": "PR_kwDORGnINM8AAAABHHYcTQ",
+      "title": "Removing message figure scale beyond what is used.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/39",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses issue #37 ",
+      "createdAt": "2026-10-07T12:15:31Z",
+      "updatedAt": "2026-10-07T12:17:21Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "942bdef79214a023b725cedc4b1c0f3b2336aa5b",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue37",
+      "headRefOid": "ff1d541c0f5be89a5e8981b3adf8e24a4c8ab8fa",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABRGBRMA",
+          "commit": {
+            "abbreviatedOid": "ff1d541"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-07T12:17:20Z",
+          "updatedAt": "2026-10-07T12:17:20Z",
+          "comments": []
         }
       ]
     }
