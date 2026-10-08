@@ -559,7 +559,7 @@ Table of Contents
              |  |    |                             |    |  |
           4. |  |<---+ SSL_connect()  SSL_accept() +--->|  |    5.
              |  |    |                             |    |  |
-             |  +--->|                             |<---+  |    6.
+             |  |<---|-----------------------------|--->|  |    6.
              |  |    |                             |    |  |
              |  |    |                             |    |  |
           7. |  +--->| READ installed              |    |  |
@@ -619,8 +619,8 @@ Table of Contents
         any TLS records produced by the TLS server to the client key
         manager per Section 4.
 
-   6.   The TLS primitives return after the handshake has completed
-        successfully.
+   6.   The TLS endpoints continue exchange TLS messages to complete the
+        TLS handshake.
 
    7.   The client key manager's TLS handshake completes.  It exports
         all Primary and Restart DKC keys, installs the server to client

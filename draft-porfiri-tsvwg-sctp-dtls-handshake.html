@@ -2044,8 +2044,9 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
                 <path d="M 216,112 L 408,112" fill="none" stroke="black"></path>
                 <path d="M 72,176 L 104,176" fill="none" stroke="black"></path>
                 <path d="M 344,176 L 376,176" fill="none" stroke="black"></path>
-                <path d="M 64,208 L 96,208" fill="none" stroke="black"></path>
-                <path d="M 352,208 L 384,208" fill="none" stroke="black"></path>
+                <path d="M 72,208 L 96,208" fill="none" stroke="black"></path>
+                <path d="M 112,208 L 336,208" fill="none" stroke="black"></path>
+                <path d="M 352,208 L 376,208" fill="none" stroke="black"></path>
                 <path d="M 64,256 L 96,256" fill="none" stroke="black"></path>
                 <path d="M 104,272 L 192,272" fill="none" stroke="black"></path>
                 <path d="M 240,272 L 336,272" fill="none" stroke="black"></path>
@@ -2060,13 +2061,13 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
                 <polygon class="arrowhead" points="408,400 396,394.4 396,405.6" fill="black" transform="rotate(0,400,400)"></polygon>
                 <polygon class="arrowhead" points="408,96 396,90.4 396,101.6" fill="black" transform="rotate(0,400,96)"></polygon>
                 <polygon class="arrowhead" points="408,64 396,58.4 396,69.6" fill="black" transform="rotate(0,400,64)"></polygon>
+                <polygon class="arrowhead" points="384,208 372,202.4 372,213.6" fill="black" transform="rotate(0,376,208)"></polygon>
                 <polygon class="arrowhead" points="384,176 372,170.4 372,181.6" fill="black" transform="rotate(0,376,176)"></polygon>
                 <polygon class="arrowhead" points="360,288 348,282.4 348,293.6" fill="black" transform="rotate(180,352,288)"></polygon>
-                <polygon class="arrowhead" points="360,208 348,202.4 348,213.6" fill="black" transform="rotate(180,352,208)"></polygon>
                 <polygon class="arrowhead" points="344,272 332,266.4 332,277.6" fill="black" transform="rotate(0,336,272)"></polygon>
                 <polygon class="arrowhead" points="120,336 108,330.4 108,341.6" fill="black" transform="rotate(180,112,336)"></polygon>
                 <polygon class="arrowhead" points="104,256 92,250.4 92,261.6" fill="black" transform="rotate(0,96,256)"></polygon>
-                <polygon class="arrowhead" points="104,208 92,202.4 92,213.6" fill="black" transform="rotate(0,96,208)"></polygon>
+                <polygon class="arrowhead" points="80,208 68,202.4 68,213.6" fill="black" transform="rotate(180,72,208)"></polygon>
                 <polygon class="arrowhead" points="80,176 68,170.4 68,181.6" fill="black" transform="rotate(180,72,176)"></polygon>
                 <polygon class="arrowhead" points="56,416 44,410.4 44,421.6" fill="black" transform="rotate(180,48,416)"></polygon>
                 <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
@@ -2175,7 +2176,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.<a href="#se
    produced by the TLS server to the client key manager per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.1-5.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.6">
-            <p id="section-6.1-5.6.1">The TLS primitives return after the handshake has completed successfully.<a href="#section-6.1-5.6.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-5.6.1">The TLS endpoints continue exchange TLS messages to complete the TLS handshake.<a href="#section-6.1-5.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.7">
             <p id="section-6.1-5.7.1">The client key manager's TLS handshake completes. It exports all Primary
