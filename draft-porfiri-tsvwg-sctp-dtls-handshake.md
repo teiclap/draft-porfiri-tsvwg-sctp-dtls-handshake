@@ -1,7 +1,7 @@
 ---
 docname: draft-porfiri-tsvwg-sctp-dtls-handshake-latest
-title: Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
-abbrev: TLS for DTLS in SCTP
+title: Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
+abbrev: TLS based Key Management for SCTP DTLS Chunk
 obsoletes:
 cat: std
 ipr: trust200902
@@ -68,6 +68,7 @@ informative:
     date: October 2024
 
 normative:
+  RFC8126:
   RFC8996:
   RFC9147:
   RFC9260:
@@ -79,7 +80,7 @@ normative:
 --- abstract
 
 This document defines how Transport Layer Security (TLS) 1.3
-is used as a key-management method for the SCTP DTLS Chunk mechanism.
+is used as a key management method for the SCTP DTLS Chunk mechanism.
 It specifies how a TLS handshake establishes the initial security
 context for an SCTP association and how subsequent TLS handshakes
 provide key updates and re-authentication. The goal is to enable
@@ -109,8 +110,7 @@ This document defines one such method: it uses TLS 1.3 {{RFC9846}}
 handshakes carried as SCTP user messages to perform mutual
 authentication and derive keying material for the DTLS Chunk
 Protection Operator.  The combination of the SCTP DTLS Chunk and the
-key-management defined in this document is referred to as "TLS for
-DTLS in SCTP".
+key management defined in this document is referred to as "DTLS in SCTP".
 
 The key advantages of this approach are:
 
@@ -276,14 +276,14 @@ or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported.
 
-The cipher suites negotiated in the key-management TLS connection
+The cipher suites negotiated in the key management TLS connection
 MUST only include those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
 suites (see Section 7.3 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 
 ## Authentication and Identity {#tls-auth}
 
-TLS for DTLS in SCTP MUST be mutually authenticated.  It is
+DTLS in SCTP MUST be mutually authenticated.  It is
 RECOMMENDED to use certificate-based authentication.
 
 When certificates are used, the application is responsible for
@@ -306,7 +306,7 @@ Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.
 
-This requirement is independent of the key-management role: the Client
+This requirement is independent of the key management role: the Client
 and Server roles are re-derived from the SCTP handshake and MAY differ
 after an SCTP restart ({{sctp-restart}}), but an endpoint that changes
 role MUST still present the same authenticated identity.
@@ -359,9 +359,9 @@ close the TLS connection before the client has had the opportunity to
 obtain the tickets it requested.
 
 
-# TLS-based Key Management Messages {#tls-user-message}
+# Key Management Messages {#tls-user-message}
 
-All TLS-based key management messages MUST be sent as SCTP user messages
+All key management messages MUST be sent as SCTP user messages
 using reliable in-order delivery on stream 0.
 
 There are two classes of these key management messages:
@@ -438,7 +438,7 @@ is already in progress, in which case the Rekey Request is ignored (see
 Role determination and method selection follow the procedure defined
 in Section 5.1 of
 {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.  After
-the SCTP association is established, the key-management function
+the SCTP association is established, the key management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
 (Client or Server), the selected DTLS Key
 Management Method, and the downgrade prevention data (both endpoints'
@@ -527,7 +527,7 @@ consistent view of sequence numbers and replay window.
      |  |    |                             |    |  |
   4. |  |<---+ SSL_connect()  SSL_accept() +--->|  |    5.
      |  |    |                             |    |  |
-     |  |<---|-----------------------------|--->|  |    6.
+     |  |<---+-----------------------------+--->|  |    6.
      |  |    |                             |    |  |
      |  |    |                             |    |  |
   7. |  +--->| READ installed              |    |  |
@@ -629,7 +629,7 @@ including:
 ### Procedure {#rekey-procedure}
 
   The client key manager and the server key manager keep the same
-  key-management roles for the entire lifetime of the SCTP association:
+  key management roles for the entire lifetime of the SCTP association:
   the client key manager is always the TLS client and the server key
   manager is always the TLS server, for the initial handshake and for
   every rekeying.  Consequently, only the client key manager ever
@@ -666,7 +666,7 @@ including:
      |  |    |      or got Rekey Req:)     |    |  |
   3. |  |<---+ SSL_connect()  SSL_accept() +--->|  |  4.
      |  |    |                             |    |  |
-     |  +--->|                             |<---+  |  5.
+     |  |<---+-----------------------------+--->|  |  5.
      |  |    |                             |    |  |
   6. |  +--->| READ (epoch N+1)            |    |  |
      |  |    +---------[RKI]-------------->|    |  |  7b.
@@ -713,7 +713,7 @@ epoch N+1 DKC.
   4. The server key manager awaits the rekeying TLS handshake as a TLS
      server.
 
-  5. The TLS primitives return after the handshake has completed successfully.
+  5. The TLS endpoints continue exchange TLS messages to complete the TLS handshake.
 
   6. The client key manager's TLS handshake completes.  It exports all
      Primary and Restart DKC keys for epoch N+1, installs the server to
@@ -909,8 +909,8 @@ back-off.
 
 TLS has its own error reporting via TLS alert messages.  When a TLS
 handshake error occurs, the TLS alert is sent in an SCTP user message
-(see {{tls-user-message}}) with the TLS for DTLS in SCTP TLS Records PPID
-(4242).
+(see {{tls-user-message}}) with the TLS records for DTLS Chunk
+Key Management PPID (4242).
 
 If a TLS handshake fails during initial establishment and the
 implementation determines that it can address the cause of the error
@@ -936,7 +936,7 @@ followed.
 
 ## Privacy Considerations
 
-Although TLS for DTLS in SCTP provides privacy for user messages and
+Although DTLS in SCTP provides privacy for user messages and
 almost all SCTP chunks, the SCTP common header, DTLS chunk header,
 and DTLS record header are not confidentiality protected.  An
 attacker can correlate TLS connections over the same SCTP association
@@ -948,14 +948,14 @@ TLS 1.3 with external PSK authentication does not provide identity
 protection.
 
 By mandating ephemeral key exchange and cipher suites with
-confidentiality, TLS for DTLS in SCTP effectively mitigates many
+confidentiality, DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.
 
-It is RECOMMENDED that implementations of this key-management
+It is RECOMMENDED that implementations of this key management
 method do not allow the ULP to exchange any data beyond the
-key-management information following this specification until
+key management information following this specification until
 the peer is authenticated and the local endpoint and the remote
 have both installed read and write keys and enforced protection. This is to avoid any information
 leakage from the ULP to unintended parties.
@@ -968,10 +968,10 @@ leakage from the ULP to unintended parties.
 IANA is requested to assign one DTLS Key Management Method Identifier
 in the "DTLS Key Management Method" registry defined by
 {{I-D.ietf-tsvwg-sctp-dtls-chunk}} to identify the
-key-management method defined in this document.
+key management method defined in this document.
 
-| Identifier | Key Management Method Name     | Reference | Contact       |
-| 192        | TLS for DTLS in SCTP           | RFC-TBD   | Draft Authors |
+| Identifier | Key Management Method Name                   | Reference | Contact       |
+| 192        | TLS based Key Management for SCTP DTLS Chunk | RFC-TBD   | Draft Authors |
 {: #iana-psi title="DTLS Key Management Method Identifier" cols="r l l l"}
 
 ## TLS Exporter Labels {#iana-export-label}
@@ -984,6 +984,34 @@ Comment.
 | EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
 {: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
 
+## DTLS Chunk Key Management Control Message Types {#sec-iana-ctrl-types}
+
+IANA is requested to create a new registry called "DTLS Chunk
+Key Management Control Message Types" in the Stream Control
+Transmission Protocol (SCTP) Parameters group.  This registry
+governs the values of the Ctrl Type field of the control messages
+defined in {{control-messages}}.
+
+The registration policy for this registry is IETF Review as defined in
+{{RFC8126}}.
+
+Each entry in the registry MUST contain the following fields:
+
+* Ctrl Type: an 8-bit unsigned integer value (0x00-0xFF).
+* Name: a short, human-readable name for the control message type.
+* Reference: a reference to the document defining the control message
+  type.
+
+The initial contents of the registry are shown in
+{{iana-ctrl-types}}.  The value 0x00 is reserved.
+
+| Ctrl Type   | Name               | Reference |
+| 0x00        | Reserved           | RFC-TBD   |
+| 0x01        | Read Key Installed | RFC-TBD   |
+| 0x02        | Rekey Request      | RFC-TBD   |
+| 0x03-0xFF   | Unassigned         |           |
+{: #iana-ctrl-types title="DTLS Chunk Key Management Control Message Types" cols="l l l"}
+
 ## SCTP Payload Protocol Identifier {#sec-iana-ppid}
 
 In the Stream Control Transmission Protocol (SCTP) Parameters group's
@@ -994,7 +1022,7 @@ Furthermore, IANA is requested to add an entry in the "Payload Protocol
 Identifiers" registry for the PPID 4243 as depicted in
 {{iana-payload-protection-id}}.
 
-| ID Value | SCTP Payload Protocol Identifier | Reference |
-| 4242     | TLS for DTLS in SCTP TLS Records | RFC-To-Be |
-| 4243     | TLS for DTLS in SCTP Control     | RFC-To-Be |
+| ID Value | SCTP Payload Protocol Identifier              | Reference |
+| 4242     | TLS records for DTLS Chunk Key Management      | RFC-To-Be |
+| 4243     | Control Messages for DTLS Chunk Key Management | RFC-To-Be |
 {: #iana-payload-protection-id title="Payload Protocol Identifier" cols="r l l"}
