@@ -527,7 +527,7 @@ consistent view of sequence numbers and replay window.
      |  |    |                             |    |  |
   4. |  |<---+ SSL_connect()  SSL_accept() +--->|  |    5.
      |  |    |                             |    |  |
-     |  +--->|                             |<---+  |    6.
+     |  |<---|-----------------------------|--->|  |    6.
      |  |    |                             |    |  |
      |  |    |                             |    |  |
   7. |  +--->| READ installed              |    |  |
@@ -585,7 +585,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.
    received TLS records to the TLS server and to forward any TLS records
    produced by the TLS server to the client key manager per {{tls-user-message}}.
 
-  6. The TLS primitives return after the handshake has completed successfully.
+  6. The TLS endpoints continue exchange TLS messages to complete the TLS handshake.
 
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
