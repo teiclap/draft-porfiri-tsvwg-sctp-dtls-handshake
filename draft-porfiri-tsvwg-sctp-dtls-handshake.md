@@ -381,13 +381,11 @@ Other SCTP user messages MUST NOT use this PPID.
 
 Control messages are sent as SCTP user messages, they MUST use PPID 4243
 and contain a single byte identifying the type as shown in the following
-{{control-message-format}}.
-Other user messages MUST NOT use this PPID.
+{{control-message-format}}. Other user messages MUST NOT use this PPID.
 
 ~~~~~~~~~~~ aasvg
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0 1 2 3 4 5 6 7
++-+-+-+-+-+-+-+-+
 |   Ctrl Type   |
 +-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
