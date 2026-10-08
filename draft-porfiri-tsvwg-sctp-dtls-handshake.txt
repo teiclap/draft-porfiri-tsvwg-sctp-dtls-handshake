@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 10 April 2027                                          Ericsson
+Expires: 11 April 2027                                          Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                          7 October 2026
+                                                          8 October 2026
 
 
    Transport Layer Security (TLS) based key-management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 April 2027.
+   This Internet-Draft will expire on 11 April 2027.
 
 Copyright Notice
 
@@ -402,11 +402,10 @@ Table of Contents
    4243 and contain a single byte identifying the type as shown in the
    following Figure 2.  Other user messages MUST NOT use this PPID.
 
-      0                   1                   2                   3
-      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     |   Ctrl Type   |
-     +-+-+-+-+-+-+-+-+
+                              0 1 2 3 4 5 6 7
+                             +-+-+-+-+-+-+-+-+
+                             |   Ctrl Type   |
+                             +-+-+-+-+-+-+-+-+
 
                       Figure 2: Control Message Format
 
