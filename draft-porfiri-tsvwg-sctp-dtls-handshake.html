@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</title>
+<title>Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</title>
 <meta content="Magnus Westerlund" name="author">
 <meta content="John Preuß Mattsson" name="author">
 <meta content="Claudio Porfiri" name="author">
 <meta content="Michael Tüxen" name="author">
 <meta content="
        This document defines how Transport Layer Security (TLS) 1.3
-is used as a key-management method for the SCTP DTLS Chunk mechanism.
+is used as a key management method for the SCTP DTLS Chunk mechanism.
 It specifies how a TLS handshake establishes the initial security
 context for an SCTP association and how subsequent TLS handshakes
 provide key updates and re-authentication. The goal is to enable
@@ -1049,7 +1049,7 @@ svg {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">TLS for DTLS in SCTP</td>
+<td class="center">TLS based Key Management for SCTP DTLS C</td>
 <td class="right">October 2026</td>
 </tr></thead>
 <tfoot><tr>
@@ -1094,11 +1094,11 @@ svg {
 </dd>
 </dl>
 </div>
-<h1 id="title">Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</h1>
+<h1 id="title">Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document defines how Transport Layer Security (TLS) 1.3
-is used as a key-management method for the SCTP DTLS Chunk mechanism.
+is used as a key management method for the SCTP DTLS Chunk mechanism.
 It specifies how a TLS handshake establishes the initial security
 context for an SCTP association and how subsequent TLS handshakes
 provide key updates and re-authentication. The goal is to enable
@@ -1215,7 +1215,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-tls-based-key-management-me" class="internal xref">TLS-based Key Management Messages</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-key-management-messages" class="internal xref">Key Management Messages</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
                 <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-tls-records" class="internal xref">TLS Records</a></p>
@@ -1310,7 +1310,10 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-tls-exporter-labels" class="internal xref">TLS Exporter Labels</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
-                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-sctp-payload-protocol-ident" class="internal xref">SCTP Payload Protocol Identifier</a></p>
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-dtls-chunk-key-management-c" class="internal xref">DTLS Chunk Key Management Control Message Types</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
+                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="auto internal xref">9.4</a>.  <a href="#name-sctp-payload-protocol-ident" class="internal xref">SCTP Payload Protocol Identifier</a></p>
 </li>
             </ul>
 </li>
@@ -1353,8 +1356,7 @@ a DTLS Key Management Identifier.<a href="#section-1-2" class="pilcrow">¶</a></
 handshakes carried as SCTP user messages to perform mutual
 authentication and derive keying material for the DTLS Chunk
 Protection Operator.  The combination of the SCTP DTLS Chunk and the
-key-management defined in this document is referred to as "TLS for
-DTLS in SCTP".<a href="#section-1-3" class="pilcrow">¶</a></p>
+key management defined in this document is referred to as "DTLS in SCTP".<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">The key advantages of this approach are:<a href="#section-1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-5.1">
@@ -1655,7 +1657,7 @@ registries are NOT RECOMMENDED to support.  Non-AEAD cipher suites
 or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">The cipher suites negotiated in the key-management TLS connection
+<p id="section-3.2-2">The cipher suites negotiated in the key management TLS connection
 MUST only include those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
 suites (see Section 7.3 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-3.2-2" class="pilcrow">¶</a></p>
@@ -1666,7 +1668,7 @@ suites (see Section 7.3 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" clas
         <h3 id="name-authentication-and-identity">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-authentication-and-identity" class="section-name selfRef">Authentication and Identity</a>
         </h3>
-<p id="section-3.3-1">TLS for DTLS in SCTP MUST be mutually authenticated.  It is
+<p id="section-3.3-1">DTLS in SCTP MUST be mutually authenticated.  It is
 RECOMMENDED to use certificate-based authentication.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">When certificates are used, the application is responsible for
 trust anchor management, certificate chain validation, and identity
@@ -1685,7 +1687,7 @@ connection established after an SCTP restart (<a href="#sctp-restart" class="aut
 Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
-<p id="section-3.3-5">This requirement is independent of the key-management role: the Client
+<p id="section-3.3-5">This requirement is independent of the key management role: the Client
 and Server roles are re-derived from the SCTP handshake and MAY differ
 after an SCTP restart (<a href="#sctp-restart" class="auto internal xref">Section 6.3</a>), but an endpoint that changes
 role MUST still present the same authenticated identity.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
@@ -1750,10 +1752,10 @@ obtain the tickets it requested.<a href="#section-3.5-3" class="pilcrow">¶</a><
 </div>
 <div id="tls-user-message">
 <section id="section-4">
-      <h2 id="name-tls-based-key-management-me">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-tls-based-key-management-me" class="section-name selfRef">TLS-based Key Management Messages</a>
+      <h2 id="name-key-management-messages">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-key-management-messages" class="section-name selfRef">Key Management Messages</a>
       </h2>
-<p id="section-4-1">All TLS-based key management messages MUST be sent as SCTP user messages
+<p id="section-4-1">All key management messages MUST be sent as SCTP user messages
 using reliable in-order delivery on stream 0.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">There are two classes of these key management messages:<a href="#section-4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1896,7 +1898,7 @@ is already in progress, in which case the Rekey Request is ignored (see
 <p id="section-5.1-1">Role determination and method selection follow the procedure defined
 in Section 5.1 of
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.  After
-the SCTP association is established, the key-management function
+the SCTP association is established, the key management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
 (Client or Server), the selected DTLS Key
 Management Method, and the downgrade prevention data (both endpoints'
@@ -2044,9 +2046,7 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
                 <path d="M 216,112 L 408,112" fill="none" stroke="black"></path>
                 <path d="M 72,176 L 104,176" fill="none" stroke="black"></path>
                 <path d="M 344,176 L 376,176" fill="none" stroke="black"></path>
-                <path d="M 72,208 L 96,208" fill="none" stroke="black"></path>
-                <path d="M 112,208 L 336,208" fill="none" stroke="black"></path>
-                <path d="M 352,208 L 376,208" fill="none" stroke="black"></path>
+                <path d="M 72,208 L 376,208" fill="none" stroke="black"></path>
                 <path d="M 64,256 L 96,256" fill="none" stroke="black"></path>
                 <path d="M 104,272 L 192,272" fill="none" stroke="black"></path>
                 <path d="M 240,272 L 336,272" fill="none" stroke="black"></path>
@@ -2241,7 +2241,7 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
 <a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-procedure" class="section-name selfRef">Procedure</a>
           </h4>
 <p id="section-6.2.2-1">The client key manager and the server key manager keep the same
-  key-management roles for the entire lifetime of the SCTP association:
+  key management roles for the entire lifetime of the SCTP association:
   the client key manager is always the TLS client and the server key
   manager is always the TLS server, for the initial handshake and for
   every rekeying.  Consequently, only the client key manager ever
@@ -2280,22 +2280,21 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
                   <path d="M 272,128 L 344,128" fill="none" stroke="black"></path>
                   <path d="M 72,192 L 104,192" fill="none" stroke="black"></path>
                   <path d="M 344,192 L 376,192" fill="none" stroke="black"></path>
-                  <path d="M 64,224 L 96,224" fill="none" stroke="black"></path>
-                  <path d="M 352,224 L 384,224" fill="none" stroke="black"></path>
+                  <path d="M 72,224 L 376,224" fill="none" stroke="black"></path>
                   <path d="M 64,256 L 96,256" fill="none" stroke="black"></path>
                   <path d="M 104,272 L 176,272" fill="none" stroke="black"></path>
                   <path d="M 224,272 L 336,272" fill="none" stroke="black"></path>
                   <path d="M 352,288 L 384,288" fill="none" stroke="black"></path>
                   <path d="M 112,352 L 176,352" fill="none" stroke="black"></path>
                   <path d="M 224,352 L 344,352" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="384,224 372,218.4 372,229.6" fill="black" transform="rotate(0,376,224)"></polygon>
                   <polygon class="arrowhead" points="384,192 372,186.4 372,197.6" fill="black" transform="rotate(0,376,192)"></polygon>
                   <polygon class="arrowhead" points="360,288 348,282.4 348,293.6" fill="black" transform="rotate(180,352,288)"></polygon>
-                  <polygon class="arrowhead" points="360,224 348,218.4 348,229.6" fill="black" transform="rotate(180,352,224)"></polygon>
                   <polygon class="arrowhead" points="344,272 332,266.4 332,277.6" fill="black" transform="rotate(0,336,272)"></polygon>
                   <polygon class="arrowhead" points="120,352 108,346.4 108,357.6" fill="black" transform="rotate(180,112,352)"></polygon>
                   <polygon class="arrowhead" points="120,128 108,122.4 108,133.6" fill="black" transform="rotate(180,112,128)"></polygon>
                   <polygon class="arrowhead" points="104,256 92,250.4 92,261.6" fill="black" transform="rotate(0,96,256)"></polygon>
-                  <polygon class="arrowhead" points="104,224 92,218.4 92,229.6" fill="black" transform="rotate(0,96,224)"></polygon>
+                  <polygon class="arrowhead" points="80,224 68,218.4 68,229.6" fill="black" transform="rotate(180,72,224)"></polygon>
                   <polygon class="arrowhead" points="80,192 68,186.4 68,197.6" fill="black" transform="rotate(180,72,192)"></polygon>
                   <g class="text">
                     <text x="40" y="36">Initiator</text>
@@ -2406,7 +2405,7 @@ per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href
 server.<a href="#section-6.2.2-9.4.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.5">
-              <p id="section-6.2.2-9.5.1">The TLS primitives return after the handshake has completed successfully.<a href="#section-6.2.2-9.5.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.2-9.5.1">The TLS endpoints continue exchange TLS messages to complete the TLS handshake.<a href="#section-6.2.2-9.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.6">
               <p id="section-6.2.2-9.6.1">The client key manager's TLS handshake completes.  It exports all
@@ -2710,8 +2709,8 @@ back-off.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-7-1">TLS has its own error reporting via TLS alert messages.  When a TLS
 handshake error occurs, the TLS alert is sent in an SCTP user message
-(see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the TLS for DTLS in SCTP TLS Records PPID
-(4242).<a href="#section-7-1" class="pilcrow">¶</a></p>
+(see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the TLS records for DTLS Chunk
+Key Management PPID (4242).<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">If a TLS handshake fails during initial establishment and the
 implementation determines that it can address the cause of the error
 (for example, by retrying with different parameters, as long as doing
@@ -2745,7 +2744,7 @@ followed.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
         <h3 id="name-privacy-considerations">
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
         </h3>
-<p id="section-8.2-1">Although TLS for DTLS in SCTP provides privacy for user messages and
+<p id="section-8.2-1">Although DTLS in SCTP provides privacy for user messages and
 almost all SCTP chunks, the SCTP common header, DTLS chunk header,
 and DTLS record header are not confidentiality protected.  An
 attacker can correlate TLS connections over the same SCTP association
@@ -2755,13 +2754,13 @@ certificate-based authentication in TLS 1.3 and to not reuse tickets.
 TLS 1.3 with external PSK authentication does not provide identity
 protection.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2-3">By mandating ephemeral key exchange and cipher suites with
-confidentiality, TLS for DTLS in SCTP effectively mitigates many
+confidentiality, DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">It is RECOMMENDED that implementations of this key-management
+<p id="section-8.2-4">It is RECOMMENDED that implementations of this key management
 method do not allow the ULP to exchange any data beyond the
-key-management information following this specification until
+key management information following this specification until
 the peer is authenticated and the local endpoint and the remote
 have both installed read and write keys and enforced protection. This is to avoid any information
 leakage from the ULP to unintended parties.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
@@ -2782,7 +2781,7 @@ leakage from the ULP to unintended parties.<a href="#section-8.2-4" class="pilcr
 <p id="section-9.1-1">IANA is requested to assign one DTLS Key Management Method Identifier
 in the "DTLS Key Management Method" registry defined by
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span> to identify the
-key-management method defined in this document.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+key management method defined in this document.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 <span id="name-dtls-key-management-method-i"></span><div id="iana-psi">
 <table class="center" id="table-3">
           <caption>
@@ -2800,7 +2799,7 @@ key-management method defined in this document.<a href="#section-9.1-1" class="p
           <tbody>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">192</td>
-              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP</td>
+              <td class="text-left" rowspan="1" colspan="1">TLS based Key Management for SCTP DTLS Chunk</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
               <td class="text-left" rowspan="1" colspan="1">Draft Authors</td>
             </tr>
@@ -2841,22 +2840,88 @@ Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="sec-iana-ppid">
+<div id="sec-iana-ctrl-types">
 <section id="section-9.3">
-        <h3 id="name-sctp-payload-protocol-ident">
-<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-sctp-payload-protocol-ident" class="section-name selfRef">SCTP Payload Protocol Identifier</a>
+        <h3 id="name-dtls-chunk-key-management-c">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-dtls-chunk-key-management-c" class="section-name selfRef">DTLS Chunk Key Management Control Message Types</a>
         </h3>
-<p id="section-9.3-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
-"Payload Protocol Identifiers" registry, IANA is requested to update the
-name and reference for the PPID 4242 as depicted in
-<a href="#iana-payload-protection-id" class="auto internal xref">Table 5</a>.
-Furthermore, IANA is requested to add an entry in the "Payload Protocol
-Identifiers" registry for the PPID 4243 as depicted in
-<a href="#iana-payload-protection-id" class="auto internal xref">Table 5</a>.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
-<span id="name-payload-protocol-identifier"></span><div id="iana-payload-protection-id">
+<p id="section-9.3-1">IANA is requested to create a new registry called "DTLS Chunk
+Key Management Control Message Types" in the Stream Control
+Transmission Protocol (SCTP) Parameters group.  This registry
+governs the values of the Ctrl Type field of the control messages
+defined in <a href="#control-messages" class="auto internal xref">Section 4.2</a>.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<p id="section-9.3-2">The registration policy for this registry is IETF Review as defined in
+<span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>.<a href="#section-9.3-2" class="pilcrow">¶</a></p>
+<p id="section-9.3-3">Each entry in the registry MUST contain the following fields:<a href="#section-9.3-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.3-4.1">
+            <p id="section-9.3-4.1.1">Ctrl Type: an 8-bit unsigned integer value (0x00-0xFF).<a href="#section-9.3-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-4.2">
+            <p id="section-9.3-4.2.1">Name: a short, human-readable name for the control message type.<a href="#section-9.3-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-4.3">
+            <p id="section-9.3-4.3.1">Reference: a reference to the document defining the control message
+type.<a href="#section-9.3-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-9.3-5">The initial contents of the registry are shown in
+<a href="#iana-ctrl-types" class="auto internal xref">Table 5</a>.  The value 0x00 is reserved.<a href="#section-9.3-5" class="pilcrow">¶</a></p>
+<span id="name-dtls-chunk-key-management-co"></span><div id="iana-ctrl-types">
 <table class="center" id="table-5">
           <caption>
 <a href="#table-5" class="selfRef">Table 5</a>:
+<a href="#name-dtls-chunk-key-management-co" class="selfRef">DTLS Chunk Key Management Control Message Types</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Ctrl Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x00</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x01</td>
+              <td class="text-left" rowspan="1" colspan="1">Read Key Installed</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x02</td>
+              <td class="text-left" rowspan="1" colspan="1">Rekey Request</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x03-0xFF</td>
+              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="sec-iana-ppid">
+<section id="section-9.4">
+        <h3 id="name-sctp-payload-protocol-ident">
+<a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-sctp-payload-protocol-ident" class="section-name selfRef">SCTP Payload Protocol Identifier</a>
+        </h3>
+<p id="section-9.4-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Payload Protocol Identifiers" registry, IANA is requested to update the
+name and reference for the PPID 4242 as depicted in
+<a href="#iana-payload-protection-id" class="auto internal xref">Table 6</a>.
+Furthermore, IANA is requested to add an entry in the "Payload Protocol
+Identifiers" registry for the PPID 4243 as depicted in
+<a href="#iana-payload-protection-id" class="auto internal xref">Table 6</a>.<a href="#section-9.4-1" class="pilcrow">¶</a></p>
+<span id="name-payload-protocol-identifier"></span><div id="iana-payload-protection-id">
+<table class="center" id="table-6">
+          <caption>
+<a href="#table-6" class="selfRef">Table 6</a>:
 <a href="#name-payload-protocol-identifier" class="selfRef">Payload Protocol Identifier</a>
           </caption>
 <thead>
@@ -2869,12 +2934,12 @@ Identifiers" registry for the PPID 4243 as depicted in
           <tbody>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4242</td>
-              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP TLS Records</td>
+              <td class="text-left" rowspan="1" colspan="1">TLS records for DTLS Chunk Key Management</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4243</td>
-              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP Control</td>
+              <td class="text-left" rowspan="1" colspan="1">Control Messages for DTLS Chunk Key Management</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
             </tr>
           </tbody>
@@ -2895,6 +2960,10 @@ Identifiers" registry for the PPID 4243 as depicted in
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
+<dt id="RFC8126">[RFC8126]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8996">[RFC8996]</dt>
         <dd>
 <span class="refAuthor">Moriarty, K.</span> and <span class="refAuthor">S. Farrell</span>, <span class="refTitle">"Deprecating TLS 1.0 and TLS 1.1"</span>, <span class="seriesInfo">BCP 195</span>, <span class="seriesInfo">RFC 8996</span>, <span class="seriesInfo">DOI 10.17487/RFC8996</span>, <time datetime="2021-03" class="refDate">March 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8996">https://www.rfc-editor.org/info/rfc8996</a>&gt;</span>. </dd>
