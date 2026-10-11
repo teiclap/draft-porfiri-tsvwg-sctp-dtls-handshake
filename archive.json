@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-08T04:04:58.502716+00:00",
+  "timestamp": "2026-10-11T03:29:52.165343+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -333,15 +333,15 @@
       "id": "I_kwDORGnINM8AAAABVFvRSg",
       "title": "Initial Estbalishment step 6",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/32",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "In figure 3 and Step 6 we have a duplication of Step 7. I think it is a remainder of when the TLS messages was present. Either remove or clarify the TLS message exchanges directly between the TLS instances. ",
       "createdAt": "2026-10-05T10:19:22Z",
-      "updatedAt": "2026-10-05T10:19:22Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-08T14:25:01Z",
+      "closedAt": "2026-10-08T14:25:01Z",
       "comments": []
     },
     {
@@ -383,15 +383,17 @@
       "id": "I_kwDORGnINM8AAAABVjlPIA",
       "title": "Name of PPIDs",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/36",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "gloinul"
+      ],
       "labels": [],
       "body": "Need to discuss the names of the PPIDs. \n\nThe names was updated in #31 to be:\nID Value \tSCTP Payload Protocol Identifier \tReference\n4242 \tTLS for DTLS in SCTP TLS Records \tRFC-To-Be\n4243 \tTLS for DTLS in SCTP Control \tRFC-To-Be\n\nThis based on the motivation that they should not be generic, and especially just TLS was to wide as it didn't contain a purpose for this TLS. \n",
       "createdAt": "2026-10-07T08:03:55Z",
-      "updatedAt": "2026-10-07T08:03:55Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-08T16:31:34Z",
+      "closedAt": "2026-10-08T16:31:34Z",
       "comments": []
     },
     {
@@ -399,14 +401,50 @@
       "id": "I_kwDORGnINM8AAAABVmTTLg",
       "title": "Cleanup figure 2 - Control Message",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/37",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "As the basis for the control message is a 8-bit type and then an optional field value this figure should be fixed so show the later possibility.",
       "createdAt": "2026-10-07T11:50:07Z",
-      "updatedAt": "2026-10-07T11:50:07Z",
+      "updatedAt": "2026-10-08T14:18:20Z",
+      "closedAt": "2026-10-08T14:18:20Z",
+      "comments": []
+    },
+    {
+      "number": 40,
+      "id": "I_kwDORGnINM8AAAABV4b94Q",
+      "title": "IANA section for control messages",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/40",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "gloinul"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-08T14:18:45Z",
+      "updatedAt": "2026-10-08T16:31:34Z",
+      "closedAt": "2026-10-08T16:31:34Z",
+      "comments": []
+    },
+    {
+      "number": 41,
+      "id": "I_kwDORGnINM8AAAABV5kANw",
+      "title": "The architecture section should be updated",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/41",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "teiclap"
+      ],
+      "labels": [],
+      "body": "The architecture section has become a bit to short. It should be updated to at least explain:\n\n- That the KM instantiate a TLS connection, the necessary message are exchange between the endpoints.\n- PPIDs being used for seperation of the KM control messages from the TLS record and the ULP\n- The KM when the TLS handshake has completed exports the key and create the DKCs. \n",
+      "createdAt": "2026-10-08T15:35:21Z",
+      "updatedAt": "2026-10-09T06:04:42Z",
       "closedAt": null,
       "comments": []
     }
@@ -1746,24 +1784,26 @@
       "id": "PR_kwDORGnINM8AAAABHHMH2A",
       "title": "Fixing Initial Procedure Step 6",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/38",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Addresses #32 \r\n\r\nChanges the figure to indicate that TLS endpoints exchange necessary messages between each other to complete handshake.\r\n",
       "createdAt": "2026-10-07T11:57:59Z",
-      "updatedAt": "2026-10-07T12:01:16Z",
+      "updatedAt": "2026-10-08T14:25:05Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "942bdef79214a023b725cedc4b1c0f3b2336aa5b",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue32",
       "headRefOid": "8c34443edbeaa5148e548fd90d467239fc669604",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-10-08T14:25:00Z",
+      "mergedAt": "2026-10-08T14:25:00Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "7e0dde3c119217078e523e65ad75b35e54c71239"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1786,24 +1826,26 @@
       "id": "PR_kwDORGnINM8AAAABHHYcTQ",
       "title": "Removing message figure scale beyond what is used.",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/39",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Addresses issue #37 ",
       "createdAt": "2026-10-07T12:15:31Z",
-      "updatedAt": "2026-10-07T12:17:21Z",
+      "updatedAt": "2026-10-08T14:25:24Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "942bdef79214a023b725cedc4b1c0f3b2336aa5b",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue37",
       "headRefOid": "ff1d541c0f5be89a5e8981b3adf8e24a4c8ab8fa",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-10-08T14:18:18Z",
+      "mergedAt": "2026-10-08T14:18:18Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "327a1c5399dda5e2dc5240f5941c3800cb2a34ed"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1817,6 +1859,48 @@
           "body": "",
           "createdAt": "2026-10-07T12:17:20Z",
           "updatedAt": "2026-10-07T12:17:20Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 42,
+      "id": "PR_kwDORGnINM8AAAABHXyKCA",
+      "title": "Added IANA section to resolve Issue #40. Updated names of PPIDs to re\u2026",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/42",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\u2026solve Issue #36. Reverted use of key-management to key management. Fixed step 5 in Rekeying same way as step 6 in initial. Updted abbreveitated title and solution name.",
+      "createdAt": "2026-10-08T16:15:05Z",
+      "updatedAt": "2026-10-08T16:31:41Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "7e0dde3c119217078e523e65ad75b35e54c71239",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue40",
+      "headRefOid": "c1e860b3de1ab3b1d3095464f3b3620a550b4207",
+      "closedAt": "2026-10-08T16:31:32Z",
+      "mergedAt": "2026-10-08T16:31:32Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "9b16d551a969bdb23f70ee47fc8322ece26a3bab"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABRW1-Gg",
+          "commit": {
+            "abbreviatedOid": "c1e860b"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-08T16:25:26Z",
+          "updatedAt": "2026-10-08T16:25:26Z",
           "comments": []
         }
       ]
