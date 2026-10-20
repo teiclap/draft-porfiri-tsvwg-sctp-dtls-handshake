@@ -1597,15 +1597,16 @@ SCTP.  Normative procedures are specified in <a href="#procedures" class="auto i
 <p id="section-2.1-2">As shown in <a href="#overview-layering" class="auto internal xref">Figure 1</a>, the Key Management Method is
 layered above SCTP alongside the Upper Layer Protocol (ULP), while the
 DTLS Chunk Protection Operator sits within SCTP and performs the actual
-protection and unprotection of SCTP packets.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+protection of SCTP packets by encrypting and decrypting them and performing
+integrity verification.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
 <p id="section-2.1-3">The Key Management Method instantiates a TLS 1.3 connection that is used
 solely for mutual authentication and key establishment; it never carries
 user data.  The key managers drive this connection through the TLS user
 API (the client key manager acting as the TLS client, the server key
-manager as the TLS server) and relay the resulting TLS records to each
+manager as the TLS server, role determination is specified in
+<a href="#role-determination" class="auto internal xref">Section 5.1</a>) and relay the resulting TLS records to each
 other as SCTP user messages, so that the TLS handshake is performed
-between the two endpoints.  Role determination is specified in
-<a href="#role-determination" class="auto internal xref">Section 5.1</a>.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+between the two endpoints.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <p id="section-2.1-4">TLS records and key management control information travel over the same
 SCTP association as the ULP's data and are distinguished by the SCTP
 Payload Protocol Identifier (PPID): PPID 4242 for TLS records, PPID 4243
@@ -1618,9 +1619,6 @@ keying material from the TLS Exporter and creates the DTLS Key Contexts
 (DKCs) used by the DTLS Chunk Protection Operator to protect SCTP
 packets; the TLS connection is then closed.  Key derivation and DKC
 installation are specified in <a href="#dtls-key-derivation" class="auto internal xref">Section 5</a>.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
-<p id="section-2.1-6">Application data is never transmitted in TLS application_data records;
-it is sent via SCTP DATA chunks protected by the DTLS Chunk Protection
-Operator.<a href="#section-2.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protocol-flow-summary">
