@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-11T03:29:52.165343+00:00",
+  "timestamp": "2026-10-22T02:56:30.667947+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -1901,6 +1901,151 @@
           "body": "",
           "createdAt": "2026-10-08T16:25:26Z",
           "updatedAt": "2026-10-08T16:25:26Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "id": "PR_kwDORGnINM8AAAABJiFLrQ",
+      "title": "Updated the architecture section",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/43",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-20T10:52:54Z",
+      "updatedAt": "2026-10-21T18:15:03Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "a2ce12869563df6694670fb63e3be38a76afa85b",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issu41",
+      "headRefOid": "17cb3ed29efba27254704e3bc5117e095d12e7f0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABTPM_lA",
+          "commit": {
+            "abbreviatedOid": "2067738"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-20T13:50:08Z",
+          "updatedAt": "2026-10-20T13:54:21Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "I think unprotection is not the right term. On the receiver side it performs decryption and integrity verification. Thus, it is a protection operation in itself, just the receiver side. ",
+              "createdAt": "2026-10-20T13:50:08Z",
+              "updatedAt": "2026-10-20T13:54:21Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "I think it should be clarified that this is just using DTLS Chunks role determination already here. ",
+              "createdAt": "2026-10-20T13:52:34Z",
+              "updatedAt": "2026-10-20T13:54:21Z"
+            },
+            {
+              "originalPosition": 39,
+              "body": "This feels like like a repetition of what has already been stated. So I think this can be removed. ",
+              "createdAt": "2026-10-20T13:54:13Z",
+              "updatedAt": "2026-10-20T13:54:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABTPSlpw",
+          "commit": {
+            "abbreviatedOid": "2067738"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-20T13:56:55Z",
+          "updatedAt": "2026-10-20T13:56:56Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "OK",
+              "createdAt": "2026-10-20T13:56:55Z",
+              "updatedAt": "2026-10-20T13:56:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABTPXJuA",
+          "commit": {
+            "abbreviatedOid": "2067738"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-20T14:02:21Z",
+          "updatedAt": "2026-10-20T14:02:21Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "OK",
+              "createdAt": "2026-10-20T14:02:21Z",
+              "updatedAt": "2026-10-20T14:02:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABTPXRIQ",
+          "commit": {
+            "abbreviatedOid": "2067738"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-20T14:02:28Z",
+          "updatedAt": "2026-10-20T14:02:29Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "OK",
+              "createdAt": "2026-10-20T14:02:28Z",
+              "updatedAt": "2026-10-20T14:02:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABTY9J1A",
+          "commit": {
+            "abbreviatedOid": "17cb3ed"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-21T07:18:46Z",
+          "updatedAt": "2026-10-21T07:18:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABTgl1zg",
+          "commit": {
+            "abbreviatedOid": "17cb3ed"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-21T18:15:02Z",
+          "updatedAt": "2026-10-21T18:15:02Z",
           "comments": []
         }
       ]
