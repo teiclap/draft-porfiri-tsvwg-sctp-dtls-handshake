@@ -233,11 +233,35 @@ SCTP.  Normative procedures are specified in {{procedures}}.
 ~~~~~~~~~~~
 {: #overview-layering title="Architecture" artwork-align="center"}
 
-Application data is never transmitted in TLS application_data records.
-Instead, application data is sent via SCTP DATA chunks protected by
-the DTLS Chunk Protection Operator.  TLS 1.3 is used solely for key
-management: performing handshakes, deriving keys via the TLS Exporter,
-and then closing the TLS connection.
+As shown in {{overview-layering}}, the Key Management Method is
+layered above SCTP alongside the Upper Layer Protocol (ULP), while the
+DTLS Chunk Protection Operator sits within SCTP and performs the actual
+protection of SCTP packets by encrypting and decrypting them and performing
+integrity verification.
+
+The Key Management Method instantiates a TLS 1.3 connection that is used
+solely for mutual authentication and key establishment; it never carries
+user data.  The key managers drive this connection through the TLS user
+API (the client key manager acting as the TLS client, the server key
+manager as the TLS server, role determination is specified in
+{{role-determination}}) and relay the resulting TLS records to each
+other as SCTP user messages, so that the TLS handshake is performed
+between the two endpoints.
+
+TLS records and key management control information travel over the same
+SCTP association as the ULP's data and are distinguished by the SCTP
+Payload Protocol Identifier (PPID): PPID 4242 for TLS records, PPID 4243
+for control information, and the ULP's own PPID(s) for application data.
+This separation lets the receiver deliver each message to the TLS
+connection, to the key management logic, or to the ULP, as appropriate.
+The framing and control messages are specified in {{tls-user-message}}.
+
+When the TLS handshake completes, the key management function derives
+keying material from the TLS Exporter and creates the DTLS Key Contexts
+(DKCs) used by the DTLS Chunk Protection Operator to protect SCTP
+packets; the TLS connection is then closed.  Key derivation and DKC
+installation are specified in {{dtls-key-derivation}}.
+
 
 ## Protocol Flow Summary
 
