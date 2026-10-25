@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-22T02:56:30.667947+00:00",
+  "timestamp": "2026-10-25T02:49:39.987149+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -435,7 +435,7 @@
       "id": "I_kwDORGnINM8AAAABV5kANw",
       "title": "The architecture section should be updated",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/41",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -444,8 +444,8 @@
       "labels": [],
       "body": "The architecture section has become a bit to short. It should be updated to at least explain:\n\n- That the KM instantiate a TLS connection, the necessary message are exchange between the endpoints.\n- PPIDs being used for seperation of the KM control messages from the TLS record and the ULP\n- The KM when the TLS handshake has completed exports the key and create the DKCs. \n",
       "createdAt": "2026-10-08T15:35:21Z",
-      "updatedAt": "2026-10-09T06:04:42Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-22T06:10:57Z",
+      "closedAt": "2026-10-22T06:10:57Z",
       "comments": []
     }
   ],
@@ -1910,24 +1910,26 @@
       "id": "PR_kwDORGnINM8AAAABJiFLrQ",
       "title": "Updated the architecture section",
       "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/43",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-10-20T10:52:54Z",
-      "updatedAt": "2026-10-21T18:15:03Z",
+      "updatedAt": "2026-10-22T06:11:03Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "a2ce12869563df6694670fb63e3be38a76afa85b",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issu41",
       "headRefOid": "17cb3ed29efba27254704e3bc5117e095d12e7f0",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-10-22T06:10:56Z",
+      "mergedAt": "2026-10-22T06:10:56Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "ece4e48011da9643141221cf77ecafc63ac24a9d"
+      },
       "comments": [],
       "reviews": [
         {
