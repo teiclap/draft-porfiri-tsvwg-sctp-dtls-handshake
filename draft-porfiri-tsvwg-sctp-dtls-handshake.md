@@ -42,8 +42,6 @@ author:
    email: tuexen@fh-muenster.de
 
 informative:
-  RFC5705:
-  RFC9149:
   RFC9525:
 
   ANSSI-DAT-NT-003:
@@ -68,9 +66,11 @@ informative:
     date: October 2024
 
 normative:
+  RFC5705:
   RFC8126:
   RFC8996:
   RFC9147:
+  RFC9149:
   RFC9260:
   RFC9325:
   RFC9846:
@@ -289,13 +289,13 @@ The protocol operates in three phases:
 ## TLS Version
 
 This document defines the usage of TLS 1.3 {{RFC9846}}.  Earlier
-versions of TLS MUST NOT be used.  Only one version of TLS MUST be
-used during the lifetime of an SCTP Association.
+versions of TLS MUST NOT be used. An endpoint MUST NOT use more
+than one TLS version during the lifetime of an SCTP association.
 
 ## Cipher Suite Constraints
 
 Parameters not marked as "Y" in the "Recommended" column of TLS
-registries are NOT RECOMMENDED to support.  Non-AEAD cipher suites
+registries SHOULD NOT be supported.  Non-AEAD cipher suites
 or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported.
@@ -771,8 +771,7 @@ epoch N+1 DKC.
   coexist temporarily until the drain timer expires (see
   {{drain-timer}}).
 
-  All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
-  NOT be used.
+  All rekeying MUST use ephemeral key exchange.
 
 ### Drain Timer Considerations {#drain-timer}
 
