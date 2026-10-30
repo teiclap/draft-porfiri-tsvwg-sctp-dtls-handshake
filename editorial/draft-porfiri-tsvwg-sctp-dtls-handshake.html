@@ -1663,8 +1663,8 @@ to establish fresh Primary and Restart DKCs.<a href="#section-2.2-2.3.1" class="
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-tls-version" class="section-name selfRef">TLS Version</a>
         </h3>
 <p id="section-3.1-1">This document defines the usage of TLS 1.3 <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.  Earlier
-versions of TLS MUST NOT be used.  Only one version of TLS MUST be
-used during the lifetime of an SCTP Association.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+versions of TLS MUST NOT be used. An endpoint MUST NOT use more
+than one TLS version during the lifetime of an SCTP association.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cipher-suite-constraints">
@@ -1673,7 +1673,7 @@ used during the lifetime of an SCTP Association.<a href="#section-3.1-1" class="
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-cipher-suite-constraints" class="section-name selfRef">Cipher Suite Constraints</a>
         </h3>
 <p id="section-3.2-1">Parameters not marked as "Y" in the "Recommended" column of TLS
-registries are NOT RECOMMENDED to support.  Non-AEAD cipher suites
+registries SHOULD NOT be supported.  Non-AEAD cipher suites
 or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
@@ -2460,8 +2460,7 @@ N+1 DKC.<a href="#section-6.2.2-9.8.1" class="pilcrow">¶</a></p>
   initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
   coexist temporarily until the drain timer expires (see
   <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-11" class="pilcrow">¶</a></p>
-<p id="section-6.2.2-12">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
-  NOT be used.<a href="#section-6.2.2-12" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-12">All rekeying MUST use ephemeral key exchange.<a href="#section-6.2.2-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="drain-timer">
@@ -2981,6 +2980,10 @@ Identifiers" registry for the PPID 4243 as depicted in
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
+<dt id="RFC5705">[RFC5705]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"Keying Material Exporters for Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 5705</span>, <span class="seriesInfo">DOI 10.17487/RFC5705</span>, <time datetime="2010-03" class="refDate">March 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5705">https://www.rfc-editor.org/info/rfc5705</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8126">[RFC8126]</dt>
         <dd>
 <span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;</span>. </dd>
@@ -2992,6 +2995,10 @@ Identifiers" registry for the PPID 4243 as depicted in
 <dt id="RFC9147">[RFC9147]</dt>
         <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">N. Modadugu</span>, <span class="refTitle">"The Datagram Transport Layer Security (DTLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9147</span>, <span class="seriesInfo">DOI 10.17487/RFC9147</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9147">https://www.rfc-editor.org/info/rfc9147</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9149">[RFC9149]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, and <span class="refAuthor">C.A. Wood</span>, <span class="refTitle">"TLS Ticket Requests"</span>, <span class="seriesInfo">RFC 9149</span>, <span class="seriesInfo">DOI 10.17487/RFC9149</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9149">https://www.rfc-editor.org/info/rfc9149</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9260">[RFC9260]</dt>
         <dd>
@@ -3026,14 +3033,6 @@ Identifiers" registry for the PPID 4243 as depicted in
 <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="RFC5705">[RFC5705]</dt>
-        <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"Keying Material Exporters for Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 5705</span>, <span class="seriesInfo">DOI 10.17487/RFC5705</span>, <time datetime="2010-03" class="refDate">March 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5705">https://www.rfc-editor.org/info/rfc5705</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC9149">[RFC9149]</dt>
-        <dd>
-<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, and <span class="refAuthor">C.A. Wood</span>, <span class="refTitle">"TLS Ticket Requests"</span>, <span class="seriesInfo">RFC 9149</span>, <span class="seriesInfo">DOI 10.17487/RFC9149</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9149">https://www.rfc-editor.org/info/rfc9149</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC9525">[RFC9525]</dt>
         <dd>
 <span class="refAuthor">Saint-Andre, P.</span> and <span class="refAuthor">R. Salz</span>, <span class="refTitle">"Service Identity in TLS"</span>, <span class="seriesInfo">RFC 9525</span>, <span class="seriesInfo">DOI 10.17487/RFC9525</span>, <time datetime="2023-11" class="refDate">November 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9525">https://www.rfc-editor.org/info/rfc9525</a>&gt;</span>. </dd>
