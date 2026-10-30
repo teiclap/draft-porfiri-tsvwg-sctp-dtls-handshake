@@ -2,7 +2,6 @@
 docname: draft-porfiri-tsvwg-sctp-dtls-handshake-latest
 title: Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
 abbrev: TLS based Key Management for SCTP DTLS Chunk
-obsoletes:
 cat: std
 ipr: trust200902
 wg: TSVWG
@@ -481,6 +480,7 @@ the concatenation of the following fields:
 | Key type | 1 byte | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
 | Client KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Client |
 | Server KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Server |
+{: #exporter-context-table title="Exporter Context" cols="l c l "}
 
 Each DTLS Key Management Parameter (Section 4.1 of
 {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) is included as the
@@ -610,7 +610,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.
    received TLS records to the TLS server and to forward any TLS records
    produced by the TLS server to the client key manager per {{tls-user-message}}.
 
-  6. The TLS endpoints continue exchange TLS messages to complete the TLS handshake.
+  6. The TLS endpoints continues to exchange TLS messages to complete the TLS handshake.
 
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
@@ -981,8 +981,9 @@ It is RECOMMENDED that implementations of this key management
 method do not allow the ULP to exchange any data beyond the
 key management information following this specification until
 the peer is authenticated and the local endpoint and the remote
-have both installed read and write keys and enforced protection. This is to avoid any information
-leakage from the ULP to unintended parties.
+endpoint have both installed read and write keys and enforced
+protection. This is to avoid any information leakage from
+the ULP to unintended parties.
 
 
 # IANA Considerations {#iana-considerations}
