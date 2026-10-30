@@ -503,9 +503,10 @@ combination of Direction, Key role, and Key type values produces a
 distinct export, yielding 12 values in total (2 directions × 2 roles
 × 3 types).
 
-The Client installs exports with Direction=Client to server as its
-write keys and Direction=Server to client as its read keys.  The
-Responder does the reverse.
+The endpoint with the Client role installs exports with
+Direction=Client to server as its write keys and
+Direction=Server to client as its read keys.  The
+endpoint with Server role does the reverse.
 
 The length of exported material depends on the negotiated cipher
 suite.
