@@ -498,15 +498,15 @@ Table of Contents
    concatenation of the following fields:
 
       +===========+==========+======================================+
-      | Field     | Length   | Value                                |
+      | Field     |  Length  | Value                                |
       +===========+==========+======================================+
-      | Direction | 1 byte   | 0x00 = Client to Server, 0x01 =      |
+      | Direction |  1 byte  | 0x00 = Client to Server, 0x01 =      |
       |           |          | Server to Client                     |
       +-----------+----------+--------------------------------------+
-      | Key role  | 1 byte   | 0x00 = primary/traffic, 0x01 =       |
+      | Key role  |  1 byte  | 0x00 = primary/traffic, 0x01 =       |
       |           |          | restart                              |
       +-----------+----------+--------------------------------------+
-      | Key type  | 1 byte   | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
+      | Key type  |  1 byte  | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
       +-----------+----------+--------------------------------------+
       | Client KM | variable | DTLS Key Management Parameter sent   |
       | Param     |          | by the endpoint designated as Client |
@@ -515,7 +515,7 @@ Table of Contents
       | Param     |          | by the endpoint designated as Server |
       +-----------+----------+--------------------------------------+
 
-                                  Table 2
+                         Table 2: Exporter Context
 
    Each DTLS Key Management Parameter (Section 4.1 of
    [I-D.ietf-tsvwg-sctp-dtls-chunk]) is included as the sequence of
@@ -645,8 +645,8 @@ Table of Contents
         any TLS records produced by the TLS server to the client key
         manager per Section 4.
 
-   6.   The TLS endpoints continue exchange TLS messages to complete the
-        TLS handshake.
+   6.   The TLS endpoints continues to exchange TLS messages to complete
+        the TLS handshake.
 
    7.   The client key manager's TLS handshake completes.  It exports
         all Primary and Restart DKC keys, installs the server to client
@@ -1018,9 +1018,9 @@ Table of Contents
    It is RECOMMENDED that implementations of this key management method
    do not allow the ULP to exchange any data beyond the key management
    information following this specification until the peer is
-   authenticated and the local endpoint and the remote have both
-   installed read and write keys and enforced protection.  This is to
-   avoid any information leakage from the ULP to unintended parties.
+   authenticated and the local endpoint and the remote endpoint have
+   both installed read and write keys and enforced protection.  This is
+   to avoid any information leakage from the ULP to unintended parties.
 
 9.  IANA Considerations
 
