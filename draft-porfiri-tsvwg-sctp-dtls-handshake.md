@@ -192,7 +192,7 @@ ULP:
 
 # Overview {#overview}
 
-This section provides an informational overview of TLS for DTLS in
+This section provides an informational overview of DTLS in
 SCTP.  Normative procedures are specified in {{procedures}}.
 
 ## Architecture {#architecture}
@@ -476,7 +476,7 @@ the concatenation of the following fields:
 | Field | Length | Value |
 |-------|--------|-------|
 | Direction | 1 byte | 0x00 = Client to Server, 0x01 = Server to Client |
-| Key role | 1 byte | 0x00 = primary/traffic, 0x01 = restart |
+| Key role | 1 byte | 0x00 = primary, 0x01 = restart |
 | Key type | 1 byte | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
 | Client KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Client |
 | Server KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Server |
@@ -635,9 +635,8 @@ RKI = Read Key Installed control message; R+W = read and write keys.
 
   If the TLS handshake fails in step 6, it SHOULD be retried according to {{error-handling}}.
 
- After key installation, the TLS connection SHOULD be closed promptly. When
- session resumption is supported, closure follows the procedure in
- {{session-resumption}}.
+ After key installation, the TLS connection SHOULD be closed promptly
+ following the procedure in {{session-resumption}}.
 
 
 ## Rekeying {#rekeying}
@@ -648,7 +647,7 @@ Rekeying is triggered by implementation-configurable criteria,
 including:
 
 * Time elapsed since last peer authentication.
-* Volume of data transferred since last forward-secrecy rekeying.
+* Volume of data transferred since last rekeying.
 * Approaching the cipher suite's AEAD usage limits.
 
 ### Procedure {#rekey-procedure}
@@ -682,7 +681,7 @@ including:
  Initiator                                     Responder
      |  (traffic continues using epoch N DKC)      |
      |                                             |
-     | TLS  cliKM                       srvKM  TLS |
+     | TLS  client KM               server KM  TLS |
      |  |    |                             |    |  |
      |  |    |  (server needs to rekey:)   |    |  |
   2. |  |    |<--------[Rekey Req]---------+    |  |  1.
@@ -708,7 +707,7 @@ including:
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
-Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 Rekey Req = Rekey Request control message;
 RKI = Read Key Installed control message; R+W = read and
 write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
