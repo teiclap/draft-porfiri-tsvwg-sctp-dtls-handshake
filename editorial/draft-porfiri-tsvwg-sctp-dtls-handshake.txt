@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 3 May 2027                                             Ericsson
+Expires: 5 May 2027                                             Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                         30 October 2026
+                                                         1 November 2026
 
 
    Transport Layer Security (TLS) based Key Management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 May 2027.
+   This Internet-Draft will expire on 5 May 2027.
 
 Copyright Notice
 
@@ -216,8 +216,8 @@ Table of Contents
 
 2.  Overview
 
-   This section provides an informational overview of TLS for DTLS in
-   SCTP.  Normative procedures are specified in Section 6.
+   This section provides an informational overview of DTLS in SCTP.
+   Normative procedures are specified in Section 6.
 
 2.1.  Architecture
 
@@ -503,8 +503,7 @@ Table of Contents
       | Direction |  1 byte  | 0x00 = Client to Server, 0x01 =      |
       |           |          | Server to Client                     |
       +-----------+----------+--------------------------------------+
-      | Key role  |  1 byte  | 0x00 = primary/traffic, 0x01 =       |
-      |           |          | restart                              |
+      | Key role  |  1 byte  | 0x00 = primary, 0x01 = restart       |
       +-----------+----------+--------------------------------------+
       | Key type  |  1 byte  | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
       +-----------+----------+--------------------------------------+
@@ -676,9 +675,8 @@ Table of Contents
    If the TLS handshake fails in step 6, it SHOULD be retried according
    to Section 7.
 
-   After key installation, the TLS connection SHOULD be closed promptly.
-   When session resumption is supported, closure follows the procedure
-   in Section 3.5.
+   After key installation, the TLS connection SHOULD be closed promptly
+   following the procedure in Section 3.5.
 
 6.2.  Rekeying
 
@@ -689,7 +687,7 @@ Table of Contents
 
    *  Time elapsed since last peer authentication.
 
-   *  Volume of data transferred since last forward-secrecy rekeying.
+   *  Volume of data transferred since last rekeying.
 
    *  Approaching the cipher suite's AEAD usage limits.
 
@@ -723,7 +721,7 @@ Table of Contents
           Initiator                                     Responder
               |  (traffic continues using epoch N DKC)      |
               |                                             |
-              | TLS  cliKM                       srvKM  TLS |
+              | TLS  client KM               server KM  TLS |
               |  |    |                             |    |  |
               |  |    |  (server needs to rekey:)   |    |  |
            2. |  |    |<--------[Rekey Req]---------+    |  |  1.
@@ -748,10 +746,10 @@ Table of Contents
 
                         Figure 4: Rekeying Procedure
 
-   Legend: TLS = local TLS engine; cliKM/srvKM = client/server key
-   manager; Rekey Req = Rekey Request control message; RKI = Read Key
-   Installed control message; R+W = read and write keys; N, N+1 = old
-   and new epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
+   Legend: TLS = local TLS engine; client KM/server KM = client/server
+   key manager; Rekey Req = Rekey Request control message; RKI = Read
+   Key Installed control message; R+W = read and write keys; N, N+1 =
+   old and new epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
 
    The diagram in Figure 4 shows both triggers.  Steps 1 and 2 (the
    Rekey Request) are present only when the server key manager is the
