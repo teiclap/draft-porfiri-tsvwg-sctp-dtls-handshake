@@ -2643,31 +2643,35 @@ DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶<
 <a href="#name-sctp-restart-procedure" class="selfRef">SCTP Restart Procedure</a>
             </figcaption></figure>
 </div>
-<ol start="1" type="1" class="normal type-1" id="section-6.3.2-2">
-<li id="section-6.3.2-2.1">
-              <p id="section-6.3.2-2.1.1">The restarting endpoint (Initiator) retrieves the restart key
+<p id="section-6.3.2-2">Steps 1-5 are following what is defined in Section 5.4 (Restart Considerations)
+in <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.2-3">
+<li id="section-6.3.2-3.1">
+              <p id="section-6.3.2-3.1.1">The restarting endpoint (Initiator) retrieves the restart key
 material from persistent secure storage and installs the Restart
-DKC for both send and receive directions.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
+DKC for both send and receive directions.<a href="#section-6.3.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.2">
-              <p id="section-6.3.2-2.2.1">The Initiator sends INIT (VTag=0). Include the DTLS Key Management
-Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-3.2">
+              <p id="section-6.3.2-3.2.1">The Initiator sends INIT (VTag=0). Include the DTLS Key Management
+Parameter with the same method list and the same role and restart settings,
+but a new random Tie Breaker.<a href="#section-6.3.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.3">
-              <p id="section-6.3.2-2.3.1">The Responder (the not restarting endpoint) replies INIT-ACK in
+            <li id="section-6.3.2-3.3">
+              <p id="section-6.3.2-3.3.1">The Responder (the not restarting endpoint) replies INIT-ACK in
 plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.  Include the DTLS Key Management
-Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
+Parameter with the same method list and the same role and restart
+settings, but a new random Tie Breaker.<a href="#section-6.3.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.4">
-              <p id="section-6.3.2-2.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
-the Restart DKC (R bit set).<a href="#section-6.3.2-2.4.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-3.4">
+              <p id="section-6.3.2-3.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
+the Restart DKC (R bit set).<a href="#section-6.3.2-3.4.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.5">
-              <p id="section-6.3.2-2.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
-the Restart DKC (R bit set).<a href="#section-6.3.2-2.5.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-3.5">
+              <p id="section-6.3.2-3.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
+the Restart DKC (R bit set).<a href="#section-6.3.2-3.5.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.6">
-              <p id="section-6.3.2-2.6.1">Both endpoints have a restarted association, whose state is
+            <li id="section-6.3.2-3.6">
+              <p id="section-6.3.2-3.6.1">Both endpoints have a restarted association, whose state is
 as described in Section 5.2.4.1 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, with two differences
 specific to this document: DTLS chunk protection is enforced using
 the Restart DKC (the COOKIE ECHO and COOKIE ACK were exchanged
@@ -2677,51 +2681,51 @@ association, since the new INIT handshake re-runs role determination.
 The authenticated peer identity, however, MUST remain the same as in
 the previous instance of the association (see <a href="#tls-auth" class="auto internal xref">Section 3.3</a>).
 The ULP MAY be informed that the association is restarted at this
-point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-2.6.1" class="pilcrow">¶</a></p>
+point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-3.6.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.7">
-              <p id="section-6.3.2-2.7.1">Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
+            <li id="section-6.3.2-3.7">
+              <p id="section-6.3.2-3.7.1">Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
 correspond one-to-one to steps 4 to 9 of the initial establishment
-procedure (<a href="#initial-establishment" class="auto internal xref">Section 6.1</a>).  They differ only as follows:<a href="#section-6.3.2-2.7.1" class="pilcrow">¶</a></p>
+procedure (<a href="#initial-establishment" class="auto internal xref">Section 6.1</a>).  They differ only as follows:<a href="#section-6.3.2-3.7.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.2-2.7.2.1">
-                  <p id="section-6.3.2-2.7.2.1.1">all key management messages are carried inside DTLS chunks protected
-with the Restart DKC;<a href="#section-6.3.2-2.7.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3.2-3.7.2.1">
+                  <p id="section-6.3.2-3.7.2.1.1">all key management messages are carried inside DTLS chunks protected
+with the Restart DKC;<a href="#section-6.3.2-3.7.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-6.3.2-2.7.2.2">
-                  <p id="section-6.3.2-2.7.2.2.1">in addition to the Primary DKC, each endpoint exports, installs, and
+                <li class="normal" id="section-6.3.2-3.7.2.2">
+                  <p id="section-6.3.2-3.7.2.2.1">in addition to the Primary DKC, each endpoint exports, installs, and
 commits the new Restart DKC to persistent secure storage, removing
-the old one;<a href="#section-6.3.2-2.7.2.2.1" class="pilcrow">¶</a></p>
+the old one;<a href="#section-6.3.2-3.7.2.2.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-6.3.2-2.7.2.3">
-                  <p id="section-6.3.2-2.7.2.3.1">at the key transition (steps 11 and 12), each endpoint switches the
+                <li class="normal" id="section-6.3.2-3.7.2.3">
+                  <p id="section-6.3.2-3.7.2.3.1">at the key transition (steps 11 and 12), each endpoint switches the
 active DTLS key context from the Restart DKC to the new Primary DKC
 after the Read Key Installed exchange completes (the Read Key
 Installed messages themselves are protected with the Restart DKC),
 rather than enforcing protection for the first time; the ULP was
-already informed at step 6.<a href="#section-6.3.2-2.7.2.3.1" class="pilcrow">¶</a></p>
+already informed at step 6.<a href="#section-6.3.2-3.7.2.3.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
           </ol>
-<ol start="13" type="1" class="normal type-1" id="section-6.3.2-3">
-<li id="section-6.3.2-3.1">
-              <p id="section-6.3.2-3.1.1">Protected application traffic uses the new Primary DKC.<a href="#section-6.3.2-3.1.1" class="pilcrow">¶</a></p>
+<ol start="13" type="1" class="normal type-1" id="section-6.3.2-4">
+<li id="section-6.3.2-4.1">
+              <p id="section-6.3.2-4.1.1">Protected application traffic uses the new Primary DKC.<a href="#section-6.3.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.2-4">After restart, the new Primary DKC MUST use epoch 3 (the epoch
-resets).<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-5">The Responder MUST NOT change the Restart DKC during the restart
+<p id="section-6.3.2-5">After restart, the new Primary DKC is required to use epoch 3 (the epoch
+resets), see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-5.4" class="relref">Section 5.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-6">The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
-removed.<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-6">It is RECOMMENDED to complete the TLS handshake and install new DKCs
+removed.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-7">It is RECOMMENDED to complete the TLS handshake and install new DKCs
 as soon as possible after restart, to minimize the window during
-which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-7">Note: There MAY exist a short time gap after association establishment
+which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-8">Note: There MAY exist a short time gap after association establishment
 where no Restart DKC is yet installed.  If an SCTP restart is
 initiated during that time, it will fail.  However, this is unlikely
 as the restarting endpoint sends INIT multiple times with exponential
-back-off.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
+back-off.<a href="#section-6.3.2-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
