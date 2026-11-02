@@ -1008,9 +1008,9 @@ Comment.
 | EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
 {: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
 
-## DTLS Chunk Key Management Control Message Types {#sec-iana-ctrl-types}
+## DTLS in SCTP Key Management Control Message Types {#sec-iana-ctrl-types}
 
-IANA is requested to create a new registry called "DTLS Chunk
+IANA is requested to create a new registry called "DTLS in SCTP
 Key Management Control Message Types" in the Stream Control
 Transmission Protocol (SCTP) Parameters group.  This registry
 governs the values of the Ctrl Type field of the control messages
@@ -1034,7 +1034,7 @@ The initial contents of the registry are shown in
 | 0x01        | Read Key Installed | RFC-TBD   |
 | 0x02        | Rekey Request      | RFC-TBD   |
 | 0x03-0xFF   | Unassigned         |           |
-{: #iana-ctrl-types title="DTLS Chunk Key Management Control Message Types" cols="l l l"}
+{: #iana-ctrl-types title="DTLS in SCTP Key Management Control Message Types" cols="l l l"}
 
 ## SCTP Payload Protocol Identifier {#sec-iana-ppid}
 
@@ -1046,7 +1046,7 @@ Furthermore, IANA is requested to add an entry in the "Payload Protocol
 Identifiers" registry for the PPID 4243 as depicted in
 {{iana-payload-protection-id}}.
 
-| ID Value | SCTP Payload Protocol Identifier              | Reference |
-| 4242     | TLS records for DTLS Chunk Key Management      | RFC-To-Be |
-| 4243     | Control Messages for DTLS Chunk Key Management | RFC-To-Be |
+| ID Value | SCTP Payload Protocol Identifier                 | Reference |
+| 4242     | TLS records for DTLS in SCTP Key Management      | RFC-To-Be |
+| 4243     | Control Messages for DTLS in SCTP Key Management | RFC-To-Be |
 {: #iana-payload-protection-id title="Payload Protocol Identifier" cols="r l l"}
