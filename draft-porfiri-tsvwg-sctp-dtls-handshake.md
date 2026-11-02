@@ -779,18 +779,29 @@ after new (epoch N+1) DKCs have been activated.  Its purpose is to
 allow in-flight packets protected with the old keys to be received
 and processed before those keys are removed.
 
-The drain timer value depends on whether the delivery of the final
+When the client KM receives the Read Key Installed
+control message {{control-messages}} in Step 8, installs the write
+key and starts the drain timer it do knows that the server endpoint
+already is sending using the new DKC. Thus it can set a short timer
+to allow any reordered or delayed packets has been drained before
+removing the old DKS. A value of 3 seconds are recommended.
+
+The server drain timer value depends on whether the delivery of the final
 rekeying message has been confirmed:
 
-* If delivery of the last rekeying message has been confirmed (e.g.,
-  through SCTP acknowledgment of the DATA chunk carrying the TLS
-  Finished), the old DKC MAY be removed after a short drain timer.
-  A value of 120 seconds (one Maximum Segment Lifetime) is
-  RECOMMENDED in this case.
+* If delivery of the server's Read Key Installed control message
+  {{control-messages}} has been confirmed (e.g.,
+  through SCTP acknowledgment of the DATA chunk carrying control message,
+  the old DKC MAY be removed after a short drain timer.
+  A value of 3 seconds is RECOMMENDED in this case to allow for
+  reordered or delayed packets to arrive.
 
-* If delivery has not been confirmed, the drain timer MUST be set to
-  at least the SCTP association failure time (T_fail).  This ensures
-  that if the final rekeying message is lost and requires
+* If delivery of the Read Key Installed control message
+  {{control-messages}} sent by this endpoint has not been confirmed,
+  the drain timer MUST be set to at least the SCTP association
+  failure time (T_fail).  This ensures first of all that the ULP
+  traffic is not impacted by the drainage, and that if the final
+  rekeying message is lost and requires
   retransmission, the old DKC remains available for as long as SCTP
   continues retransmission attempts.  If the association fails
   (i.e., SCTP declares the peer unreachable), the DKCs are removed
@@ -803,7 +814,7 @@ default values from {{RFC9260}} (RTO.Initial = 1s, RTO.Max = 60s,
 Association.Max.Retrans = 10), T_fail is approximately 303 seconds.
 
 Implementations SHOULD set the drain timer to at least T_fail when
-delivery of the final rekeying message has not been confirmed.
+delivery of the Read Key Installed message has not been confirmed.
 
 ### Concurrent Rekey Requests {#sim-rekeying}
 
