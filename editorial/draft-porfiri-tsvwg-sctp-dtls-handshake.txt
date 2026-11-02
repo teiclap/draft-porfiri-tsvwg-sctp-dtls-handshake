@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 5 May 2027                                             Ericsson
+Expires: 6 May 2027                                             Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                         1 November 2026
+                                                         2 November 2026
 
 
    Transport Layer Security (TLS) based Key Management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -644,7 +644,7 @@ Table of Contents
         any TLS records produced by the TLS server to the client key
         manager per Section 4.
 
-   6.   The TLS endpoints continues to exchange TLS messages to complete
+   6.   The TLS endpoints continue to exchange TLS messages to complete
         the TLS handshake.
 
    7.   The client key manager's TLS handshake completes.  It exports
