@@ -860,16 +860,21 @@ For protected SCTP restart to succeed:
 ~~~~~~~~~~~
 {: #restart-diagram title="SCTP Restart Procedure" artwork-align="center"}
 
+Steps 1-5 are following what is defined in Section 5.4 (Restart Considerations)
+in {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+
 1. The restarting endpoint (Initiator) retrieves the restart key
    material from persistent secure storage and installs the Restart
    DKC for both send and receive directions.
 
 2. The Initiator sends INIT (VTag=0). Include the DTLS Key Management
-   Parameter with the same method list but a new random Tie Breaker.
+   Parameter with the same method list and the same role and restart settings,
+   but a new random Tie Breaker.
 
 3. The Responder (the not restarting endpoint) replies INIT-ACK in
    plain text per {{RFC9260}}.  Include the DTLS Key Management
-   Parameter with the same method list but a new random Tie Breaker.
+   Parameter with the same method list and the same role and restart
+   settings, but a new random Tie Breaker.
 
 4. The Initiator sends COOKIE ECHO in a DTLS chunk protected with
    the Restart DKC (R bit set).
@@ -910,8 +915,8 @@ procedure ({{initial-establishment}}).  They differ only as follows:
 {:start="13"}
 13. Protected application traffic uses the new Primary DKC.
 
-After restart, the new Primary DKC MUST use epoch 3 (the epoch
-resets).
+After restart, the new Primary DKC is required to use epoch 3 (the epoch
+resets), see {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
