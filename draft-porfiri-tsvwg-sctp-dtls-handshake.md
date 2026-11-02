@@ -495,7 +495,7 @@ results in mismatched keys and association failure.
 
 A single TLS Exporter label is used to derive all keying material:
 
-    EXPORTER_TLS_FOR_DTLS_IN_SCTP
+    EXPORTER_DTLS_IN_SCTP
 
 The specific key material (direction, role, and type) is
 differentiated by the exporter context ({{exporter-context}}).  Each
@@ -1005,7 +1005,7 @@ Exporter Label Registry {{RFC5705}} with Reference RFC-TBD and empty
 Comment.
 
 | Value | DTLS-OK | Recommended |
-| EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
+| EXPORTER_DTLS_IN_SCTP | Y | N |
 {: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
 
 ## DTLS Chunk Key Management Control Message Types {#sec-iana-ctrl-types}
