@@ -917,7 +917,7 @@ procedure ({{initial-establishment}}).  They differ only as follows:
 13. Protected application traffic uses the new Primary DKC.
 
 After restart, the new Primary DKC is required to use epoch 3 (the epoch
-resets), see Section 5.4 of {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
+resets), see {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
