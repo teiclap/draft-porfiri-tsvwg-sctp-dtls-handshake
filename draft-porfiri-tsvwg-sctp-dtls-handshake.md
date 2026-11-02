@@ -2,7 +2,6 @@
 docname: draft-porfiri-tsvwg-sctp-dtls-handshake-latest
 title: Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk
 abbrev: TLS based Key Management for SCTP DTLS Chunk
-obsoletes:
 cat: std
 ipr: trust200902
 wg: TSVWG
@@ -42,8 +41,6 @@ author:
    email: tuexen@fh-muenster.de
 
 informative:
-  RFC5705:
-  RFC9149:
   RFC9525:
 
   ANSSI-DAT-NT-003:
@@ -68,9 +65,11 @@ informative:
     date: October 2024
 
 normative:
+  RFC5705:
   RFC8126:
   RFC8996:
   RFC9147:
+  RFC9149:
   RFC9260:
   RFC9325:
   RFC9846:
@@ -193,7 +192,7 @@ ULP:
 
 # Overview {#overview}
 
-This section provides an informational overview of TLS for DTLS in
+This section provides an informational overview of DTLS in
 SCTP.  Normative procedures are specified in {{procedures}}.
 
 ## Architecture {#architecture}
@@ -289,13 +288,13 @@ The protocol operates in three phases:
 ## TLS Version
 
 This document defines the usage of TLS 1.3 {{RFC9846}}.  Earlier
-versions of TLS MUST NOT be used.  Only one version of TLS MUST be
-used during the lifetime of an SCTP Association.
+versions of TLS MUST NOT be used. An endpoint MUST NOT use more
+than one TLS version during the lifetime of an SCTP association.
 
 ## Cipher Suite Constraints
 
 Parameters not marked as "Y" in the "Recommended" column of TLS
-registries are NOT RECOMMENDED to support.  Non-AEAD cipher suites
+registries SHOULD NOT be supported.  Non-AEAD cipher suites
 or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported.
@@ -477,10 +476,11 @@ the concatenation of the following fields:
 | Field | Length | Value |
 |-------|--------|-------|
 | Direction | 1 byte | 0x00 = Client to Server, 0x01 = Server to Client |
-| Key role | 1 byte | 0x00 = primary/traffic, 0x01 = restart |
+| Key role | 1 byte | 0x00 = primary, 0x01 = restart |
 | Key type | 1 byte | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
 | Client KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Client |
 | Server KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Server |
+{: #exporter-context-table title="Exporter Context" cols="l c l "}
 
 Each DTLS Key Management Parameter (Section 4.1 of
 {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) is included as the
@@ -503,9 +503,10 @@ combination of Direction, Key role, and Key type values produces a
 distinct export, yielding 12 values in total (2 directions × 2 roles
 × 3 types).
 
-The Client installs exports with Direction=Client to server as its
-write keys and Direction=Server to client as its read keys.  The
-Responder does the reverse.
+The endpoint with the Client role installs exports with
+Direction=Client to server as its write keys and
+Direction=Server to client as its read keys.  The
+endpoint with Server role does the reverse.
 
 The length of exported material depends on the negotiated cipher
 suite.
@@ -609,7 +610,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.
    received TLS records to the TLS server and to forward any TLS records
    produced by the TLS server to the client key manager per {{tls-user-message}}.
 
-  6. The TLS endpoints continue exchange TLS messages to complete the TLS handshake.
+  6. The TLS endpoints continue to exchange TLS messages to complete the TLS handshake.
 
   7. The client key manager's TLS handshake completes. It exports all Primary
    and Restart DKC keys, installs the server to client key material as its read
@@ -634,9 +635,8 @@ RKI = Read Key Installed control message; R+W = read and write keys.
 
   If the TLS handshake fails in step 6, it SHOULD be retried according to {{error-handling}}.
 
- After key installation, the TLS connection SHOULD be closed promptly. When
- session resumption is supported, closure follows the procedure in
- {{session-resumption}}.
+ After key installation, the TLS connection SHOULD be closed promptly
+ following the procedure in {{session-resumption}}.
 
 
 ## Rekeying {#rekeying}
@@ -647,7 +647,7 @@ Rekeying is triggered by implementation-configurable criteria,
 including:
 
 * Time elapsed since last peer authentication.
-* Volume of data transferred since last forward-secrecy rekeying.
+* Volume of data transferred since last rekeying.
 * Approaching the cipher suite's AEAD usage limits.
 
 ### Procedure {#rekey-procedure}
@@ -681,7 +681,7 @@ including:
  Initiator                                     Responder
      |  (traffic continues using epoch N DKC)      |
      |                                             |
-     | TLS  cliKM                       srvKM  TLS |
+     | TLS  client KM               server KM  TLS |
      |  |    |                             |    |  |
      |  |    |  (server needs to rekey:)   |    |  |
   2. |  |    |<--------[Rekey Req]---------+    |  |  1.
@@ -707,7 +707,7 @@ including:
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
-Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 Rekey Req = Rekey Request control message;
 RKI = Read Key Installed control message; R+W = read and
 write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
@@ -770,8 +770,7 @@ epoch N+1 DKC.
   coexist temporarily until the drain timer expires (see
   {{drain-timer}}).
 
-  All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
-  NOT be used.
+  All rekeying MUST use ephemeral key exchange.
 
 ### Drain Timer Considerations {#drain-timer}
 
@@ -981,8 +980,9 @@ It is RECOMMENDED that implementations of this key management
 method do not allow the ULP to exchange any data beyond the
 key management information following this specification until
 the peer is authenticated and the local endpoint and the remote
-have both installed read and write keys and enforced protection. This is to avoid any information
-leakage from the ULP to unintended parties.
+endpoint have both installed read and write keys and enforced
+protection. This is to avoid any information leakage from
+the ULP to unintended parties.
 
 
 # IANA Considerations {#iana-considerations}
