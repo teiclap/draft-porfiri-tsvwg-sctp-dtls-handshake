@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-25T02:49:39.987149+00:00",
+  "timestamp": "2026-11-03T04:58:22.756536+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -446,6 +446,142 @@
       "createdAt": "2026-10-08T15:35:21Z",
       "updatedAt": "2026-10-22T06:10:57Z",
       "closedAt": "2026-10-22T06:10:57Z",
+      "comments": []
+    },
+    {
+      "number": 44,
+      "id": "I_kwDORGnINM8AAAABboXf-A",
+      "title": "Exporter label",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/44",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "With the general shortining of the name of the solution to \"DTLS in SCTP\" should we change the TLS exporter label from:\nEXPORTER_TLS_FOR_DTLS_IN_SCTP\n\nTo:\nEXPORTER_DTLS_IN_SCTP\n\n",
+      "createdAt": "2026-11-01T16:25:06Z",
+      "updatedAt": "2026-11-01T16:25:06Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 45,
+      "id": "I_kwDORGnINM8AAAABbotLYg",
+      "title": "Drain Timer and what is \"last rekeying message\"?",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/45",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The Drain Timer Consideration section states: \n\n`If delivery of the last rekeying message has been confirmed (e.g., through SCTP acknowledgment of the DATA chunk carrying the TLS Finished)`\n\nWhat is the \"last rekeying message\"? I think this can be improved now that we have updated the procedure to be clearer, and in fact I think we likely can consider to reduce the timer value even further than one MSS, as if one have received the RKI message this is solely the time an outstanding packet that has been reordered would be meaningful to arrive. Thus I think 3 seconds would be plenty of time. \n\n",
+      "createdAt": "2026-11-01T16:58:39Z",
+      "updatedAt": "2026-11-02T15:35:37Z",
+      "closedAt": "2026-11-02T15:35:37Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "With the procedure we have the transmission of the RKI on the server side to the client starts the drain timer. At this point the client have's the key, just have not installed it's write key. If the servers drain time fires before the server's RKI reaches the client then the server will no longer be able to receive the client's packets. The server side will retransmitt the RKI using its retransmitt timer until the association fails. So I think the general structure is likely correct that the server should not set its drain timer to a low value until it has comfirmation that its RKI has been delivered. So I think a small update clarifying that this text discusses the RKI message. And likely the confirmed case can be reduced to a lower value of 3 or 5 seconds.",
+          "createdAt": "2026-11-01T17:06:50Z",
+          "updatedAt": "2026-11-01T17:06:50Z"
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "id": "I_kwDORGnINM8AAAABbo47sw",
+      "title": "Restart Procedure",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/46",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Clarify that the Steps 1-6 is following DTLS chunk. \n\nStep 2 should perhaps add that the endpoint needs to set the same role, restart bits as previous. \n\n\"After restart, the new Primary DKC MUST use epoch 3 (the epoch resets).\" is this duplicate to DTLS chunk, in that case reference that requirement. \n\n\"The Responder MUST NOT change the Restart DKC during the restart procedure. After the new Restart DKC is installed, the old one is removed.\"\n\nThe above appears a bit unclear. Need to clarify that the Restart DKC can't be replaced until the new Primary DKC is in place and draining has happened. Then the new restart DKC can be installed. Likely should extend the procedure list to make that clear. \n\n\n\n\n",
+      "createdAt": "2026-11-01T17:16:43Z",
+      "updatedAt": "2026-11-02T15:30:26Z",
+      "closedAt": "2026-11-02T15:30:26Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "So if #54 is accepted this can be closed as the remaining aspect is instead covered in #53. ",
+          "createdAt": "2026-11-02T12:43:25Z",
+          "updatedAt": "2026-11-02T12:43:25Z"
+        }
+      ]
+    },
+    {
+      "number": 47,
+      "id": "I_kwDORGnINM8AAAABbo7PsA",
+      "title": "DTLS-OK for the TLS exporter",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/47",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Now that we are using TLS 1.3 and not DTLS 1.3, what is the meaning of the DTLS-Ok : Yes on the exporter label?\n\n",
+      "createdAt": "2026-11-01T17:20:32Z",
+      "updatedAt": "2026-11-02T13:53:42Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I do struggle to find information about what are the criteria for setting this to Y. @emanjon any input on this? ",
+          "createdAt": "2026-11-02T13:53:42Z",
+          "updatedAt": "2026-11-02T13:53:42Z"
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "id": "I_kwDORGnINM8AAAABbo8zHg",
+      "title": "Section 9.3",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/48",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "'IANA is requested to create a new registry called \"DTLS Chunk Key Management Control Message Types\" in the Stream Control Transmission Protocol (SCTP) Parameters group. This registry governs the values of the Ctrl Type field of the control messages defined in Section 4.2.'\n\nShould this registry really be called this, or should it instead be called \"DTLS In SCTP Control Message Types\"?\n\n\n\n",
+      "createdAt": "2026-11-01T17:23:13Z",
+      "updatedAt": "2026-11-01T17:23:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 52,
+      "id": "I_kwDORGnINM8AAAABbzQgQA",
+      "title": "Improved trigger of drainage after rekeying",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/52",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The procedure in the drainage of the old epoch (Section 6.2.3) is problematic. The issue is really about that the server initiate the drainage in step 7: \n\n`The server key manager proceeds only after both its own TLS handshake has completed (7a) and it has received the client key manager's Read Key Installed control message (7b). Once both conditions are met, it exports both direction key material for both the Primary and Restart DKCs for epoch N+1, installs both the read (receive) key and the write (send) key, starts the drain timer to remove the old (epoch N) DKC, and switches sending to the epoch N+1 DKC. The server key manager sends a Read Key Installed control message (Section 4.2.1) to the client key manager.`\n\nHowever, the client will not install its write key until it receives the RKI from the server. At this point no more SCTP packets using the old extension should be generated. If one knows this has happened then one can safely run a short timer (like 3 seconds) just to ensure that any delayed or reordered packets leaves the network. However, if you don't have an explicit indication of the delivery then the server can't really run a shorter timer than the failure to avoid impacting the ULP. If the RKI would be lost and delayed triggering the drain timer on the server side prior the client starting sending with the new epoch will impact the ULP. So the choice is between T_fail (303 seconds) and 3 seconds. Leaving a longer window of opprotunity for an attacker after a rekey. \n\nThe main issue is that there are no ensured mechanism for the server to know that a particular message has been delivered unless one drain the whole association. Also this would mean an implementation requirement. \n\nThus I think we should consider an additional KM message \"Rekey Completed\" sent by the client to the server, and use server reception of this to start the drainage timer. Thus avoiding all the issues. \n",
+      "createdAt": "2026-11-02T10:22:15Z",
+      "updatedAt": "2026-11-02T10:22:15Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 53,
+      "id": "I_kwDORGnINM8AAAABb1QEdA",
+      "title": "When should the restart DKC be owerwritten during restart",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/issues/53",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently the restart section's step 7-12 says it is like Initial. However, this is actually not quite true. There is one important difference and why this may actually be better to model on the rekeying. Namely that the overwriting of the old restart DKC (especially for epoch 3 replacing epoch 3) needs to consider what to do with draining. If one overwrites Restart Epoch 3 directly after the primary write key is in place there will be no drain on the restart. And the spec allows ULPs to use the restart for its own traffic to ensure application session continuation. Thus, there is a point of draining the restart after the primary have been used. \n\nTo make this procedure fast, I would recommend that we resolve issue #52 and in that solution ensures that the server can know when the client has put its write key in place and based on that can wait a short time and then overwrite the restart DKC in its association. \n\nThis procedure may also need to consider when the persistent storage should be overwritten. That maybe should be overwritten as soon as the primary write key and the new restart DKC has been genereated but that requires more thought.  ",
+      "createdAt": "2026-11-02T12:40:36Z",
+      "updatedAt": "2026-11-02T12:40:36Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -2048,6 +2184,430 @@
           "body": "",
           "createdAt": "2026-10-21T18:15:02Z",
           "updatedAt": "2026-10-21T18:15:02Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "id": "PR_kwDORGnINM8AAAABMJEkAg",
+      "title": "Various minor fixes and improvements. ",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/49",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Commits contains description of changes. ",
+      "createdAt": "2026-11-01T17:28:13Z",
+      "updatedAt": "2026-11-02T15:01:10Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "editorial",
+      "headRefOid": "2c4b2d2da0feac4f0f27327f6516c97a85529cc6",
+      "closedAt": "2026-11-02T15:01:10Z",
+      "mergedAt": "2026-11-02T15:01:10Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "26b6c58326e4f011033d1c320a07108a58f8570f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABVbfgBw",
+          "commit": {
+            "abbreviatedOid": "6751f43"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-02T07:06:34Z",
+          "updatedAt": "2026-11-02T07:06:34Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVgnuBA",
+          "commit": {
+            "abbreviatedOid": "6751f43"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-02T14:56:04Z",
+          "updatedAt": "2026-11-02T14:56:04Z",
+          "comments": [
+            {
+              "originalPosition": 87,
+              "body": "Shouldn't this be 'continue to', since TLS endpoints is plural?",
+              "createdAt": "2026-11-02T14:56:04Z",
+              "updatedAt": "2026-11-02T14:56:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVgoJpQ",
+          "commit": {
+            "abbreviatedOid": "6751f43"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-02T14:56:35Z",
+          "updatedAt": "2026-11-02T14:56:35Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 50,
+      "id": "PR_kwDORGnINM8AAAABMQrSXQ",
+      "title": "Renamed the TLS exporter label to EXPORTER_DTLS_IN_SCTP.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/50",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Resolve issue #44 ",
+      "createdAt": "2026-11-02T09:09:56Z",
+      "updatedAt": "2026-11-02T15:01:47Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue44",
+      "headRefOid": "0803a0cee696373a346257b8fa4c01bd40e84f85",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ok, lets leave it for now and have a discussion on the whole naming and after that decided if we kill, or change this PR. ",
+          "createdAt": "2026-11-02T15:01:47Z",
+          "updatedAt": "2026-11-02T15:01:47Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABVcvqhg",
+          "commit": {
+            "abbreviatedOid": "0803a0c"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-02T09:24:39Z",
+          "updatedAt": "2026-11-02T09:24:39Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVgpwGg",
+          "commit": {
+            "abbreviatedOid": "0803a0c"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-02T14:58:22Z",
+          "updatedAt": "2026-11-02T14:58:22Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "I think the old term is pretty descriptive for the solution described in this document. It is more specific, which is good for the label, I think.",
+              "createdAt": "2026-11-02T14:58:22Z",
+              "updatedAt": "2026-11-02T14:58:22Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "id": "PR_kwDORGnINM8AAAABMQ26BA",
+      "title": "Improved drainage description matching the updated procedures.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/51",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes issues #45",
+      "createdAt": "2026-11-02T09:24:46Z",
+      "updatedAt": "2026-11-02T15:35:36Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue45",
+      "headRefOid": "df877078d18505848e19dbea2b194f1984373154",
+      "closedAt": "2026-11-02T15:35:36Z",
+      "mergedAt": "2026-11-02T15:35:36Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "931dd395e1c5364c62c0c3e784d84fdf15d79c6e"
+      },
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Need to do more edits as the client and server are different. ",
+          "createdAt": "2026-11-02T10:24:24Z",
+          "updatedAt": "2026-11-02T10:24:24Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "So new text fixing separating the two cases. ",
+          "createdAt": "2026-11-02T10:31:46Z",
+          "updatedAt": "2026-11-02T10:31:46Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "As input to the discussion: on the server side we may assume that the new DKC has been set and RKI has been queued for the delivery. The following may apply\r\n1. RKI arrives at once\r\n2. There's DATA in flight before RKI that is on another stream, it's lost but RKI is delivered\r\n3. There's DATA in flight before RKI that is on another stream, it's lost and RKI is lost as well\r\n4. \r\nSince the client has already the DKC for receiving the new DKC, whatever happens we have at most the need for retransmitting the DATA once.\r\n\r\nI think that we are quite sure in doing on the server side exactly the same as in the client side, being sure that SCTP will properly fix any outstanding issue.",
+          "createdAt": "2026-11-02T12:13:53Z",
+          "updatedAt": "2026-11-02T12:16:36Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The issue is that what we do initially works fine in that context as the ULP is likely not to start using the SCTP association until the protection is in place. As each side notifies its ULP when it can write there is no issue. \r\n\r\nWhen rekeying the S->C RKI message if lost and being retransmitted the client will stay sending on the old DKC. If one have a short timer on the server drain that happens immediately after installing the write key one can after the draim timer fires end up in a situation where S->C ULP traffic works, but the C->S traffic fails. \r\n\r\nAs long as one can determine that the S->C RKI has been delivered using the short timer works. So I think the text in this PR works, but it do requires that the server side can determine when RKI is delivered to avoid using very long timer (5+ min). And that is really the question in #52.",
+          "createdAt": "2026-11-02T12:23:11Z",
+          "updatedAt": "2026-11-02T12:25:00Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "> The issue is that what we do initially works fine in that context as the ULP is likely not to start using the SCTP association until the protection is in place. As each side notifies its ULP when it can write there is no issue.\r\n> \r\n> When rekeying the S->C RKI message if lost and being retransmitted the client will stay sending on the old DKC. If one have a short timer on the server drain that happens immediately after installing the write key one can after the draim timer fires end up in a situation where S->C ULP traffic works, but the C->S traffic fails.\r\n> \r\n> As long as one can determine that the S->C RKI has been delivered using the short timer works. So I think the text in this PR works, but it do requires that the server side can determine when RKI is delivered to avoid using very long timer (5+ min). And that is really the question in #52.\r\n\r\nI agree, that's why I wrote that this is an input for the discussion.\r\nIn my opinion there's not a perfect solution for the server, but by using the SCTP feature we should find a tradeoff that minimizes the traffic disturbances.",
+          "createdAt": "2026-11-02T12:29:52Z",
+          "updatedAt": "2026-11-02T12:29:52Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABVdSmRQ",
+          "commit": {
+            "abbreviatedOid": "612aec1"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Even before this change, there was a problem in the legacy text: an SCTP user is not informed that a user message has been successfully delivered. We need to discuss this",
+          "createdAt": "2026-11-02T10:11:59Z",
+          "updatedAt": "2026-11-02T10:11:59Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVeLWhw",
+          "commit": {
+            "abbreviatedOid": "df87707"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Fine as the server's RKI is already encrypted with the new DKC.\nWe are sure of that as the server sets the new DKC first and after that it sends RKI.",
+          "createdAt": "2026-11-02T11:32:10Z",
+          "updatedAt": "2026-11-02T11:32:10Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVg-2eA",
+          "commit": {
+            "abbreviatedOid": "df87707"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-02T15:20:37Z",
+          "updatedAt": "2026-11-02T15:20:37Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "Where is T_fail defined?",
+              "createdAt": "2026-11-02T15:20:37Z",
+              "updatedAt": "2026-11-02T15:20:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVhJFUQ",
+          "commit": {
+            "abbreviatedOid": "df87707"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-02T15:32:05Z",
+          "updatedAt": "2026-11-02T15:32:05Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "In the next paragraph at least its calculation is provided. ",
+              "createdAt": "2026-11-02T15:32:05Z",
+              "updatedAt": "2026-11-02T15:32:05Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "id": "PR_kwDORGnINM8AAAABMTRlzg",
+      "title": "Addressing the more editorial clarification parts of issue 46.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/54",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-11-02T12:42:02Z",
+      "updatedAt": "2026-11-02T15:30:25Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue46",
+      "headRefOid": "076de34c81f31bf74d5248131fa136b46e0a97f2",
+      "closedAt": "2026-11-02T15:30:24Z",
+      "mergedAt": "2026-11-02T15:30:24Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "eb61fee5f0d571cfd023ed4bce22b83fc4d6744a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABVe-ycg",
+          "commit": {
+            "abbreviatedOid": "c3c083b"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-02T12:45:17Z",
+          "updatedAt": "2026-11-02T12:45:17Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVhB71Q",
+          "commit": {
+            "abbreviatedOid": "c3c083b"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-02T15:23:56Z",
+          "updatedAt": "2026-11-02T15:23:57Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "Why not use {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}",
+              "createdAt": "2026-11-02T15:23:57Z",
+              "updatedAt": "2026-11-02T15:23:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVhCKnQ",
+          "commit": {
+            "abbreviatedOid": "c3c083b"
+          },
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-02T15:24:13Z",
+          "updatedAt": "2026-11-02T15:24:13Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABVhHVWQ",
+          "commit": {
+            "abbreviatedOid": "c3c083b"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-02T15:30:14Z",
+          "updatedAt": "2026-11-02T15:30:15Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": " Ok, it works at least locally. Will see if it works when the github CLI process its. ",
+              "createdAt": "2026-11-02T15:30:14Z",
+              "updatedAt": "2026-11-02T15:30:15Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "id": "PR_kwDORGnINM8AAAABMTmDuQ",
+      "title": "Using DTLS in SCTP in the IANA section and registry names.",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/55",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This also changes the PPID names. ",
+      "createdAt": "2026-11-02T13:07:35Z",
+      "updatedAt": "2026-11-02T14:04:16Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue48",
+      "headRefOid": "2b7d26562a35159fa994f278f15f5e208d6d6e4c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "tuexen",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think the DTLS chunk is more precisely. DTLS in SCTP could make the reader think that we run DTLS in SCTP, which includes the DTLS handshake... But we only run the encrypt/decrypt in SCTP, the handshake is actually a different protocol (TLS).",
+          "createdAt": "2026-11-02T13:11:27Z",
+          "updatedAt": "2026-11-02T13:11:27Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Just to clarify mine thinking for why to rename them. The current is descriptive, but not a name. So staying with the current works fine until there actually exists a second one. But we can clearly leave them as they are for now. ",
+          "createdAt": "2026-11-02T13:57:11Z",
+          "updatedAt": "2026-11-02T13:57:11Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABVf7Saw",
+          "commit": {
+            "abbreviatedOid": "2b7d265"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-02T14:04:16Z",
+          "updatedAt": "2026-11-02T14:04:16Z",
           "comments": []
         }
       ]
