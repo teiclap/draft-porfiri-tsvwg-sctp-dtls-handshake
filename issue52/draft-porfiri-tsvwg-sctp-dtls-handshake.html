@@ -2456,13 +2456,14 @@ key manager sends a Read Key Installed control message
               <p id="section-6.2.2-9.8.1">The client key manager receives the Read Key Installed
 control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>), installs the client
 key material as its write (send) key, starts the drain timer to
-remove the old (epoch N) DKC, and switches sending to the epoch
-N+1 DKC.<a href="#section-6.2.2-9.8.1" class="pilcrow">¶</a></p>
+remove the old both the Primary and Restart(epoch N) DKC, and
+switches sending to the epoch N+1 DKC.<a href="#section-6.2.2-9.8.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.9">
               <p id="section-6.2.2-9.9.1">The server key manager is notified that the new key has
 been succesfully used when receiving a message from client, it
-starts the drain timer to remove the old (epoch N) DKC.<a href="#section-6.2.2-9.9.1" class="pilcrow">¶</a></p>
+starts the drain timer to remove the old both the Primary and
+Restart (epoch N) DKC.<a href="#section-6.2.2-9.9.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
 <p id="section-6.2.2-10">If the TLS handshake fails in step 5, it SHOULD be retried according to <a href="#error-handling" class="auto internal xref">Section 7</a>.<a href="#section-6.2.2-10" class="pilcrow">¶</a></p>
