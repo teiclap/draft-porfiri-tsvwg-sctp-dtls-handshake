@@ -2634,13 +2634,13 @@ DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶<
                     <text x="184" y="212">for</text>
                     <text x="216" y="212">new</text>
                     <text x="256" y="212">keys,</text>
-                    <text x="80" y="228">steps</text>
-                    <text x="128" y="228">7-12,</text>
-                    <text x="164" y="228">as</text>
-                    <text x="188" y="228">in</text>
-                    <text x="232" y="228">initial</text>
-                    <text x="292" y="228">setup)</text>
-                    <text x="16" y="260">13.</text>
+                    <text x="104" y="228">steps</text>
+                    <text x="152" y="228">7-13,</text>
+                    <text x="188" y="228">as</text>
+                    <text x="212" y="228">in</text>
+                    <text x="248" y="228">rekey</text>
+                    <text x="296" y="228">case)</text>
+                    <text x="16" y="260">14.</text>
                     <text x="152" y="260">[DTLS(protected</text>
                     <text x="232" y="260">APP</text>
                     <text x="276" y="260">DATA)]</text>
@@ -2699,31 +2699,22 @@ The ULP MAY be informed that the association is restarted at this
 point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-3.6.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-3.7">
-              <p id="section-6.3.2-3.7.1">Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
-correspond one-to-one to steps 4 to 9 of the initial establishment
-procedure (<a href="#initial-establishment" class="auto internal xref">Section 6.1</a>).  They differ only as follows:<a href="#section-6.3.2-3.7.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-3.7.1">Steps 7 to 13 perform the TLS 1.3 handshake and key installation, and
+correspond one-to-one to steps 3 to 9 of the rekey
+procedure (<a href="#rekey-procedure" class="auto internal xref">Section 6.2.2</a>).  They differ only as follows:<a href="#section-6.3.2-3.7.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.2-3.7.2.1">
-                  <p id="section-6.3.2-3.7.2.1.1">all key management messages are carried inside DTLS chunks protected
-with the Restart DKC;<a href="#section-6.3.2-3.7.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-6.3.2-3.7.2.2">
-                  <p id="section-6.3.2-3.7.2.2.1">in addition to the Primary DKC, each endpoint exports, installs, and
-commits the new Restart DKC to persistent secure storage, removing
-the old one;<a href="#section-6.3.2-3.7.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-6.3.2-3.7.2.3">
-                  <p id="section-6.3.2-3.7.2.3.1">at the key transition (steps 11 and 12), each endpoint switches the
+                  <p id="section-6.3.2-3.7.2.1.1">at the key transition (steps 11 and 12), each endpoint switches the
 active DTLS key context from the Restart DKC to the new Primary DKC
 after the Read Key Installed exchange completes (the Read Key
 Installed messages themselves are protected with the Restart DKC),
 rather than enforcing protection for the first time; the ULP was
-already informed at step 6.<a href="#section-6.3.2-3.7.2.3.1" class="pilcrow">¶</a></p>
+already informed at step 6.<a href="#section-6.3.2-3.7.2.1.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
           </ol>
-<ol start="13" type="1" class="normal type-1" id="section-6.3.2-4">
+<ol start="14" type="1" class="normal type-1" id="section-6.3.2-4">
 <li id="section-6.3.2-4.1">
               <p id="section-6.3.2-4.1.1">Protected application traffic uses the new Primary DKC.<a href="#section-6.3.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
