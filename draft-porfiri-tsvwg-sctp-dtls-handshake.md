@@ -763,7 +763,7 @@ epoch N+1 DKC.
 
   9. The server key manager is notified that the new key has
      been succesfully used when receiving a message from client, it
-     starts the drain timer to remove the old both the Primary and
+     starts the drain timer to remove both Primary and
      Restart (epoch N) DKC.
 
   If the TLS handshake fails in step 5, it SHOULD be retried according to {{error-handling}}.
