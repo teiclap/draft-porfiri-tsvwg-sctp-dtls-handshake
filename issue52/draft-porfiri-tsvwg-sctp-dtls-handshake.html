@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</title>
+<title>Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</title>
 <meta content="Magnus Westerlund" name="author">
 <meta content="John Preuß Mattsson" name="author">
 <meta content="Claudio Porfiri" name="author">
+<meta content="Michael Tüxen" name="author">
 <meta content="
        This document defines how Transport Layer Security (TLS) 1.3
-is used as a key-management method for the SCTP DTLS Chunk mechanism.
+is used as a key management method for the SCTP DTLS Chunk mechanism.
 It specifies how a TLS handshake establishes the initial security
 context for an SCTP association and how subsequent TLS handshakes
 provide key updates and re-authentication. The goal is to enable
@@ -18,22 +19,22 @@ authenticated and confidential communication over SCTP using the
 DTLS Chunk, leveraging standardized TLS 1.3 features for key
 management and rekeying. 
     " name="description">
-<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="xml2rfc 3.35.0" name="generator">
 <meta content="draft-porfiri-tsvwg-sctp-dtls-handshake-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.1
-    Python 3.14.8
-    ConfigArgParse 1.8.0
+  xml2rfc 3.35.0
+    Python 3.14.10
+    ConfigArgParse 1.9.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.12.2
+    platformdirs 4.14.3
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.9.1
+    wcwidth 0.9.4
 -->
 <link href="draft-porfiri-tsvwg-sctp-dtls-handshake.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1034,7 +1035,7 @@ svg {
   & :is([stroke="white"], [stroke^="#fff"]) {
     stroke: var(--background-color);
   }
-  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+  & :is([fill="black"], [fill^="#000"], :not([fill], [fill] *)) {
     fill: var(--text-color);
   }
   & :is([fill="white"], [fill^="#fff"]) {
@@ -1048,12 +1049,12 @@ svg {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">TLS for DTLS in SCTP</td>
-<td class="right">October 2026</td>
+<td class="center">TLS based Key Management for SCTP DTLS C</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 10 April 2027</td>
+<td class="center">Expires 10 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1066,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-07" class="published">7 October 2026</time>
+<time datetime="2026-11-06" class="published">6 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-10">10 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-10">10 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1086,14 +1087,18 @@ svg {
       <div class="author-name">C. Porfiri</div>
 <div class="org">Ericsson</div>
 </div>
+<div class="author">
+      <div class="author-name">M. Tüxen</div>
+<div class="org">Münster Univ. of Appl. Sciences</div>
+</div>
 </dd>
 </dl>
 </div>
-<h1 id="title">Transport Layer Security (TLS) based key-management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</h1>
+<h1 id="title">Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document defines how Transport Layer Security (TLS) 1.3
-is used as a key-management method for the SCTP DTLS Chunk mechanism.
+is used as a key management method for the SCTP DTLS Chunk mechanism.
 It specifies how a TLS handshake establishes the initial security
 context for an SCTP association and how subsequent TLS handshakes
 provide key updates and re-authentication. The goal is to enable
@@ -1135,7 +1140,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 10 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 10 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1210,7 +1215,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-tls-based-key-management-me" class="internal xref">TLS-based Key Management Messages</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-key-management-messages" class="internal xref">Key Management Messages</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
                 <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-tls-records" class="internal xref">TLS Records</a></p>
@@ -1305,7 +1310,10 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-tls-exporter-labels" class="internal xref">TLS Exporter Labels</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
-                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-sctp-payload-protocol-ident" class="internal xref">SCTP Payload Protocol Identifier</a></p>
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-dtls-chunk-key-management-c" class="internal xref">DTLS Chunk Key Management Control Message Types</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
+                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="auto internal xref">9.4</a>.  <a href="#name-sctp-payload-protocol-ident" class="internal xref">SCTP Payload Protocol Identifier</a></p>
 </li>
             </ul>
 </li>
@@ -1348,8 +1356,7 @@ a DTLS Key Management Identifier.<a href="#section-1-2" class="pilcrow">¶</a></
 handshakes carried as SCTP user messages to perform mutual
 authentication and derive keying material for the DTLS Chunk
 Protection Operator.  The combination of the SCTP DTLS Chunk and the
-key-management defined in this document is referred to as "TLS for
-DTLS in SCTP".<a href="#section-1-3" class="pilcrow">¶</a></p>
+key management defined in this document is referred to as "DTLS in SCTP".<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">The key advantages of this approach are:<a href="#section-1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-5.1">
@@ -1489,7 +1496,7 @@ to the "server" role (S bit) in the DTLS Key Management Parameter of
       <h2 id="name-overview">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
       </h2>
-<p id="section-2-1">This section provides an informational overview of TLS for DTLS in
+<p id="section-2-1">This section provides an informational overview of DTLS in
 SCTP.  Normative procedures are specified in <a href="#procedures" class="auto internal xref">Section 6</a>.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <div id="architecture">
 <section id="section-2.1">
@@ -1500,29 +1507,30 @@ SCTP.  Normative procedures are specified in <a href="#procedures" class="auto i
 <figure id="figure-1">
           <div id="section-2.1-1.1">
             <div class="alignCenter art-svg artwork" id="section-2.1-1.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="512" width="464" viewBox="0 0 464 512" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,32 L 8,320" fill="none" stroke="black"></path>
-                <path d="M 8,416 L 8,496" fill="none" stroke="black"></path>
-                <path d="M 72,328 L 72,368" fill="none" stroke="black"></path>
-                <path d="M 96,368 L 96,408" fill="none" stroke="black"></path>
-                <path d="M 136,32 L 136,320" fill="none" stroke="black"></path>
-                <path d="M 152,32 L 152,320" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="528" width="464" viewBox="0 0 464 528" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,32 L 8,336" fill="none" stroke="black"></path>
+                <path d="M 8,432 L 8,512" fill="none" stroke="black"></path>
+                <path d="M 72,344 L 72,384" fill="none" stroke="black"></path>
+                <path d="M 96,384 L 96,424" fill="none" stroke="black"></path>
+                <path d="M 136,32 L 136,336" fill="none" stroke="black"></path>
+                <path d="M 152,32 L 152,336" fill="none" stroke="black"></path>
                 <path d="M 168,64 L 168,304" fill="none" stroke="black"></path>
+                <path d="M 176,344 L 176,384" fill="none" stroke="black"></path>
                 <path d="M 184,112 L 184,256" fill="none" stroke="black"></path>
-                <path d="M 192,432 L 192,480" fill="none" stroke="black"></path>
+                <path d="M 192,448 L 192,496" fill="none" stroke="black"></path>
                 <path d="M 208,96 L 208,128" fill="none" stroke="black"></path>
                 <path d="M 208,160 L 208,192" fill="none" stroke="black"></path>
                 <path d="M 208,240 L 208,288" fill="none" stroke="black"></path>
-                <path d="M 280,328 L 280,368" fill="none" stroke="black"></path>
                 <path d="M 296,192 L 296,240" fill="none" stroke="black"></path>
-                <path d="M 368,432 L 368,480" fill="none" stroke="black"></path>
+                <path d="M 296,312 L 296,384" fill="none" stroke="black"></path>
+                <path d="M 368,448 L 368,496" fill="none" stroke="black"></path>
                 <path d="M 384,96 L 384,128" fill="none" stroke="black"></path>
                 <path d="M 384,160 L 384,192" fill="none" stroke="black"></path>
                 <path d="M 384,240 L 384,288" fill="none" stroke="black"></path>
                 <path d="M 400,64 L 400,304" fill="none" stroke="black"></path>
-                <path d="M 416,112 L 416,448" fill="none" stroke="black"></path>
-                <path d="M 432,32 L 432,320" fill="none" stroke="black"></path>
-                <path d="M 432,416 L 432,496" fill="none" stroke="black"></path>
+                <path d="M 416,112 L 416,464" fill="none" stroke="black"></path>
+                <path d="M 432,32 L 432,336" fill="none" stroke="black"></path>
+                <path d="M 432,432 L 432,512" fill="none" stroke="black"></path>
                 <path d="M 8,32 L 136,32" fill="none" stroke="black"></path>
                 <path d="M 152,32 L 432,32" fill="none" stroke="black"></path>
                 <path d="M 168,64 L 400,64" fill="none" stroke="black"></path>
@@ -1537,21 +1545,22 @@ SCTP.  Normative procedures are specified in <a href="#procedures" class="auto i
                 <path d="M 184,256 L 200,256" fill="none" stroke="black"></path>
                 <path d="M 208,288 L 384,288" fill="none" stroke="black"></path>
                 <path d="M 168,304 L 400,304" fill="none" stroke="black"></path>
-                <path d="M 8,320 L 136,320" fill="none" stroke="black"></path>
-                <path d="M 152,320 L 432,320" fill="none" stroke="black"></path>
-                <path d="M 72,368 L 280,368" fill="none" stroke="black"></path>
-                <path d="M 8,416 L 432,416" fill="none" stroke="black"></path>
-                <path d="M 192,432 L 368,432" fill="none" stroke="black"></path>
-                <path d="M 376,448 L 416,448" fill="none" stroke="black"></path>
-                <path d="M 192,480 L 368,480" fill="none" stroke="black"></path>
-                <path d="M 8,496 L 432,496" fill="none" stroke="black"></path>
-                <polygon class="arrowhead" points="424,408 412,402.4 412,413.6" fill="black" transform="rotate(90,416,408)"></polygon>
-                <polygon class="arrowhead" points="384,448 372,442.4 372,453.6" fill="black" transform="rotate(180,376,448)"></polygon>
-                <polygon class="arrowhead" points="288,328 276,322.4 276,333.6" fill="black" transform="rotate(270,280,328)"></polygon>
+                <path d="M 8,336 L 136,336" fill="none" stroke="black"></path>
+                <path d="M 152,336 L 432,336" fill="none" stroke="black"></path>
+                <path d="M 72,384 L 296,384" fill="none" stroke="black"></path>
+                <path d="M 8,432 L 432,432" fill="none" stroke="black"></path>
+                <path d="M 192,448 L 368,448" fill="none" stroke="black"></path>
+                <path d="M 376,464 L 416,464" fill="none" stroke="black"></path>
+                <path d="M 192,496 L 368,496" fill="none" stroke="black"></path>
+                <path d="M 8,512 L 432,512" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="424,424 412,418.4 412,429.6" fill="black" transform="rotate(90,416,424)"></polygon>
+                <polygon class="arrowhead" points="384,464 372,458.4 372,469.6" fill="black" transform="rotate(180,376,464)"></polygon>
+                <polygon class="arrowhead" points="304,312 292,306.4 292,317.6" fill="black" transform="rotate(270,296,312)"></polygon>
                 <polygon class="arrowhead" points="208,256 196,250.4 196,261.6" fill="black" transform="rotate(0,200,256)"></polygon>
                 <polygon class="arrowhead" points="208,112 196,106.4 196,117.6" fill="black" transform="rotate(0,200,112)"></polygon>
-                <polygon class="arrowhead" points="104,408 92,402.4 92,413.6" fill="black" transform="rotate(90,96,408)"></polygon>
-                <polygon class="arrowhead" points="80,328 68,322.4 68,333.6" fill="black" transform="rotate(270,72,328)"></polygon>
+                <polygon class="arrowhead" points="184,344 172,338.4 172,349.6" fill="black" transform="rotate(270,176,344)"></polygon>
+                <polygon class="arrowhead" points="104,424 92,418.4 92,429.6" fill="black" transform="rotate(90,96,424)"></polygon>
+                <polygon class="arrowhead" points="80,344 68,338.4 68,349.6" fill="black" transform="rotate(270,72,344)"></polygon>
                 <g class="text">
                   <text x="72" y="52">ULP</text>
                   <text x="232" y="52">Key</text>
@@ -1568,13 +1577,15 @@ SCTP.  Normative procedures are specified in <a href="#procedures" class="auto i
                   <text x="308" y="260">Record</text>
                   <text x="260" y="276">Protection</text>
                   <text x="340" y="276">Operator</text>
-                  <text x="444" y="372">keys</text>
-                  <text x="68" y="388">PPID</text>
-                  <text x="92" y="452">SCTP</text>
-                  <text x="252" y="452">DTLS</text>
-                  <text x="296" y="452">Chunk</text>
-                  <text x="244" y="468">Protection</text>
-                  <text x="324" y="468">Operator</text>
+                  <text x="224" y="372">PPID=4243</text>
+                  <text x="344" y="372">PPID=4242</text>
+                  <text x="444" y="388">keys</text>
+                  <text x="68" y="404">PPID</text>
+                  <text x="92" y="468">SCTP</text>
+                  <text x="252" y="468">DTLS</text>
+                  <text x="296" y="468">Chunk</text>
+                  <text x="244" y="484">Protection</text>
+                  <text x="324" y="484">Operator</text>
                 </g>
               </svg><a href="#section-2.1-1.1.1" class="pilcrow">¶</a>
 </div>
@@ -1583,11 +1594,31 @@ SCTP.  Normative procedures are specified in <a href="#procedures" class="auto i
 <a href="#name-architecture-2" class="selfRef">Architecture</a>
           </figcaption></figure>
 </div>
-<p id="section-2.1-2">Application data is never transmitted in TLS application_data records.
-Instead, application data is sent via SCTP DATA chunks protected by
-the DTLS Chunk Protection Operator.  TLS 1.3 is used solely for key
-management: performing handshakes, deriving keys via the TLS Exporter,
-and then closing the TLS connection.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-2">As shown in <a href="#overview-layering" class="auto internal xref">Figure 1</a>, the Key Management Method is
+layered above SCTP alongside the Upper Layer Protocol (ULP), while the
+DTLS Chunk Protection Operator sits within SCTP and performs the actual
+protection of SCTP packets by encrypting and decrypting them and performing
+integrity verification.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">The Key Management Method instantiates a TLS 1.3 connection that is used
+solely for mutual authentication and key establishment; it never carries
+user data.  The key managers drive this connection through the TLS user
+API (the client key manager acting as the TLS client, the server key
+manager as the TLS server, role determination is specified in
+<a href="#role-determination" class="auto internal xref">Section 5.1</a>) and relay the resulting TLS records to each
+other as SCTP user messages, so that the TLS handshake is performed
+between the two endpoints.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">TLS records and key management control information travel over the same
+SCTP association as the ULP's data and are distinguished by the SCTP
+Payload Protocol Identifier (PPID): PPID 4242 for TLS records, PPID 4243
+for control information, and the ULP's own PPID(s) for application data.
+This separation lets the receiver deliver each message to the TLS
+connection, to the key management logic, or to the ULP, as appropriate.
+The framing and control messages are specified in <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1-5">When the TLS handshake completes, the key management function derives
+keying material from the TLS Exporter and creates the DTLS Key Contexts
+(DKCs) used by the DTLS Chunk Protection Operator to protect SCTP
+packets; the TLS connection is then closed.  Key derivation and DKC
+installation are specified in <a href="#dtls-key-derivation" class="auto internal xref">Section 5</a>.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protocol-flow-summary">
@@ -1632,8 +1663,8 @@ to establish fresh Primary and Restart DKCs.<a href="#section-2.2-2.3.1" class="
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-tls-version" class="section-name selfRef">TLS Version</a>
         </h3>
 <p id="section-3.1-1">This document defines the usage of TLS 1.3 <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.  Earlier
-versions of TLS MUST NOT be used.  Only one version of TLS MUST be
-used during the lifetime of an SCTP Association.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+versions of TLS MUST NOT be used. An endpoint MUST NOT use more
+than one TLS version during the lifetime of an SCTP association.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cipher-suite-constraints">
@@ -1642,11 +1673,11 @@ used during the lifetime of an SCTP Association.<a href="#section-3.1-1" class="
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-cipher-suite-constraints" class="section-name selfRef">Cipher Suite Constraints</a>
         </h3>
 <p id="section-3.2-1">Parameters not marked as "Y" in the "Recommended" column of TLS
-registries are NOT RECOMMENDED to support.  Non-AEAD cipher suites
+registries SHOULD NOT be supported.  Non-AEAD cipher suites
 or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">The cipher suites negotiated in the key-management TLS connection
+<p id="section-3.2-2">The cipher suites negotiated in the key management TLS connection
 MUST only include those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
 suites (see Section 7.3 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-3.2-2" class="pilcrow">¶</a></p>
@@ -1657,7 +1688,7 @@ suites (see Section 7.3 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" clas
         <h3 id="name-authentication-and-identity">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-authentication-and-identity" class="section-name selfRef">Authentication and Identity</a>
         </h3>
-<p id="section-3.3-1">TLS for DTLS in SCTP MUST be mutually authenticated.  It is
+<p id="section-3.3-1">DTLS in SCTP MUST be mutually authenticated.  It is
 RECOMMENDED to use certificate-based authentication.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">When certificates are used, the application is responsible for
 trust anchor management, certificate chain validation, and identity
@@ -1676,7 +1707,7 @@ connection established after an SCTP restart (<a href="#sctp-restart" class="aut
 Clients and servers MUST NOT accept a change of identity during the
 setup of a new TLS connection, but MAY accept negotiation of stronger
 algorithms and security parameters.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
-<p id="section-3.3-5">This requirement is independent of the key-management role: the Client
+<p id="section-3.3-5">This requirement is independent of the key management role: the Client
 and Server roles are re-derived from the SCTP handshake and MAY differ
 after an SCTP restart (<a href="#sctp-restart" class="auto internal xref">Section 6.3</a>), but an endpoint that changes
 role MUST still present the same authenticated identity.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
@@ -1741,10 +1772,10 @@ obtain the tickets it requested.<a href="#section-3.5-3" class="pilcrow">¶</a><
 </div>
 <div id="tls-user-message">
 <section id="section-4">
-      <h2 id="name-tls-based-key-management-me">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-tls-based-key-management-me" class="section-name selfRef">TLS-based Key Management Messages</a>
+      <h2 id="name-key-management-messages">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-key-management-messages" class="section-name selfRef">Key Management Messages</a>
       </h2>
-<p id="section-4-1">All TLS-based key management messages MUST be sent as SCTP user messages
+<p id="section-4-1">All key management messages MUST be sent as SCTP user messages
 using reliable in-order delivery on stream 0.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">There are two classes of these key management messages:<a href="#section-4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1773,56 +1804,27 @@ Other SCTP user messages MUST NOT use this PPID.<a href="#section-4.1-1" class="
         </h3>
 <p id="section-4.2-1">Control messages are sent as SCTP user messages, they MUST use PPID 4243
 and contain a single byte identifying the type as shown in the following
-<a href="#control-message-format" class="auto internal xref">Figure 2</a>.
-Other user messages MUST NOT use this PPID.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<a href="#control-message-format" class="auto internal xref">Figure 2</a>. Other user messages MUST NOT use this PPID.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <span id="name-control-message-format"></span><div id="control-message-format">
 <figure id="figure-2">
           <div id="section-4.2-2.1">
             <div class="alignCenter art-svg artwork" id="section-4.2-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="528" viewBox="0 0 528 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
-                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
-                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
-                <path d="M 8,96 L 136,96" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="96" width="144" viewBox="0 0 144 96" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
+                <path d="M 136,48 L 136,80" fill="none" stroke="black"></path>
+                <path d="M 8,48 L 136,48" fill="none" stroke="black"></path>
+                <path d="M 8,80 L 136,80" fill="none" stroke="black"></path>
                 <g class="text">
                   <text x="16" y="36">0</text>
-                  <text x="176" y="36">1</text>
-                  <text x="336" y="36">2</text>
-                  <text x="496" y="36">3</text>
-                  <text x="16" y="52">0</text>
-                  <text x="32" y="52">1</text>
-                  <text x="48" y="52">2</text>
-                  <text x="64" y="52">3</text>
-                  <text x="80" y="52">4</text>
-                  <text x="96" y="52">5</text>
-                  <text x="112" y="52">6</text>
-                  <text x="128" y="52">7</text>
-                  <text x="144" y="52">8</text>
-                  <text x="160" y="52">9</text>
-                  <text x="176" y="52">0</text>
-                  <text x="192" y="52">1</text>
-                  <text x="208" y="52">2</text>
-                  <text x="224" y="52">3</text>
-                  <text x="240" y="52">4</text>
-                  <text x="256" y="52">5</text>
-                  <text x="272" y="52">6</text>
-                  <text x="288" y="52">7</text>
-                  <text x="304" y="52">8</text>
-                  <text x="320" y="52">9</text>
-                  <text x="336" y="52">0</text>
-                  <text x="352" y="52">1</text>
-                  <text x="368" y="52">2</text>
-                  <text x="384" y="52">3</text>
-                  <text x="400" y="52">4</text>
-                  <text x="416" y="52">5</text>
-                  <text x="432" y="52">6</text>
-                  <text x="448" y="52">7</text>
-                  <text x="464" y="52">8</text>
-                  <text x="480" y="52">9</text>
-                  <text x="496" y="52">0</text>
-                  <text x="512" y="52">1</text>
-                  <text x="52" y="84">Ctrl</text>
-                  <text x="92" y="84">Type</text>
+                  <text x="32" y="36">1</text>
+                  <text x="48" y="36">2</text>
+                  <text x="64" y="36">3</text>
+                  <text x="80" y="36">4</text>
+                  <text x="96" y="36">5</text>
+                  <text x="112" y="36">6</text>
+                  <text x="128" y="36">7</text>
+                  <text x="52" y="68">Ctrl</text>
+                  <text x="92" y="68">Type</text>
                 </g>
               </svg><a href="#section-4.2-2.1.1" class="pilcrow">¶</a>
 </div>
@@ -1916,7 +1918,7 @@ is already in progress, in which case the Rekey Request is ignored (see
 <p id="section-5.1-1">Role determination and method selection follow the procedure defined
 in Section 5.1 of
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.  After
-the SCTP association is established, the key-management function
+the SCTP association is established, the key management function
 retrieves from the SCTP stack's DTLS chunk API the assigned role
 (Client or Server), the selected DTLS Key
 Management Method, and the downgrade prevention data (both endpoints'
@@ -1931,43 +1933,48 @@ DTLS Key Management Parameters) used as input to key derivation.<a href="#sectio
 <p id="section-5.2-1">DTLS Key Contexts are derived using the TLS Exporter as defined in
 Section 7.5 of <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.  The exporter context is constructed as
 the concatenation of the following fields:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<span id="name-exporter-context-2"></span><div id="exporter-context-table">
 <table class="center" id="table-2">
-          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+          <caption>
+<a href="#table-2" class="selfRef">Table 2</a>:
+<a href="#name-exporter-context-2" class="selfRef">Exporter Context</a>
+          </caption>
 <thead>
             <tr>
               <th class="text-left" rowspan="1" colspan="1">Field</th>
-              <th class="text-left" rowspan="1" colspan="1">Length</th>
+              <th class="text-center" rowspan="1" colspan="1">Length</th>
               <th class="text-left" rowspan="1" colspan="1">Value</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Direction</td>
-              <td class="text-left" rowspan="1" colspan="1">1 byte</td>
+              <td class="text-center" rowspan="1" colspan="1">1 byte</td>
               <td class="text-left" rowspan="1" colspan="1">0x00 = Client to Server, 0x01 = Server to Client</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Key role</td>
-              <td class="text-left" rowspan="1" colspan="1">1 byte</td>
-              <td class="text-left" rowspan="1" colspan="1">0x00 = primary/traffic, 0x01 = restart</td>
+              <td class="text-center" rowspan="1" colspan="1">1 byte</td>
+              <td class="text-left" rowspan="1" colspan="1">0x00 = primary, 0x01 = restart</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Key type</td>
-              <td class="text-left" rowspan="1" colspan="1">1 byte</td>
+              <td class="text-center" rowspan="1" colspan="1">1 byte</td>
               <td class="text-left" rowspan="1" colspan="1">0x00 = Key, 0x01 = SN_KEY, 0x02 = IV</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Client KM Param</td>
-              <td class="text-left" rowspan="1" colspan="1">variable</td>
+              <td class="text-center" rowspan="1" colspan="1">variable</td>
               <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the endpoint designated as Client</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Server KM Param</td>
-              <td class="text-left" rowspan="1" colspan="1">variable</td>
+              <td class="text-center" rowspan="1" colspan="1">variable</td>
               <td class="text-left" rowspan="1" colspan="1">DTLS Key Management Parameter sent by the endpoint designated as Server</td>
             </tr>
           </tbody>
         </table>
+</div>
 <p id="section-5.2-3">Each DTLS Key Management Parameter (Section 4.1 of
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) is included as the
 sequence of bytes sent on the wire, including the parameter header
@@ -1993,9 +2000,10 @@ differentiated by the exporter context (<a href="#exporter-context" class="auto 
 combination of Direction, Key role, and Key type values produces a
 distinct export, yielding 12 values in total (2 directions × 2 roles
 × 3 types).<a href="#section-5.3-3" class="pilcrow">¶</a></p>
-<p id="section-5.3-4">The Client installs exports with Direction=Client to server as its
-write keys and Direction=Server to client as its read keys.  The
-Responder does the reverse.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-4">The endpoint with the Client role installs exports with
+Direction=Client to server as its write keys and
+Direction=Server to client as its read keys.  The
+endpoint with Server role does the reverse.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
 <p id="section-5.3-5">The length of exported material depends on the negotiated cipher
 suite.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
 </section>
@@ -2064,8 +2072,7 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
                 <path d="M 216,112 L 408,112" fill="none" stroke="black"></path>
                 <path d="M 72,176 L 104,176" fill="none" stroke="black"></path>
                 <path d="M 344,176 L 376,176" fill="none" stroke="black"></path>
-                <path d="M 64,208 L 96,208" fill="none" stroke="black"></path>
-                <path d="M 352,208 L 384,208" fill="none" stroke="black"></path>
+                <path d="M 72,208 L 376,208" fill="none" stroke="black"></path>
                 <path d="M 64,256 L 96,256" fill="none" stroke="black"></path>
                 <path d="M 104,272 L 192,272" fill="none" stroke="black"></path>
                 <path d="M 240,272 L 336,272" fill="none" stroke="black"></path>
@@ -2080,13 +2087,13 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
                 <polygon class="arrowhead" points="408,400 396,394.4 396,405.6" fill="black" transform="rotate(0,400,400)"></polygon>
                 <polygon class="arrowhead" points="408,96 396,90.4 396,101.6" fill="black" transform="rotate(0,400,96)"></polygon>
                 <polygon class="arrowhead" points="408,64 396,58.4 396,69.6" fill="black" transform="rotate(0,400,64)"></polygon>
+                <polygon class="arrowhead" points="384,208 372,202.4 372,213.6" fill="black" transform="rotate(0,376,208)"></polygon>
                 <polygon class="arrowhead" points="384,176 372,170.4 372,181.6" fill="black" transform="rotate(0,376,176)"></polygon>
                 <polygon class="arrowhead" points="360,288 348,282.4 348,293.6" fill="black" transform="rotate(180,352,288)"></polygon>
-                <polygon class="arrowhead" points="360,208 348,202.4 348,213.6" fill="black" transform="rotate(180,352,208)"></polygon>
                 <polygon class="arrowhead" points="344,272 332,266.4 332,277.6" fill="black" transform="rotate(0,336,272)"></polygon>
                 <polygon class="arrowhead" points="120,336 108,330.4 108,341.6" fill="black" transform="rotate(180,112,336)"></polygon>
                 <polygon class="arrowhead" points="104,256 92,250.4 92,261.6" fill="black" transform="rotate(0,96,256)"></polygon>
-                <polygon class="arrowhead" points="104,208 92,202.4 92,213.6" fill="black" transform="rotate(0,96,208)"></polygon>
+                <polygon class="arrowhead" points="80,208 68,202.4 68,213.6" fill="black" transform="rotate(180,72,208)"></polygon>
                 <polygon class="arrowhead" points="80,176 68,170.4 68,181.6" fill="black" transform="rotate(180,72,176)"></polygon>
                 <polygon class="arrowhead" points="56,416 44,410.4 44,421.6" fill="black" transform="rotate(180,48,416)"></polygon>
                 <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
@@ -2195,7 +2202,7 @@ RKI = Read Key Installed control message; R+W = read and write keys.<a href="#se
    produced by the TLS server to the client key manager per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href="#section-6.1-5.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.6">
-            <p id="section-6.1-5.6.1">The TLS primitives return after the handshake has completed successfully.<a href="#section-6.1-5.6.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-5.6.1">The TLS endpoints continue to exchange TLS messages to complete the TLS handshake.<a href="#section-6.1-5.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.7">
             <p id="section-6.1-5.7.1">The client key manager's TLS handshake completes. It exports all Primary
@@ -2224,9 +2231,8 @@ RKI = Read Key Installed control message; R+W = read and write keys.<a href="#se
 </li>
         </ol>
 <p id="section-6.1-6">If the TLS handshake fails in step 6, it SHOULD be retried according to <a href="#error-handling" class="auto internal xref">Section 7</a>.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
-<p id="section-6.1-7">After key installation, the TLS connection SHOULD be closed promptly. When
- session resumption is supported, closure follows the procedure in
- <a href="#session-resumption" class="auto internal xref">Section 3.5</a>.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.1-7">After key installation, the TLS connection SHOULD be closed promptly
+ following the procedure in <a href="#session-resumption" class="auto internal xref">Section 3.5</a>.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekeying">
@@ -2246,7 +2252,7 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
               <p id="section-6.2.1-2.1.1">Time elapsed since last peer authentication.<a href="#section-6.2.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.2.1-2.2">
-              <p id="section-6.2.1-2.2.1">Volume of data transferred since last forward-secrecy rekeying.<a href="#section-6.2.1-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.1-2.2.1">Volume of data transferred since last rekeying.<a href="#section-6.2.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.2.1-2.3">
               <p id="section-6.2.1-2.3.1">Approaching the cipher suite's AEAD usage limits.<a href="#section-6.2.1-2.3.1" class="pilcrow">¶</a></p>
@@ -2260,7 +2266,7 @@ including:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
 <a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-procedure" class="section-name selfRef">Procedure</a>
           </h4>
 <p id="section-6.2.2-1">The client key manager and the server key manager keep the same
-  key-management roles for the entire lifetime of the SCTP association:
+  key management roles for the entire lifetime of the SCTP association:
   the client key manager is always the TLS client and the server key
   manager is always the TLS server, for the initial handshake and for
   every rekeying.  Consequently, only the client key manager ever
@@ -2288,33 +2294,32 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
 <figure id="figure-4">
             <div id="section-6.2.2-5.1">
               <div class="alignCenter art-svg artwork" id="section-6.2.2-5.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="464" width="456" viewBox="0 0 456 464" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 40,48 L 40,416" fill="none" stroke="black"></path>
-                  <path d="M 64,96 L 64,392" fill="none" stroke="black"></path>
-                  <path d="M 104,96 L 104,384" fill="none" stroke="black"></path>
-                  <path d="M 344,96 L 344,384" fill="none" stroke="black"></path>
-                  <path d="M 384,96 L 384,384" fill="none" stroke="black"></path>
-                  <path d="M 408,48 L 408,416" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="480" width="456" viewBox="0 0 456 480" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 40,48 L 40,432" fill="none" stroke="black"></path>
+                  <path d="M 64,96 L 64,408" fill="none" stroke="black"></path>
+                  <path d="M 104,96 L 104,400" fill="none" stroke="black"></path>
+                  <path d="M 344,96 L 344,400" fill="none" stroke="black"></path>
+                  <path d="M 384,96 L 384,400" fill="none" stroke="black"></path>
+                  <path d="M 408,48 L 408,432" fill="none" stroke="black"></path>
                   <path d="M 112,128 L 176,128" fill="none" stroke="black"></path>
                   <path d="M 272,128 L 344,128" fill="none" stroke="black"></path>
                   <path d="M 72,192 L 104,192" fill="none" stroke="black"></path>
                   <path d="M 344,192 L 376,192" fill="none" stroke="black"></path>
-                  <path d="M 64,224 L 96,224" fill="none" stroke="black"></path>
-                  <path d="M 352,224 L 384,224" fill="none" stroke="black"></path>
+                  <path d="M 72,224 L 376,224" fill="none" stroke="black"></path>
                   <path d="M 64,256 L 96,256" fill="none" stroke="black"></path>
                   <path d="M 104,272 L 176,272" fill="none" stroke="black"></path>
                   <path d="M 224,272 L 336,272" fill="none" stroke="black"></path>
                   <path d="M 352,288 L 384,288" fill="none" stroke="black"></path>
                   <path d="M 112,352 L 176,352" fill="none" stroke="black"></path>
                   <path d="M 224,352 L 344,352" fill="none" stroke="black"></path>
+                  <polygon class="arrowhead" points="384,224 372,218.4 372,229.6" fill="black" transform="rotate(0,376,224)"></polygon>
                   <polygon class="arrowhead" points="384,192 372,186.4 372,197.6" fill="black" transform="rotate(0,376,192)"></polygon>
                   <polygon class="arrowhead" points="360,288 348,282.4 348,293.6" fill="black" transform="rotate(180,352,288)"></polygon>
-                  <polygon class="arrowhead" points="360,224 348,218.4 348,229.6" fill="black" transform="rotate(180,352,224)"></polygon>
                   <polygon class="arrowhead" points="344,272 332,266.4 332,277.6" fill="black" transform="rotate(0,336,272)"></polygon>
                   <polygon class="arrowhead" points="120,352 108,346.4 108,357.6" fill="black" transform="rotate(180,112,352)"></polygon>
                   <polygon class="arrowhead" points="120,128 108,122.4 108,133.6" fill="black" transform="rotate(180,112,128)"></polygon>
                   <polygon class="arrowhead" points="104,256 92,250.4 92,261.6" fill="black" transform="rotate(0,96,256)"></polygon>
-                  <polygon class="arrowhead" points="104,224 92,218.4 92,229.6" fill="black" transform="rotate(0,96,224)"></polygon>
+                  <polygon class="arrowhead" points="80,224 68,218.4 68,229.6" fill="black" transform="rotate(180,72,224)"></polygon>
                   <polygon class="arrowhead" points="80,192 68,186.4 68,197.6" fill="black" transform="rotate(180,72,192)"></polygon>
                   <g class="text">
                     <text x="40" y="36">Initiator</text>
@@ -2326,8 +2331,10 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
                     <text x="312" y="52">N</text>
                     <text x="340" y="52">DKC)</text>
                     <text x="64" y="84">TLS</text>
-                    <text x="112" y="84">cliKM</text>
-                    <text x="336" y="84">srvKM</text>
+                    <text x="116" y="84">client</text>
+                    <text x="156" y="84">KM</text>
+                    <text x="308" y="84">server</text>
+                    <text x="348" y="84">KM</text>
                     <text x="384" y="84">TLS</text>
                     <text x="152" y="116">(server</text>
                     <text x="208" y="116">needs</text>
@@ -2368,22 +2375,23 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
                     <text x="164" y="340">TX-&gt;N+1)</text>
                     <text x="200" y="356">[RKI]</text>
                     <text x="20" y="372">8.</text>
-                    <text x="148" y="372">READ</text>
+                    <text x="144" y="372">WRITE</text>
                     <text x="188" y="372">N+1,</text>
                     <text x="236" y="372">drain,</text>
                     <text x="296" y="372">TX-&gt;N+1</text>
-                    <text x="92" y="404">(traffic</text>
-                    <text x="176" y="404">transitions</text>
-                    <text x="236" y="404">to</text>
-                    <text x="272" y="404">epoch</text>
-                    <text x="312" y="404">N+1</text>
-                    <text x="348" y="404">DKC)</text>
-                    <text x="84" y="420">(after</text>
-                    <text x="152" y="420">draining,</text>
-                    <text x="220" y="420">remove</text>
+                    <text x="436" y="388">9.</text>
+                    <text x="92" y="420">(traffic</text>
+                    <text x="176" y="420">transitions</text>
+                    <text x="236" y="420">to</text>
                     <text x="272" y="420">epoch</text>
-                    <text x="304" y="420">N</text>
-                    <text x="332" y="420">DKC)</text>
+                    <text x="312" y="420">N+1</text>
+                    <text x="348" y="420">DKC)</text>
+                    <text x="84" y="436">(after</text>
+                    <text x="152" y="436">draining,</text>
+                    <text x="220" y="436">remove</text>
+                    <text x="272" y="436">epoch</text>
+                    <text x="304" y="436">N</text>
+                    <text x="332" y="436">DKC)</text>
                   </g>
                 </svg><a href="#section-6.2.2-5.1.1" class="pilcrow">¶</a>
 </div>
@@ -2392,7 +2400,7 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
 <a href="#name-rekeying-procedure" class="selfRef">Rekeying Procedure</a>
             </figcaption></figure>
 </div>
-<p id="section-6.2.2-6">Legend: TLS = local TLS engine; cliKM/srvKM = client/server key manager;
+<p id="section-6.2.2-6">Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 Rekey Req = Rekey Request control message;
 RKI = Read Key Installed control message; R+W = read and
 write keys; N, N+1 = old and new epoch; TX-&gt;N+1 = switch sending to the
@@ -2425,7 +2433,7 @@ per <a href="#tls-user-message" class="auto internal xref">Section 4</a>.<a href
 server.<a href="#section-6.2.2-9.4.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.5">
-              <p id="section-6.2.2-9.5.1">The TLS primitives return after the handshake has completed successfully.<a href="#section-6.2.2-9.5.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.2-9.5.1">The TLS endpoints continue exchange TLS messages to complete the TLS handshake.<a href="#section-6.2.2-9.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.6">
               <p id="section-6.2.2-9.6.1">The client key manager's TLS handshake completes.  It exports all
@@ -2440,11 +2448,9 @@ handshake has completed (7a) and it has received the client key
 manager's Read Key Installed control message (7b).  Once both
 conditions are met, it exports both direction key material for
 both the Primary and Restart DKCs for epoch N+1, installs both
-the read (receive) key and the write (send) key, starts the drain
-timer to remove the old (epoch N) DKC, and switches sending to
-the epoch N+1 DKC. The server key manager sends a Read Key
-Installed control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the
-client key manager.<a href="#section-6.2.2-9.7.1" class="pilcrow">¶</a></p>
+the read (receive) key and the write (send) key. The server
+key manager sends a Read Key Installed control message
+(<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the client key manager.<a href="#section-6.2.2-9.7.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.8">
               <p id="section-6.2.2-9.8.1">The client key manager receives the Read Key Installed
@@ -2453,14 +2459,18 @@ key material as its write (send) key, starts the drain timer to
 remove the old (epoch N) DKC, and switches sending to the epoch
 N+1 DKC.<a href="#section-6.2.2-9.8.1" class="pilcrow">¶</a></p>
 </li>
+            <li id="section-6.2.2-9.9">
+              <p id="section-6.2.2-9.9.1">The server key manager is notified that the new key has
+been succesfully used when receiving a message from client, it
+starts the drain timer to remove the old (epoch N) DKC.<a href="#section-6.2.2-9.9.1" class="pilcrow">¶</a></p>
+</li>
           </ol>
 <p id="section-6.2.2-10">If the TLS handshake fails in step 5, it SHOULD be retried according to <a href="#error-handling" class="auto internal xref">Section 7</a>.<a href="#section-6.2.2-10" class="pilcrow">¶</a></p>
 <p id="section-6.2.2-11">The new DKCs use epoch N+1 (where N is the current epoch when
   initiating rekeying).  Both old (epoch N) and new (epoch N+1) DKCs
   coexist temporarily until the drain timer expires (see
   <a href="#drain-timer" class="auto internal xref">Section 6.2.3</a>).<a href="#section-6.2.2-11" class="pilcrow">¶</a></p>
-<p id="section-6.2.2-12">All rekeying MUST use ephemeral key exchange.  TLS Key Update MUST
-  NOT be used.<a href="#section-6.2.2-12" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-12">All rekeying MUST use ephemeral key exchange.<a href="#section-6.2.2-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="drain-timer">
@@ -2472,33 +2482,43 @@ N+1 DKC.<a href="#section-6.2.2-9.8.1" class="pilcrow">¶</a></p>
 after new (epoch N+1) DKCs have been activated.  Its purpose is to
 allow in-flight packets protected with the old keys to be received
 and processed before those keys are removed.<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.2.3-2">The drain timer value depends on whether the delivery of the final
-rekeying message has been confirmed:<a href="#section-6.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.2.3-2">When the client KM receives the Read Key Installed
+control message <a href="#control-messages" class="auto internal xref">Section 4.2</a> in Step 8, installs the write
+key and starts the drain timer it do knows that the server endpoint
+already is sending using the new DKC. Thus it can set a short timer
+to allow any reordered or delayed packets has been drained before
+removing the old DKS. A value of 3 seconds are recommended.<a href="#section-6.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.2.3-3">The server drain timer value depends on whether the delivery of the final
+rekeying message has been confirmed:<a href="#section-6.2.3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.2.3-3.1">
-              <p id="section-6.2.3-3.1.1">If delivery of the last rekeying message has been confirmed (e.g.,
-through SCTP acknowledgment of the DATA chunk carrying the TLS
-Finished), the old DKC MAY be removed after a short drain timer.
-A value of 120 seconds (one Maximum Segment Lifetime) is
-RECOMMENDED in this case.<a href="#section-6.2.3-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.2.3-4.1">
+              <p id="section-6.2.3-4.1.1">If delivery of the server's Read Key Installed control message
+<a href="#control-messages" class="auto internal xref">Section 4.2</a> has been confirmed (e.g.,
+through SCTP acknowledgment of the DATA chunk carrying control message,
+the old DKC MAY be removed after a short drain timer.
+A value of 3 seconds is RECOMMENDED in this case to allow for
+reordered or delayed packets to arrive.<a href="#section-6.2.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.2.3-3.2">
-              <p id="section-6.2.3-3.2.1">If delivery has not been confirmed, the drain timer MUST be set to
-at least the SCTP association failure time (T_fail).  This ensures
-that if the final rekeying message is lost and requires
+            <li class="normal" id="section-6.2.3-4.2">
+              <p id="section-6.2.3-4.2.1">If delivery of the Read Key Installed control message
+<a href="#control-messages" class="auto internal xref">Section 4.2</a> sent by this endpoint has not been confirmed,
+the drain timer MUST be set to at least the SCTP association
+failure time (T_fail).  This ensures first of all that the ULP
+traffic is not impacted by the drainage, and that if the final
+rekeying message is lost and requires
 retransmission, the old DKC remains available for as long as SCTP
 continues retransmission attempts.  If the association fails
 (i.e., SCTP declares the peer unreachable), the DKCs are removed
-as part of association teardown.<a href="#section-6.2.3-3.2.1" class="pilcrow">¶</a></p>
+as part of association teardown.<a href="#section-6.2.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.2.3-4">The SCTP association failure time depends on the Retransmission
+<p id="section-6.2.3-5">The SCTP association failure time depends on the Retransmission
 Timeout (RTO) and the maximum number of retransmissions
 (Association.Max.Retrans, as defined in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>).  With the
 default values from <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> (RTO.Initial = 1s, RTO.Max = 60s,
-Association.Max.Retrans = 10), T_fail is approximately 303 seconds.<a href="#section-6.2.3-4" class="pilcrow">¶</a></p>
-<p id="section-6.2.3-5">Implementations SHOULD set the drain timer to at least T_fail when
-delivery of the final rekeying message has not been confirmed.<a href="#section-6.2.3-5" class="pilcrow">¶</a></p>
+Association.Max.Retrans = 10), T_fail is approximately 303 seconds.<a href="#section-6.2.3-5" class="pilcrow">¶</a></p>
+<p id="section-6.2.3-6">Implementations SHOULD set the drain timer to at least T_fail when
+delivery of the Read Key Installed message has not been confirmed.<a href="#section-6.2.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sim-rekeying">
@@ -2511,8 +2531,8 @@ two ClientHellos cannot cross and no tie-breaker is needed.<a href="#section-6.2
 <p id="section-6.2.4-2">The only concurrency to resolve is when the server key manager sends a
 Rekey Request while the client key manager has already initiated (or is
 about to initiate) a rekeying to epoch N+1.  Since both the direct
-client trigger and the server's Rekey Request lead to the same outcome
-— a single client-initiated rekeying to epoch N+1 — the client key
+client trigger and the server's Rekey Request lead to the same outcome,
+a single client-initiated rekeying to epoch N+1, the client key
 manager treats an incoming Rekey Request as redundant and ignores it
 while a rekeying is already in progress.<a href="#section-6.2.4-2" class="pilcrow">¶</a></p>
 <p id="section-6.2.4-3">Similarly, if the server key manager needs to rekey while a
@@ -2637,31 +2657,35 @@ DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶<
 <a href="#name-sctp-restart-procedure" class="selfRef">SCTP Restart Procedure</a>
             </figcaption></figure>
 </div>
-<ol start="1" type="1" class="normal type-1" id="section-6.3.2-2">
-<li id="section-6.3.2-2.1">
-              <p id="section-6.3.2-2.1.1">The restarting endpoint (Initiator) retrieves the restart key
+<p id="section-6.3.2-2">Steps 1-5 are following what is defined in Section 5.4 (Restart Considerations)
+in <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.2-3">
+<li id="section-6.3.2-3.1">
+              <p id="section-6.3.2-3.1.1">The restarting endpoint (Initiator) retrieves the restart key
 material from persistent secure storage and installs the Restart
-DKC for both send and receive directions.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
+DKC for both send and receive directions.<a href="#section-6.3.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.2">
-              <p id="section-6.3.2-2.2.1">The Initiator sends INIT (VTag=0). Include the DTLS Key Management
-Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-3.2">
+              <p id="section-6.3.2-3.2.1">The Initiator sends INIT (VTag=0). Include the DTLS Key Management
+Parameter with the same method list and the same role and restart settings,
+but a new random Tie Breaker.<a href="#section-6.3.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.3">
-              <p id="section-6.3.2-2.3.1">The Responder (the not restarting endpoint) replies INIT-ACK in
+            <li id="section-6.3.2-3.3">
+              <p id="section-6.3.2-3.3.1">The Responder (the not restarting endpoint) replies INIT-ACK in
 plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.  Include the DTLS Key Management
-Parameter with the same method list but a new random Tie Breaker.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
+Parameter with the same method list and the same role and restart
+settings, but a new random Tie Breaker.<a href="#section-6.3.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.4">
-              <p id="section-6.3.2-2.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
-the Restart DKC (R bit set).<a href="#section-6.3.2-2.4.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-3.4">
+              <p id="section-6.3.2-3.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
+the Restart DKC (R bit set).<a href="#section-6.3.2-3.4.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.5">
-              <p id="section-6.3.2-2.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
-the Restart DKC (R bit set).<a href="#section-6.3.2-2.5.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-3.5">
+              <p id="section-6.3.2-3.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
+the Restart DKC (R bit set).<a href="#section-6.3.2-3.5.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.6">
-              <p id="section-6.3.2-2.6.1">Both endpoints have a restarted association, whose state is
+            <li id="section-6.3.2-3.6">
+              <p id="section-6.3.2-3.6.1">Both endpoints have a restarted association, whose state is
 as described in Section 5.2.4.1 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, with two differences
 specific to this document: DTLS chunk protection is enforced using
 the Restart DKC (the COOKIE ECHO and COOKIE ACK were exchanged
@@ -2671,51 +2695,51 @@ association, since the new INIT handshake re-runs role determination.
 The authenticated peer identity, however, MUST remain the same as in
 the previous instance of the association (see <a href="#tls-auth" class="auto internal xref">Section 3.3</a>).
 The ULP MAY be informed that the association is restarted at this
-point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-2.6.1" class="pilcrow">¶</a></p>
+point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-3.6.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6.3.2-2.7">
-              <p id="section-6.3.2-2.7.1">Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
+            <li id="section-6.3.2-3.7">
+              <p id="section-6.3.2-3.7.1">Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
 correspond one-to-one to steps 4 to 9 of the initial establishment
-procedure (<a href="#initial-establishment" class="auto internal xref">Section 6.1</a>).  They differ only as follows:<a href="#section-6.3.2-2.7.1" class="pilcrow">¶</a></p>
+procedure (<a href="#initial-establishment" class="auto internal xref">Section 6.1</a>).  They differ only as follows:<a href="#section-6.3.2-3.7.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.2-2.7.2.1">
-                  <p id="section-6.3.2-2.7.2.1.1">all key management messages are carried inside DTLS chunks protected
-with the Restart DKC;<a href="#section-6.3.2-2.7.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3.2-3.7.2.1">
+                  <p id="section-6.3.2-3.7.2.1.1">all key management messages are carried inside DTLS chunks protected
+with the Restart DKC;<a href="#section-6.3.2-3.7.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-6.3.2-2.7.2.2">
-                  <p id="section-6.3.2-2.7.2.2.1">in addition to the Primary DKC, each endpoint exports, installs, and
+                <li class="normal" id="section-6.3.2-3.7.2.2">
+                  <p id="section-6.3.2-3.7.2.2.1">in addition to the Primary DKC, each endpoint exports, installs, and
 commits the new Restart DKC to persistent secure storage, removing
-the old one;<a href="#section-6.3.2-2.7.2.2.1" class="pilcrow">¶</a></p>
+the old one;<a href="#section-6.3.2-3.7.2.2.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-6.3.2-2.7.2.3">
-                  <p id="section-6.3.2-2.7.2.3.1">at the key transition (steps 11 and 12), each endpoint switches the
+                <li class="normal" id="section-6.3.2-3.7.2.3">
+                  <p id="section-6.3.2-3.7.2.3.1">at the key transition (steps 11 and 12), each endpoint switches the
 active DTLS key context from the Restart DKC to the new Primary DKC
 after the Read Key Installed exchange completes (the Read Key
 Installed messages themselves are protected with the Restart DKC),
 rather than enforcing protection for the first time; the ULP was
-already informed at step 6.<a href="#section-6.3.2-2.7.2.3.1" class="pilcrow">¶</a></p>
+already informed at step 6.<a href="#section-6.3.2-3.7.2.3.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
           </ol>
-<ol start="13" type="1" class="normal type-1" id="section-6.3.2-3">
-<li id="section-6.3.2-3.1">
-              <p id="section-6.3.2-3.1.1">Protected application traffic uses the new Primary DKC.<a href="#section-6.3.2-3.1.1" class="pilcrow">¶</a></p>
+<ol start="13" type="1" class="normal type-1" id="section-6.3.2-4">
+<li id="section-6.3.2-4.1">
+              <p id="section-6.3.2-4.1.1">Protected application traffic uses the new Primary DKC.<a href="#section-6.3.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.2-4">After restart, the new Primary DKC MUST use epoch 3 (the epoch
-resets).<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-5">The Responder MUST NOT change the Restart DKC during the restart
+<p id="section-6.3.2-5">After restart, the new Primary DKC is required to use epoch 3 (the epoch
+resets), see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-5.4" class="relref">Section 5.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-6">The Responder MUST NOT change the Restart DKC during the restart
 procedure.  After the new Restart DKC is installed, the old one is
-removed.<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-6">It is RECOMMENDED to complete the TLS handshake and install new DKCs
+removed.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-7">It is RECOMMENDED to complete the TLS handshake and install new DKCs
 as soon as possible after restart, to minimize the window during
-which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-7">Note: There MAY exist a short time gap after association establishment
+which no Restart DKC is available for a subsequent restart.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-8">Note: There MAY exist a short time gap after association establishment
 where no Restart DKC is yet installed.  If an SCTP restart is
 initiated during that time, it will fail.  However, this is unlikely
 as the restarting endpoint sends INIT multiple times with exponential
-back-off.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
+back-off.<a href="#section-6.3.2-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2729,8 +2753,8 @@ back-off.<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-7-1">TLS has its own error reporting via TLS alert messages.  When a TLS
 handshake error occurs, the TLS alert is sent in an SCTP user message
-(see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the TLS for DTLS in SCTP TLS Records PPID
-(4242).<a href="#section-7-1" class="pilcrow">¶</a></p>
+(see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the TLS records for DTLS Chunk
+Key Management PPID (4242).<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">If a TLS handshake fails during initial establishment and the
 implementation determines that it can address the cause of the error
 (for example, by retrying with different parameters, as long as doing
@@ -2764,7 +2788,7 @@ followed.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
         <h3 id="name-privacy-considerations">
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
         </h3>
-<p id="section-8.2-1">Although TLS for DTLS in SCTP provides privacy for user messages and
+<p id="section-8.2-1">Although DTLS in SCTP provides privacy for user messages and
 almost all SCTP chunks, the SCTP common header, DTLS chunk header,
 and DTLS record header are not confidentiality protected.  An
 attacker can correlate TLS connections over the same SCTP association
@@ -2774,16 +2798,17 @@ certificate-based authentication in TLS 1.3 and to not reuse tickets.
 TLS 1.3 with external PSK authentication does not provide identity
 protection.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2-3">By mandating ephemeral key exchange and cipher suites with
-confidentiality, TLS for DTLS in SCTP effectively mitigates many
+confidentiality, DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">It is RECOMMENDED that implementations of this key-management
+<p id="section-8.2-4">It is RECOMMENDED that implementations of this key management
 method do not allow the ULP to exchange any data beyond the
-key-management information following this specification until
+key management information following this specification until
 the peer is authenticated and the local endpoint and the remote
-have both installed read and write keys and enforced protection. This is to avoid any information
-leakage from the ULP to unintended parties.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+endpoint have both installed read and write keys and enforced
+protection. This is to avoid any information leakage from
+the ULP to unintended parties.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2801,7 +2826,7 @@ leakage from the ULP to unintended parties.<a href="#section-8.2-4" class="pilcr
 <p id="section-9.1-1">IANA is requested to assign one DTLS Key Management Method Identifier
 in the "DTLS Key Management Method" registry defined by
 <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span> to identify the
-key-management method defined in this document.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+key management method defined in this document.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 <span id="name-dtls-key-management-method-i"></span><div id="iana-psi">
 <table class="center" id="table-3">
           <caption>
@@ -2819,7 +2844,7 @@ key-management method defined in this document.<a href="#section-9.1-1" class="p
           <tbody>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">192</td>
-              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP</td>
+              <td class="text-left" rowspan="1" colspan="1">TLS based Key Management for SCTP DTLS Chunk</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
               <td class="text-left" rowspan="1" colspan="1">Draft Authors</td>
             </tr>
@@ -2860,22 +2885,88 @@ Comment.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="sec-iana-ppid">
+<div id="sec-iana-ctrl-types">
 <section id="section-9.3">
-        <h3 id="name-sctp-payload-protocol-ident">
-<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-sctp-payload-protocol-ident" class="section-name selfRef">SCTP Payload Protocol Identifier</a>
+        <h3 id="name-dtls-chunk-key-management-c">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-dtls-chunk-key-management-c" class="section-name selfRef">DTLS Chunk Key Management Control Message Types</a>
         </h3>
-<p id="section-9.3-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
-"Payload Protocol Identifiers" registry, IANA is requested to update the
-name and reference for the PPID 4242 as depicted in
-<a href="#iana-payload-protection-id" class="auto internal xref">Table 5</a>.
-Furthermore, IANA is requested to add an entry in the "Payload Protocol
-Identifiers" registry for the PPID 4243 as depicted in
-<a href="#iana-payload-protection-id" class="auto internal xref">Table 5</a>.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
-<span id="name-payload-protocol-identifier"></span><div id="iana-payload-protection-id">
+<p id="section-9.3-1">IANA is requested to create a new registry called "DTLS Chunk
+Key Management Control Message Types" in the Stream Control
+Transmission Protocol (SCTP) Parameters group.  This registry
+governs the values of the Ctrl Type field of the control messages
+defined in <a href="#control-messages" class="auto internal xref">Section 4.2</a>.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<p id="section-9.3-2">The registration policy for this registry is IETF Review as defined in
+<span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>.<a href="#section-9.3-2" class="pilcrow">¶</a></p>
+<p id="section-9.3-3">Each entry in the registry MUST contain the following fields:<a href="#section-9.3-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.3-4.1">
+            <p id="section-9.3-4.1.1">Ctrl Type: an 8-bit unsigned integer value (0x00-0xFF).<a href="#section-9.3-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-4.2">
+            <p id="section-9.3-4.2.1">Name: a short, human-readable name for the control message type.<a href="#section-9.3-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-4.3">
+            <p id="section-9.3-4.3.1">Reference: a reference to the document defining the control message
+type.<a href="#section-9.3-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-9.3-5">The initial contents of the registry are shown in
+<a href="#iana-ctrl-types" class="auto internal xref">Table 5</a>.  The value 0x00 is reserved.<a href="#section-9.3-5" class="pilcrow">¶</a></p>
+<span id="name-dtls-chunk-key-management-co"></span><div id="iana-ctrl-types">
 <table class="center" id="table-5">
           <caption>
 <a href="#table-5" class="selfRef">Table 5</a>:
+<a href="#name-dtls-chunk-key-management-co" class="selfRef">DTLS Chunk Key Management Control Message Types</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Ctrl Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x00</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x01</td>
+              <td class="text-left" rowspan="1" colspan="1">Read Key Installed</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x02</td>
+              <td class="text-left" rowspan="1" colspan="1">Rekey Request</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x03-0xFF</td>
+              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="sec-iana-ppid">
+<section id="section-9.4">
+        <h3 id="name-sctp-payload-protocol-ident">
+<a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-sctp-payload-protocol-ident" class="section-name selfRef">SCTP Payload Protocol Identifier</a>
+        </h3>
+<p id="section-9.4-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Payload Protocol Identifiers" registry, IANA is requested to update the
+name and reference for the PPID 4242 as depicted in
+<a href="#iana-payload-protection-id" class="auto internal xref">Table 6</a>.
+Furthermore, IANA is requested to add an entry in the "Payload Protocol
+Identifiers" registry for the PPID 4243 as depicted in
+<a href="#iana-payload-protection-id" class="auto internal xref">Table 6</a>.<a href="#section-9.4-1" class="pilcrow">¶</a></p>
+<span id="name-payload-protocol-identifier"></span><div id="iana-payload-protection-id">
+<table class="center" id="table-6">
+          <caption>
+<a href="#table-6" class="selfRef">Table 6</a>:
 <a href="#name-payload-protocol-identifier" class="selfRef">Payload Protocol Identifier</a>
           </caption>
 <thead>
@@ -2888,12 +2979,12 @@ Identifiers" registry for the PPID 4243 as depicted in
           <tbody>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4242</td>
-              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP TLS Records</td>
+              <td class="text-left" rowspan="1" colspan="1">TLS records for DTLS Chunk Key Management</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
             </tr>
             <tr>
               <td class="text-right" rowspan="1" colspan="1">4243</td>
-              <td class="text-left" rowspan="1" colspan="1">TLS for DTLS in SCTP Control</td>
+              <td class="text-left" rowspan="1" colspan="1">Control Messages for DTLS Chunk Key Management</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
             </tr>
           </tbody>
@@ -2914,6 +3005,14 @@ Identifiers" registry for the PPID 4243 as depicted in
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
+<dt id="RFC5705">[RFC5705]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"Keying Material Exporters for Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 5705</span>, <span class="seriesInfo">DOI 10.17487/RFC5705</span>, <time datetime="2010-03" class="refDate">March 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5705">https://www.rfc-editor.org/info/rfc5705</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8126">[RFC8126]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8996">[RFC8996]</dt>
         <dd>
 <span class="refAuthor">Moriarty, K.</span> and <span class="refAuthor">S. Farrell</span>, <span class="refTitle">"Deprecating TLS 1.0 and TLS 1.1"</span>, <span class="seriesInfo">BCP 195</span>, <span class="seriesInfo">RFC 8996</span>, <span class="seriesInfo">DOI 10.17487/RFC8996</span>, <time datetime="2021-03" class="refDate">March 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8996">https://www.rfc-editor.org/info/rfc8996</a>&gt;</span>. </dd>
@@ -2921,6 +3020,10 @@ Identifiers" registry for the PPID 4243 as depicted in
 <dt id="RFC9147">[RFC9147]</dt>
         <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">N. Modadugu</span>, <span class="refTitle">"The Datagram Transport Layer Security (DTLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9147</span>, <span class="seriesInfo">DOI 10.17487/RFC9147</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9147">https://www.rfc-editor.org/info/rfc9147</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9149">[RFC9149]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, and <span class="refAuthor">C.A. Wood</span>, <span class="refTitle">"TLS Ticket Requests"</span>, <span class="seriesInfo">RFC 9149</span>, <span class="seriesInfo">DOI 10.17487/RFC9149</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9149">https://www.rfc-editor.org/info/rfc9149</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9260">[RFC9260]</dt>
         <dd>
@@ -2936,7 +3039,7 @@ Identifiers" registry for the PPID 4243 as depicted in
 <dd class="break"></dd>
 <dt id="I-D.ietf-tsvwg-sctp-dtls-chunk">[I-D.ietf-tsvwg-sctp-dtls-chunk]</dt>
         <dd>
-<span class="refAuthor">Westerlund, M.</span>, <span class="refAuthor">Mattsson, J. P.</span>, <span class="refAuthor">Porfiri, C.</span>, and <span class="refAuthor">M. Tüxen</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) DTLS Chunk"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-sctp-dtls-chunk-04</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-04">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-04</a>&gt;</span>. </dd>
+<span class="refAuthor">Westerlund, M.</span>, <span class="refAuthor">Mattsson, J. P.</span>, <span class="refAuthor">Porfiri, C.</span>, and <span class="refAuthor">M. Tüxen</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) DTLS Chunk"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-sctp-dtls-chunk-06</span>, <time datetime="2026-11-02" class="refDate">2 November 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -2955,14 +3058,6 @@ Identifiers" registry for the PPID 4243 as depicted in
 <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="RFC5705">[RFC5705]</dt>
-        <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"Keying Material Exporters for Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 5705</span>, <span class="seriesInfo">DOI 10.17487/RFC5705</span>, <time datetime="2010-03" class="refDate">March 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5705">https://www.rfc-editor.org/info/rfc5705</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC9149">[RFC9149]</dt>
-        <dd>
-<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, and <span class="refAuthor">C.A. Wood</span>, <span class="refTitle">"TLS Ticket Requests"</span>, <span class="seriesInfo">RFC 9149</span>, <span class="seriesInfo">DOI 10.17487/RFC9149</span>, <time datetime="2022-04" class="refDate">April 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9149">https://www.rfc-editor.org/info/rfc9149</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC9525">[RFC9525]</dt>
         <dd>
 <span class="refAuthor">Saint-Andre, P.</span> and <span class="refAuthor">R. Salz</span>, <span class="refTitle">"Service Identity in TLS"</span>, <span class="seriesInfo">RFC 9525</span>, <span class="seriesInfo">DOI 10.17487/RFC9525</span>, <time datetime="2023-11" class="refDate">November 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9525">https://www.rfc-editor.org/info/rfc9525</a>&gt;</span>. </dd>
@@ -3007,6 +3102,19 @@ Identifiers" registry for the PPID 4243 as depicted in
 <div class="email">
 <span>Email:</span>
 <a href="mailto:claudio.porfiri@ericsson.com" class="email">claudio.porfiri@ericsson.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Michael Tüxen</span></div>
+<div dir="auto" class="left"><span class="org">Münster University of Applied Sciences</span></div>
+<div dir="auto" class="left"><span class="street-address">Stegerwaldstrasse 39</span></div>
+<div dir="auto" class="left">
+<span class="postal-code">48565</span> <span class="locality">Steinfurt</span>
+</div>
+<div dir="auto" class="left"><span class="country-name">Germany</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:tuexen@fh-muenster.de" class="email">tuexen@fh-muenster.de</a>
 </div>
 </address>
 </section>
