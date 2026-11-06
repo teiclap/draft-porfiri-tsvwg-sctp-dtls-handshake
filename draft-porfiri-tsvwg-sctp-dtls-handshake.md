@@ -865,9 +865,9 @@ For protected SCTP restart to succeed:
   5. |<-----[DTLS(COOKIE ACK)]----------------+   +----------
   6. |                                        | -'
      | (TLS handshake for new keys,           |
-     |  steps 7-12, as in initial setup)      |
+     |     steps 7-13, as in rekey case)      |
      |                                        |
- 13. +------[DTLS(protected APP DATA)]------->|  APP DATA
+ 14. +------[DTLS(protected APP DATA)]------->|  APP DATA
      |<-----[DTLS(protected APP DATA)]--------+
      |                  ...                   |
 
@@ -909,16 +909,9 @@ in {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
    The ULP MAY be informed that the association is restarted at this
    point.  ULP traffic MAY begin immediately using the Restart DKC.
 
-7. Steps 7 to 12 perform the TLS 1.3 handshake and key installation, and
-correspond one-to-one to steps 4 to 9 of the initial establishment
-procedure ({{initial-establishment}}).  They differ only as follows:
-
-   * all key management messages are carried inside DTLS chunks protected
-  with the Restart DKC;
-
-   * in addition to the Primary DKC, each endpoint exports, installs, and
-  commits the new Restart DKC to persistent secure storage, removing
-  the old one;
+7. Steps 7 to 13 perform the TLS 1.3 handshake and key installation, and
+correspond one-to-one to steps 3 to 9 of the rekey
+procedure ({{rekey-procedure}}).  They differ only as follows:
 
    * at the key transition (steps 11 and 12), each endpoint switches the
   active DTLS key context from the Restart DKC to the new Primary DKC
@@ -927,8 +920,8 @@ procedure ({{initial-establishment}}).  They differ only as follows:
   rather than enforcing protection for the first time; the ULP was
   already informed at step 6.
 
-{:start="13"}
-13. Protected application traffic uses the new Primary DKC.
+{:start="14"}
+14. Protected application traffic uses the new Primary DKC.
 
 After restart, the new Primary DKC is required to use epoch 3 (the epoch
 resets), see {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
