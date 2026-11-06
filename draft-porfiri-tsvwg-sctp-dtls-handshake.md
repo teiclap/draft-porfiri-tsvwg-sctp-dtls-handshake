@@ -699,7 +699,8 @@ including:
      |  |    |  (install R+W N+1, drain,   |    |  |
      |  |    |   TX->N+1)                  |    |  |
      |  |    |<--------[RKI]---------------+    |  |
-  8. |  |    |   READ N+1, drain, TX->N+1  |    |  |
+  8. |  |    |  WRITE N+1, drain, TX->N+1  |    |  |
+     |  |    |                             |    |  |  9.
      |  |    |                             |    |  |
      |  (traffic transitions to epoch N+1 DKC)     |
      |  (after draining, remove epoch N DKC)       |
@@ -750,17 +751,19 @@ epoch N+1 DKC.
      manager's Read Key Installed control message (7b).  Once both
      conditions are met, it exports both direction key material for
      both the Primary and Restart DKCs for epoch N+1, installs both
-     the read (receive) key and the write (send) key, starts the drain
-     timer to remove the old (epoch N) DKC, and switches sending to
-     the epoch N+1 DKC. The server key manager sends a Read Key
-     Installed control message ({{read-key-installed}}) to the
-     client key manager.
+     the read (receive) key and the write (send) key. The server
+     key manager sends a Read Key Installed control message
+     ({{read-key-installed}}) to the client key manager.
 
   8. The client key manager receives the Read Key Installed
      control message ({{read-key-installed}}), installs the client
      key material as its write (send) key, starts the drain timer to
      remove the old (epoch N) DKC, and switches sending to the epoch
      N+1 DKC.
+
+  9. The server key manager is notified that the new key has
+     been succesfully used when receiving a message from client, it
+     starts the drain timer to remove the old (epoch N) DKC.
 
   If the TLS handshake fails in step 5, it SHOULD be retried according to {{error-handling}}.
 
