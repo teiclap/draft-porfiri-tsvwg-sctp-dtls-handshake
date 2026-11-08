@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-03T04:58:22.756536+00:00",
+  "timestamp": "2026-11-08T03:56:30.500458+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -460,9 +460,17 @@
       "labels": [],
       "body": "With the general shortining of the name of the solution to \"DTLS in SCTP\" should we change the TLS exporter label from:\nEXPORTER_TLS_FOR_DTLS_IN_SCTP\n\nTo:\nEXPORTER_DTLS_IN_SCTP\n\n",
       "createdAt": "2026-11-01T16:25:06Z",
-      "updatedAt": "2026-11-01T16:25:06Z",
+      "updatedAt": "2026-11-05T15:34:51Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Considering to call the whole solution (D)TLS protected SCTP. \n",
+          "createdAt": "2026-11-05T15:34:51Z",
+          "updatedAt": "2026-11-05T15:34:51Z"
+        }
+      ]
     },
     {
       "number": 45,
@@ -548,9 +556,17 @@
       "labels": [],
       "body": "'IANA is requested to create a new registry called \"DTLS Chunk Key Management Control Message Types\" in the Stream Control Transmission Protocol (SCTP) Parameters group. This registry governs the values of the Ctrl Type field of the control messages defined in Section 4.2.'\n\nShould this registry really be called this, or should it instead be called \"DTLS In SCTP Control Message Types\"?\n\n\n\n",
       "createdAt": "2026-11-01T17:23:13Z",
-      "updatedAt": "2026-11-01T17:23:13Z",
+      "updatedAt": "2026-11-05T15:36:49Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(D)TLS protected SCTP Control Messages was proposed in the call. \n",
+          "createdAt": "2026-11-05T15:36:49Z",
+          "updatedAt": "2026-11-05T15:36:49Z"
+        }
+      ]
     },
     {
       "number": 52,
@@ -560,13 +576,23 @@
       "state": "OPEN",
       "author": "gloinul",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "teiclap"
+      ],
       "labels": [],
       "body": "The procedure in the drainage of the old epoch (Section 6.2.3) is problematic. The issue is really about that the server initiate the drainage in step 7: \n\n`The server key manager proceeds only after both its own TLS handshake has completed (7a) and it has received the client key manager's Read Key Installed control message (7b). Once both conditions are met, it exports both direction key material for both the Primary and Restart DKCs for epoch N+1, installs both the read (receive) key and the write (send) key, starts the drain timer to remove the old (epoch N) DKC, and switches sending to the epoch N+1 DKC. The server key manager sends a Read Key Installed control message (Section 4.2.1) to the client key manager.`\n\nHowever, the client will not install its write key until it receives the RKI from the server. At this point no more SCTP packets using the old extension should be generated. If one knows this has happened then one can safely run a short timer (like 3 seconds) just to ensure that any delayed or reordered packets leaves the network. However, if you don't have an explicit indication of the delivery then the server can't really run a shorter timer than the failure to avoid impacting the ULP. If the RKI would be lost and delayed triggering the drain timer on the server side prior the client starting sending with the new epoch will impact the ULP. So the choice is between T_fail (303 seconds) and 3 seconds. Leaving a longer window of opprotunity for an attacker after a rekey. \n\nThe main issue is that there are no ensured mechanism for the server to know that a particular message has been delivered unless one drain the whole association. Also this would mean an implementation requirement. \n\nThus I think we should consider an additional KM message \"Rekey Completed\" sent by the client to the server, and use server reception of this to start the drainage timer. Thus avoiding all the issues. \n",
       "createdAt": "2026-11-02T10:22:15Z",
-      "updatedAt": "2026-11-02T10:22:15Z",
+      "updatedAt": "2026-11-06T08:32:29Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Discussed with @tuexen that easiest solution is to add an SCTP API notification when DTLS Chunk's API sees a new (higher) DTLS epoch. Notification of first use of a Read Key. @tuexen to propose PR for DTLS chunk. @gloinul to write PR to use it in handshake. ",
+          "createdAt": "2026-11-05T15:23:33Z",
+          "updatedAt": "2026-11-05T15:23:33Z"
+        }
+      ]
     },
     {
       "number": 53,
@@ -580,9 +606,17 @@
       "labels": [],
       "body": "Currently the restart section's step 7-12 says it is like Initial. However, this is actually not quite true. There is one important difference and why this may actually be better to model on the rekeying. Namely that the overwriting of the old restart DKC (especially for epoch 3 replacing epoch 3) needs to consider what to do with draining. If one overwrites Restart Epoch 3 directly after the primary write key is in place there will be no drain on the restart. And the spec allows ULPs to use the restart for its own traffic to ensure application session continuation. Thus, there is a point of draining the restart after the primary have been used. \n\nTo make this procedure fast, I would recommend that we resolve issue #52 and in that solution ensures that the server can know when the client has put its write key in place and based on that can wait a short time and then overwrite the restart DKC in its association. \n\nThis procedure may also need to consider when the persistent storage should be overwritten. That maybe should be overwritten as soon as the primary write key and the new restart DKC has been genereated but that requires more thought.  ",
       "createdAt": "2026-11-02T12:40:36Z",
-      "updatedAt": "2026-11-02T12:40:36Z",
+      "updatedAt": "2026-11-06T12:39:56Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "The prototype implementation is different, the rekey procedure is copied rather than the initial.\nI agree that restart requires the old R-DKC to survive during the drain time, but rekey doesn't mention R-DKC: a possibility is to explain in the rekey sections that the rekey procedure is applied considering in this case R-DKC, on the other hand during rekey also R-DKC must be replaced at the same time as the normal DKC. Should we add the R-DKC considerations inside rekey instead?",
+          "createdAt": "2026-11-06T12:39:56Z",
+          "updatedAt": "2026-11-06T12:39:56Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -2609,6 +2643,79 @@
           "createdAt": "2026-11-02T14:04:16Z",
           "updatedAt": "2026-11-02T14:04:16Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "id": "PR_kwDORGnINM8AAAABNTgXMg",
+      "title": "Added step 9 to rekey, based on key usage notification",
+      "url": "https://github.com/teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake/pull/56",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Even if the chunk draft has not been adjusted yet, here we assume that new key usage is notifies to KM via API.",
+      "createdAt": "2026-11-06T12:29:16Z",
+      "updatedAt": "2026-11-06T13:08:14Z",
+      "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "baseRefName": "main",
+      "baseRefOid": "931dd395e1c5364c62c0c3e784d84fdf15d79c6e",
+      "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
+      "headRefName": "issue52",
+      "headRefOid": "f68f283985e014a7bab8cda48390e4b701e6a362",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORGnINM8AAAABWbt09A",
+          "commit": {
+            "abbreviatedOid": "bb58a09"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-11-06T13:02:28Z",
+          "updatedAt": "2026-11-06T13:03:33Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "remove both of the old DKCs (Primary and Restart) ...",
+              "createdAt": "2026-11-06T13:02:28Z",
+              "updatedAt": "2026-11-06T13:03:33Z"
+            },
+            {
+              "originalPosition": 31,
+              "body": "This bullet should reference the DTLS chunk API for the notification message. Same issue with \"old both\" which reads strange to me. ",
+              "createdAt": "2026-11-06T13:03:28Z",
+              "updatedAt": "2026-11-06T13:03:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABWbxrWQ",
+          "commit": {
+            "abbreviatedOid": "bb58a09"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-06T13:08:13Z",
+          "updatedAt": "2026-11-06T13:08:13Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "I agree, this needs API fix to be completed",
+              "createdAt": "2026-11-06T13:08:13Z",
+              "updatedAt": "2026-11-06T13:08:14Z"
+            }
+          ]
         }
       ]
     }
