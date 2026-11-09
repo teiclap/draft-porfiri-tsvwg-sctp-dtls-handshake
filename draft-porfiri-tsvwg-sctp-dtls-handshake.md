@@ -788,37 +788,15 @@ control message {{control-messages}} in Step 8, installs the write
 key and starts the drain timer it do knows that the server endpoint
 already is sending using the new DKC. Thus it can set a short timer
 to allow any reordered or delayed packets has been drained before
-removing the old DKS. A value of 3 seconds are recommended.
+removing the old DKS.
 
-The server drain timer value depends on whether the delivery of the final
-rekeying message has been confirmed:
+After having installed the write key, the client KM will start
+using the new key for Crypto Chunks. The server KM will be informed
+about the new key use, thus it can set short timer
+to allow any reordered or delayed packets has been drained before
+removing the old DKS.
 
-* If delivery of the server's Read Key Installed control message
-  {{control-messages}} has been confirmed (e.g.,
-  through SCTP acknowledgment of the DATA chunk carrying control message,
-  the old DKC MAY be removed after a short drain timer.
-  A value of 3 seconds is RECOMMENDED in this case to allow for
-  reordered or delayed packets to arrive.
-
-* If delivery of the Read Key Installed control message
-  {{control-messages}} sent by this endpoint has not been confirmed,
-  the drain timer MUST be set to at least the SCTP association
-  failure time (T_fail).  This ensures first of all that the ULP
-  traffic is not impacted by the drainage, and that if the final
-  rekeying message is lost and requires
-  retransmission, the old DKC remains available for as long as SCTP
-  continues retransmission attempts.  If the association fails
-  (i.e., SCTP declares the peer unreachable), the DKCs are removed
-  as part of association teardown.
-
-The SCTP association failure time depends on the Retransmission
-Timeout (RTO) and the maximum number of retransmissions
-(Association.Max.Retrans, as defined in {{RFC9260}}).  With the
-default values from {{RFC9260}} (RTO.Initial = 1s, RTO.Max = 60s,
-Association.Max.Retrans = 10), T_fail is approximately 303 seconds.
-
-Implementations SHOULD set the drain timer to at least T_fail when
-delivery of the Read Key Installed message has not been confirmed.
+For both client and server a timer value of 3 seconds is recommended.
 
 ### Concurrent Rekey Requests {#sim-rekeying}
 
