@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-08T03:56:30.500458+00:00",
+  "timestamp": "2026-11-10T05:40:15.160511+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -2658,13 +2658,13 @@
       "labels": [],
       "body": "Even if the chunk draft has not been adjusted yet, here we assume that new key usage is notifies to KM via API.",
       "createdAt": "2026-11-06T12:29:16Z",
-      "updatedAt": "2026-11-06T13:08:14Z",
+      "updatedAt": "2026-11-09T08:07:06Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "931dd395e1c5364c62c0c3e784d84fdf15d79c6e",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue52",
-      "headRefOid": "f68f283985e014a7bab8cda48390e4b701e6a362",
+      "headRefOid": "52b68d65bfc1c4b7e78de37731f3b38c1bfb116c",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
