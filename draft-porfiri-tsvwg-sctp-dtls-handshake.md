@@ -791,7 +791,7 @@ to allow any reordered or delayed packets has been drained before
 removing the old DKS.
 
 After having installed the write key, the client KM will start
-using the new key for Crypto Chunks. The server KM will be informed
+using the new key for DTLS Chunk. The server KM will be informed
 about the new key use, thus it can set short timer
 to allow any reordered or delayed packets has been drained before
 removing the old DKS.
