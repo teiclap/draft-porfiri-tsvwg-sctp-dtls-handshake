@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 13 May 2027                                            Ericsson
+Expires: 17 May 2027                                            Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                         9 November 2026
+                                                        13 November 2026
 
 
    Transport Layer Security (TLS) based Key Management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 May 2027.
+   This Internet-Draft will expire on 17 May 2027.
 
 Copyright Notice
 
@@ -828,9 +828,9 @@ Table of Contents
    delayed packets has been drained before removing the old DKS.
 
    After having installed the write key, the client KM will start using
-   the new key for Crypto Chunks.  The server KM will be informed about
-   the new key use, thus it can set short timer to allow any reordered
-   or delayed packets has been drained before removing the old DKS.
+   the new key for DTLS Chunk.  The server KM will be informed about the
+   new key use, thus it can set short timer to allow any reordered or
+   delayed packets has been drained before removing the old DKS.
 
    For both client and server a timer value of 3 seconds is recommended.
 
