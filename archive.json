@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-10T05:40:15.160511+00:00",
+  "timestamp": "2026-11-15T04:25:27.898260+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -2658,13 +2658,13 @@
       "labels": [],
       "body": "Even if the chunk draft has not been adjusted yet, here we assume that new key usage is notifies to KM via API.",
       "createdAt": "2026-11-06T12:29:16Z",
-      "updatedAt": "2026-11-09T08:07:06Z",
+      "updatedAt": "2026-11-13T11:51:00Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "931dd395e1c5364c62c0c3e784d84fdf15d79c6e",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue52",
-      "headRefOid": "52b68d65bfc1c4b7e78de37731f3b38c1bfb116c",
+      "headRefOid": "370471edaefef62c141f48b208fa04505798f606",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -2714,6 +2714,46 @@
               "body": "I agree, this needs API fix to be completed",
               "createdAt": "2026-11-06T13:08:13Z",
               "updatedAt": "2026-11-06T13:08:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABXvcAfA",
+          "commit": {
+            "abbreviatedOid": "52b68d6"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-13T08:35:20Z",
+          "updatedAt": "2026-11-13T08:35:20Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "Use \"DTLS Chunk\"",
+              "createdAt": "2026-11-13T08:35:20Z",
+              "updatedAt": "2026-11-13T08:35:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABXxk_OA",
+          "commit": {
+            "abbreviatedOid": "52b68d6"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-13T11:51:00Z",
+          "updatedAt": "2026-11-13T11:51:00Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "Done",
+              "createdAt": "2026-11-13T11:51:00Z",
+              "updatedAt": "2026-11-13T11:51:00Z"
             }
           ]
         }
