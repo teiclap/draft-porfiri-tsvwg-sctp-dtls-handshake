@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 17 May 2027                                            Ericsson
+Expires: 22 May 2027                                            Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                        13 November 2026
+                                                        18 November 2026
 
 
    Transport Layer Security (TLS) based Key Management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 May 2027.
+   This Internet-Draft will expire on 22 May 2027.
 
 Copyright Notice
 
@@ -800,9 +800,10 @@ Table of Contents
        the Primary and Restart(epoch N) DKC, and switches sending to the
        epoch N+1 DKC.
 
-   9.  The server key manager is notified that the new key has been
-       succesfully used when receiving a message from client, it starts
-       the drain timer to remove both Primary and Restart (epoch N) DKC.
+   9.  The server key manager is notified with SCTP_DTLS_NEW_EPOCH_EVENT
+       that the new key has been succesfully used when receiving a
+       message from client, it starts the drain timer to remove both
+       Primary and Restart (epoch N) DKC.
 
    If the TLS handshake fails in step 5, it SHOULD be retried according
    to Section 7.
