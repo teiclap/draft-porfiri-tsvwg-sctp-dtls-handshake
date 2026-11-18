@@ -21,4 +21,5 @@ draft-porfiri-tsvwg-sctp-dtls-handshake.xml
 Gemfile.lock
 package-lock.json
 report.xml
+findings.md
 !requirements.txt
