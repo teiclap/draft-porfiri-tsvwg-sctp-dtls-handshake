@@ -761,9 +761,9 @@ epoch N+1 DKC.
      remove the old both the Primary and Restart(epoch N) DKC, and
      switches sending to the epoch N+1 DKC.
 
-  9. The server key manager is notified that the new key has
-     been succesfully used when receiving a message from client, it
-     starts the drain timer to remove both Primary and
+  9. The server key manager is notified with SCTP_DTLS_NEW_EPOCH_EVENT
+     that the new key has been succesfully used when receiving a message
+     from client, it starts the drain timer to remove both Primary and
      Restart (epoch N) DKC.
 
   If the TLS handshake fails in step 5, it SHOULD be retried according to {{error-handling}}.
