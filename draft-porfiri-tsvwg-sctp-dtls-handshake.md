@@ -15,6 +15,11 @@ venue:
 
 author:
 -
+   ins: C. Porfiri
+   name: Claudio Porfiri
+   org: Ericsson
+   email: claudio.porfiri@ericsson.com
+-
    ins:  M. Westerlund
    name: Magnus Westerlund
    org: Ericsson
@@ -24,11 +29,6 @@ author:
    name: John Preuß Mattsson
    org: Ericsson
    email: john.mattsson@ericsson.com
--
-   ins: C. Porfiri
-   name: Claudio Porfiri
-   org: Ericsson
-   email: claudio.porfiri@ericsson.com
 -
    ins: M. Tüxen
    name: Michael Tüxen
@@ -534,6 +534,72 @@ Restart DKC MUST be maintained in a well-defined state (initialized but
 never used for regular traffic) so that both endpoints have a
 consistent view of sequence numbers and replay window.
 
+## First Use Indication {#first-use-indication}
+
+The key management method defined in this document relies on the DTLS
+Chunk indicating the first successful use of each DKC in the receive
+direction ("Indication of First use of Key Epoch", {{Section 7.11 of
+I-D.ietf-tsvwg-sctp-dtls-chunk}}).  The server key manager uses this
+indication to start the drain timer during rekeying (step 9 of
+{{rekey-procedure}}) and after an SCTP restart (step 13 of
+{{restart-procedure}}).
+
+For the purpose of this document, the DTLS Chunk MUST provide this
+indication for every DKC, Primary and Restart, as follows:
+
+* Each DKC has an associated flag, "already used".
+
+* When the receive key material of a DKC is installed ("Establish
+  Receive Key Material", {{Section 7.5 of
+  I-D.ietf-tsvwg-sctp-dtls-chunk}}), the "already used" flag of that
+  DKC is set to false.  This applies to every installation, including
+  a Restart DKC installed from persistent storage.
+
+* When a received DTLS chunk has been successfully decrypted and
+  authenticated with a DKC, has passed replay protection, and the
+  "already used" flag of that DKC is false, the DTLS Chunk sets the
+  flag to true and indicates the first use of the DKC to the key
+  manager.  The indication contains the SCTP association, the restart
+  indicator (R bit), and the DTLS epoch of the DKC.
+
+* DTLS chunks that fail decryption, authentication, or replay
+  protection MUST NOT change the flag and MUST NOT trigger the
+  indication.
+
+As a result, the indication is given exactly once for each installed
+DKC, independently of the epoch values used by other DKCs.  In
+particular, it is given for the epoch 3 Primary DKC installed after an
+SCTP restart, even though DKCs with an equal or higher epoch were used
+before the restart.
+
+~~~~~~~~~~~ pseudocode
+install_receive_keys(DKC):
+    DKC.already_used = false
+
+on_receive(chunk):
+    DKC = lookup(association, chunk.R, chunk.epoch)
+    if DKC exists and decrypt(chunk, DKC) == SUCCESS
+       and replay_check(chunk, DKC) == PASS:
+        if DKC.already_used == false:
+            DKC.already_used = true
+            indicate_first_use(association, chunk.R, chunk.epoch)
+        process the SCTP packet
+~~~~~~~~~~~
+{: #first-use-pseudocode title="First Use Indication"}
+
+When the socket API of {{Section 8 of I-D.ietf-tsvwg-sctp-dtls-chunk}}
+is used, the indication is delivered as an SCTP_DTLS_NEW_EPOCH_EVENT
+notification ({{Section 8.1.2 of I-D.ietf-tsvwg-sctp-dtls-chunk}})
+with sdne_epoch set to the epoch of the DKC.  Since this notification
+does not carry the restart indicator, the key manager associates it
+with the DKC it is waiting for: the Primary DKC whose receive key
+material was most recently installed and for which no indication has
+been received yet.
+
+Note to be removed before publication: the behavior above is expected
+to be specified in {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.  Once it is,
+this section will be reduced to a reference.
+
 
 # Procedures {#procedures}
 
@@ -761,10 +827,10 @@ epoch N+1 DKC.
      remove the old both the Primary and Restart(epoch N) DKC, and
      switches sending to the epoch N+1 DKC.
 
-  9. The server key manager is notified with SCTP_DTLS_NEW_EPOCH_EVENT
-     that the new key has been succesfully used when receiving a message
-     from client, it starts the drain timer to remove both Primary and
-     Restart (epoch N) DKC.
+  9. When the server key manager is notified of the first use of the
+     epoch N+1 Primary DKC in a received DTLS chunk
+     ({{first-use-indication}}), it starts the drain timer to remove the
+     epoch N Primary and Restart DKCs.
 
   If the TLS handshake fails in step 5, it SHOULD be retried according to {{error-handling}}.
 
@@ -887,16 +953,24 @@ in {{I-D.ietf-tsvwg-sctp-dtls-chunk}}.
    The ULP MAY be informed that the association is restarted at this
    point.  ULP traffic MAY begin immediately using the Restart DKC.
 
-7. Steps 7 to 13 perform the TLS 1.3 handshake and key installation, and
-correspond one-to-one to steps 3 to 9 of the rekey
-procedure ({{rekey-procedure}}).  They differ only as follows:
+7. Steps 7 to 13 perform the TLS 1.3 handshake and key installation,
+   and correspond one-to-one to steps 3 to 9 of the rekeying procedure
+   ({{rekey-procedure}}).  In these steps, "epoch N" refers to the
+   Restart DKC used to restart the association, and "epoch N+1" refers
+   to the new Primary and Restart DKCs, which use epoch 3
+   ({{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}).  The steps
+   differ from the rekeying procedure only as follows:
 
-   * at the key transition (steps 11 and 12), each endpoint switches the
-  active DTLS key context from the Restart DKC to the new Primary DKC
-  after the Read Key Installed exchange completes (the Read Key
-  Installed messages themselves are protected with the Restart DKC),
-  rather than enforcing protection for the first time; the ULP was
-  already informed at step 6.
+   * At the key transition (steps 11 and 12), each endpoint switches
+     the active DTLS key context from the Restart DKC to the new Primary
+     DKC after the Read Key Installed exchange completes (the Read Key
+     Installed messages themselves are protected with the Restart DKC),
+     rather than enforcing protection for the first time; the ULP was
+     already informed at step 6.
+
+   * At step 13, the server key manager starts the drain timer when it
+     is notified of the first use of the epoch 3 Primary DKC in a
+     received DTLS chunk ({{first-use-indication}}).
 
 {:start="14"}
 14. Protected application traffic uses the new Primary DKC.
