@@ -5,9 +5,9 @@
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
 <title>Transport Layer Security (TLS) based Key Management of the Stream Control Transmission Protocol (SCTP) DTLS Chunk</title>
+<meta content="Claudio Porfiri" name="author">
 <meta content="Magnus Westerlund" name="author">
 <meta content="John Preuß Mattsson" name="author">
-<meta content="Claudio Porfiri" name="author">
 <meta content="Michael Tüxen" name="author">
 <meta content="
        This document defines how Transport Layer Security (TLS) 1.3
@@ -24,13 +24,13 @@ management and rekeying.
 <!-- Generator version information:
   xml2rfc 3.35.0
     Python 3.14.10
-    ConfigArgParse 1.9.0
+    ConfigArgParse 1.10.1
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.14.3
+    platformdirs 4.14.7
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -1053,8 +1053,8 @@ svg {
 <td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Westerlund, et al.</td>
-<td class="center">Expires 22 May 2027</td>
+<td class="left">Porfiri, et al.</td>
+<td class="center">Expires 28 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1067,24 +1067,24 @@ svg {
 <dd class="internet-draft">draft-porfiri-tsvwg-sctp-dtls-handshake-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-11-18" class="published">18 November 2026</time>
+<time datetime="2026-11-24" class="published">24 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-05-22">22 May 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-28">28 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
+<div class="author">
+      <div class="author-name">C. Porfiri</div>
+<div class="org">Ericsson</div>
+</div>
 <div class="author">
       <div class="author-name">M. Westerlund</div>
 <div class="org">Ericsson</div>
 </div>
 <div class="author">
       <div class="author-name">J. Preuß Mattsson</div>
-<div class="org">Ericsson</div>
-</div>
-<div class="author">
-      <div class="author-name">C. Porfiri</div>
 <div class="org">Ericsson</div>
 </div>
 <div class="author">
@@ -1140,7 +1140,7 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1247,6 +1247,9 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
                 <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-dkc-installation" class="internal xref">DKC Installation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-first-use-indication" class="internal xref">First Use Indication</a></p>
 </li>
             </ul>
 </li>
@@ -2038,6 +2041,82 @@ never used for regular traffic) so that both endpoints have a
 consistent view of sequence numbers and replay window.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="first-use-indication">
+<section id="section-5.5">
+        <h3 id="name-first-use-indication">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-first-use-indication" class="section-name selfRef">First Use Indication</a>
+        </h3>
+<p id="section-5.5-1">The key management method defined in this document relies on the DTLS
+Chunk indicating the first successful use of each DKC in the receive
+direction ("Indication of First use of Key Epoch", <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-7.11" class="relref">Section 7.11</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).  The server key manager uses this
+indication to start the drain timer during rekeying (step 9 of
+<a href="#rekey-procedure" class="auto internal xref">Section 6.2.2</a>) and after an SCTP restart (step 13 of
+<a href="#restart-procedure" class="auto internal xref">Section 6.3.2</a>).<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">For the purpose of this document, the DTLS Chunk MUST provide this
+indication for every DKC, Primary and Restart, as follows:<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.5-3.1">
+            <p id="section-5.5-3.1.1">Each DKC has an associated flag, "already used".<a href="#section-5.5-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-3.2">
+            <p id="section-5.5-3.2.1">When the receive key material of a DKC is installed ("Establish
+Receive Key Material", <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>), the "already used" flag of that
+DKC is set to false.  This applies to every installation, including
+a Restart DKC installed from persistent storage.<a href="#section-5.5-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-3.3">
+            <p id="section-5.5-3.3.1">When a received DTLS chunk has been successfully decrypted and
+authenticated with a DKC, has passed replay protection, and the
+"already used" flag of that DKC is false, the DTLS Chunk sets the
+flag to true and indicates the first use of the DKC to the key
+manager.  The indication contains the SCTP association, the restart
+indicator (R bit), and the DTLS epoch of the DKC.<a href="#section-5.5-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-3.4">
+            <p id="section-5.5-3.4.1">DTLS chunks that fail decryption, authentication, or replay
+protection MUST NOT change the flag and MUST NOT trigger the
+indication.<a href="#section-5.5-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.5-4">As a result, the indication is given exactly once for each installed
+DKC, independently of the epoch values used by other DKCs.  In
+particular, it is given for the epoch 3 Primary DKC installed after an
+SCTP restart, even though DKCs with an equal or higher epoch were used
+before the restart.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+<span id="name-first-use-indication-2"></span><div id="first-use-pseudocode">
+<figure id="figure-3">
+          <div class="lang-pseudocode sourcecode" id="section-5.5-5.1">
+<pre>
+install_receive_keys(DKC):
+    DKC.already_used = false
+
+on_receive(chunk):
+    DKC = lookup(association, chunk.R, chunk.epoch)
+    if DKC exists and decrypt(chunk, DKC) == SUCCESS
+       and replay_check(chunk, DKC) == PASS:
+        if DKC.already_used == false:
+            DKC.already_used = true
+            indicate_first_use(association, chunk.R, chunk.epoch)
+        process the SCTP packet
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-first-use-indication-2" class="selfRef">First Use Indication</a>
+          </figcaption></figure>
+</div>
+<p id="section-5.5-6">When the socket API of <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>
+is used, the indication is delivered as an SCTP_DTLS_NEW_EPOCH_EVENT
+notification (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-8.1.2" class="relref">Section 8.1.2</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>)
+with sdne_epoch set to the epoch of the DKC.  Since this notification
+does not carry the restart indicator, the key manager associates it
+with the DKC it is waiting for: the Primary DKC whose receive key
+material was most recently installed and for which no indication has
+been received yet.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
+<p id="section-5.5-7">Note to be removed before publication: the behavior above is expected
+to be specified in <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.  Once it is,
+this section will be reduced to a reference.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="procedures">
@@ -2051,7 +2130,7 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-initial-establishment" class="section-name selfRef">Initial Establishment</a>
         </h3>
 <span id="name-initial-establishment-2"></span><div id="initial-establishment-diagram">
-<figure id="figure-3">
+<figure id="figure-4">
           <div id="section-6.1-1.1">
             <div class="alignCenter art-svg artwork" id="section-6.1-1.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="480" width="472" viewBox="0 0 472 480" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -2155,13 +2234,13 @@ consistent view of sequence numbers and replay window.<a href="#section-5.4-4" c
               </svg><a href="#section-6.1-1.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
 <a href="#name-initial-establishment-2" class="selfRef">Initial Establishment</a>
           </figcaption></figure>
 </div>
 <p id="section-6.1-2">Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 RKI = Read Key Installed control message; R+W = read and write keys.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.1-3">The diagram <a href="#initial-establishment-diagram" class="auto internal xref">Figure 3</a> shows the case where SCTP
+<p id="section-6.1-3">The diagram <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> shows the case where SCTP
   Initiator ends up with the Key Manager client role. The opposite case is
   identical but with inverted roles among Key Managers. In the following
   procedure we use Initiator and Responder referring to SCTP, Client and Server
@@ -2181,14 +2260,14 @@ RKI = Read Key Installed control message; R+W = read and write keys.<a href="#se
    Section 7.2 of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and verifies that
    the selected method matches the one defined in this document
    (see <a href="#sec-iana-psi" class="auto internal xref">Section 9.1</a>) and gets the assigned role as key manager client or
-   server (in the example depicted in <a href="#initial-establishment-diagram" class="auto internal xref">Figure 3</a>
+   server (in the example depicted in <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a>
    it is server).<a href="#section-6.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.3">
             <p id="section-6.1-5.3.1">The Initiator enters ESTABLISHED state. It performs the same retrieval and
    verification as the Responder, confirming the assigned role as key manager
    client or server (in the example depicted in
-   <a href="#initial-establishment-diagram" class="auto internal xref">Figure 3</a> it is client).<a href="#section-6.1-5.3.1" class="pilcrow">¶</a></p>
+   <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> it is client).<a href="#section-6.1-5.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-5.4">
             <p id="section-6.1-5.4.1">The client key manager starts a TLS 1.3 handshake, limiting offered cipher
@@ -2291,7 +2370,7 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
   messages are guaranteed to be delivered and are not lost; no
   key-management-level retransmission is required.<a href="#section-6.2.2-4" class="pilcrow">¶</a></p>
 <span id="name-rekeying-procedure"></span><div id="rekey-diagram">
-<figure id="figure-4">
+<figure id="figure-5">
             <div id="section-6.2.2-5.1">
               <div class="alignCenter art-svg artwork" id="section-6.2.2-5.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="480" width="456" viewBox="0 0 456 480" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -2396,7 +2475,7 @@ the rekeying TLS handshake.<a href="#section-6.2.2-3.2.1" class="pilcrow">¶</a>
                 </svg><a href="#section-6.2.2-5.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-rekeying-procedure" class="selfRef">Rekeying Procedure</a>
             </figcaption></figure>
 </div>
@@ -2405,7 +2484,7 @@ Rekey Req = Rekey Request control message;
 RKI = Read Key Installed control message; R+W = read and
 write keys; N, N+1 = old and new epoch; TX-&gt;N+1 = switch sending to the
 epoch N+1 DKC.<a href="#section-6.2.2-6" class="pilcrow">¶</a></p>
-<p id="section-6.2.2-7">The diagram in <a href="#rekey-diagram" class="auto internal xref">Figure 4</a> shows both triggers.  Steps 1 and 2 (the
+<p id="section-6.2.2-7">The diagram in <a href="#rekey-diagram" class="auto internal xref">Figure 5</a> shows both triggers.  Steps 1 and 2 (the
   Rekey Request) are present only when the server key manager is the one
   that needs to rekey; when the client key manager needs to rekey it
   starts directly at step 3.  As in initial establishment, the key
@@ -2460,10 +2539,10 @@ remove the old both the Primary and Restart(epoch N) DKC, and
 switches sending to the epoch N+1 DKC.<a href="#section-6.2.2-9.8.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.2.2-9.9">
-              <p id="section-6.2.2-9.9.1">The server key manager is notified with SCTP_DTLS_NEW_EPOCH_EVENT
-that the new key has been succesfully used when receiving a message
-from client, it starts the drain timer to remove both Primary and
-Restart (epoch N) DKC.<a href="#section-6.2.2-9.9.1" class="pilcrow">¶</a></p>
+              <p id="section-6.2.2-9.9.1">When the server key manager is notified of the first use of the
+epoch N+1 Primary DKC in a received DTLS chunk
+(<a href="#first-use-indication" class="auto internal xref">Section 5.5</a>), it starts the drain timer to remove the
+epoch N Primary and Restart DKCs.<a href="#section-6.2.2-9.9.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
 <p id="section-6.2.2-10">If the TLS handshake fails in step 5, it SHOULD be retried according to <a href="#error-handling" class="auto internal xref">Section 7</a>.<a href="#section-6.2.2-10" class="pilcrow">¶</a></p>
@@ -2550,7 +2629,7 @@ DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶<
 <a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-restart-procedure" class="section-name selfRef">Restart Procedure</a>
           </h4>
 <span id="name-sctp-restart-procedure"></span><div id="restart-diagram">
-<figure id="figure-5">
+<figure id="figure-6">
             <div id="section-6.3.2-1.1">
               <div class="alignCenter art-svg artwork" id="section-6.3.2-1.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="488" viewBox="0 0 488 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -2629,7 +2708,7 @@ DTLS Key Management Parameter.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶<
                 </svg><a href="#section-6.3.2-1.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
 <a href="#name-sctp-restart-procedure" class="selfRef">SCTP Restart Procedure</a>
             </figcaption></figure>
 </div>
@@ -2674,17 +2753,26 @@ The ULP MAY be informed that the association is restarted at this
 point.  ULP traffic MAY begin immediately using the Restart DKC.<a href="#section-6.3.2-3.6.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-3.7">
-              <p id="section-6.3.2-3.7.1">Steps 7 to 13 perform the TLS 1.3 handshake and key installation, and
-correspond one-to-one to steps 3 to 9 of the rekey
-procedure (<a href="#rekey-procedure" class="auto internal xref">Section 6.2.2</a>).  They differ only as follows:<a href="#section-6.3.2-3.7.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-3.7.1">Steps 7 to 13 perform the TLS 1.3 handshake and key installation,
+and correspond one-to-one to steps 3 to 9 of the rekeying procedure
+(<a href="#rekey-procedure" class="auto internal xref">Section 6.2.2</a>).  In these steps, "epoch N" refers to the
+Restart DKC used to restart the association, and "epoch N+1" refers
+to the new Primary and Restart DKCs, which use epoch 3
+(<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-5.4" class="relref">Section 5.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).  The steps
+differ from the rekeying procedure only as follows:<a href="#section-6.3.2-3.7.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.2-3.7.2.1">
-                  <p id="section-6.3.2-3.7.2.1.1">at the key transition (steps 11 and 12), each endpoint switches the
-active DTLS key context from the Restart DKC to the new Primary DKC
-after the Read Key Installed exchange completes (the Read Key
+                  <p id="section-6.3.2-3.7.2.1.1">At the key transition (steps 11 and 12), each endpoint switches
+the active DTLS key context from the Restart DKC to the new Primary
+DKC after the Read Key Installed exchange completes (the Read Key
 Installed messages themselves are protected with the Restart DKC),
 rather than enforcing protection for the first time; the ULP was
 already informed at step 6.<a href="#section-6.3.2-3.7.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-6.3.2-3.7.2.2">
+                  <p id="section-6.3.2-3.7.2.2.1">At step 13, the server key manager starts the drain timer when it
+is notified of the first use of the epoch 3 Primary DKC in a
+received DTLS chunk (<a href="#first-use-indication" class="auto internal xref">Section 5.5</a>).<a href="#section-6.3.2-3.7.2.2.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
@@ -3048,6 +3136,14 @@ Identifiers" registry for the PPID 4243 as depicted in
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Claudio Porfiri</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:claudio.porfiri@ericsson.com" class="email">claudio.porfiri@ericsson.com</a>
+</div>
+</address>
+<address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Magnus Westerlund</span></div>
 <div dir="auto" class="left"><span class="org">Ericsson</span></div>
 <div class="email">
@@ -3061,14 +3157,6 @@ Identifiers" registry for the PPID 4243 as depicted in
 <div class="email">
 <span>Email:</span>
 <a href="mailto:john.mattsson@ericsson.com" class="email">john.mattsson@ericsson.com</a>
-</div>
-</address>
-<address class="vcard">
-        <div dir="auto" class="left"><span class="fn nameRole">Claudio Porfiri</span></div>
-<div dir="auto" class="left"><span class="org">Ericsson</span></div>
-<div class="email">
-<span>Email:</span>
-<a href="mailto:claudio.porfiri@ericsson.com" class="email">claudio.porfiri@ericsson.com</a>
 </div>
 </address>
 <address class="vcard">
