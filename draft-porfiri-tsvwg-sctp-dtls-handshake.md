@@ -1008,7 +1008,7 @@ Comment.
 | EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
 {: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
 
-## DTLS in SCTP Key Management Control Message Types {#sec-iana-ctrl-types}
+## (D)TLS Protected SCTP Key Management Control Message Types {#sec-iana-ctrl-types}
 
 IANA is requested to create a new registry called "DTLS in SCTP
 Key Management Control Message Types" in the Stream Control
@@ -1034,7 +1034,7 @@ The initial contents of the registry are shown in
 | 0x01        | Read Key Installed | RFC-TBD   |
 | 0x02        | Rekey Request      | RFC-TBD   |
 | 0x03-0xFF   | Unassigned         |           |
-{: #iana-ctrl-types title="DTLS in SCTP Key Management Control Message Types" cols="l l l"}
+{: #iana-ctrl-types title="(D)TLS Protected SCTP Key Management Control Message Types" cols="l l l"}
 
 ## SCTP Payload Protocol Identifier {#sec-iana-ppid}
 
