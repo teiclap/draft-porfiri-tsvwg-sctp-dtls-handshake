@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 6 May 2027                                             Ericsson
+Expires: 28 May 2027                                            Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                         2 November 2026
+                                                        24 November 2026
 
 
    Transport Layer Security (TLS) based Key Management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 May 2027.
+   This Internet-Draft will expire on 28 May 2027.
 
 Copyright Notice
 
@@ -115,7 +115,7 @@ Table of Contents
    9.  IANA Considerations
      9.1.  DTLS Key Management Method Identifier
      9.2.  TLS Exporter Labels
-     9.3.  DTLS in SCTP Key Management Control Message Types
+     9.3.  (D)TLS Protected SCTP Key Management Control Message Types
      9.4.  SCTP Payload Protocol Identifier
    10. References
      10.1.  Normative References
@@ -1053,7 +1053,7 @@ Table of Contents
 
                         Table 4: TLS Exporter Label
 
-9.3.  DTLS in SCTP Key Management Control Message Types
+9.3.  (D)TLS Protected SCTP Key Management Control Message Types
 
    IANA is requested to create a new registry called "DTLS in SCTP Key
    Management Control Message Types" in the Stream Control Transmission
@@ -1088,8 +1088,8 @@ Table of Contents
               | 0x03-0xFF | Unassigned         |           |
               +-----------+--------------------+-----------+
 
-                   Table 5: DTLS in SCTP Key Management
-                          Control Message Types
+                    Table 5: (D)TLS Protected SCTP Key
+                     Management Control Message Types
 
 9.4.  SCTP Payload Protocol Identifier
 
@@ -1148,9 +1148,9 @@ Table of Contents
               Westerlund, M., Mattsson, J. P., Porfiri, C., and M.
               Tüxen, "Stream Control Transmission Protocol (SCTP) DTLS
               Chunk", Work in Progress, Internet-Draft, draft-ietf-
-              tsvwg-sctp-dtls-chunk-05, 8 October 2026,
+              tsvwg-sctp-dtls-chunk-07, 18 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-
-              sctp-dtls-chunk-05>.
+              sctp-dtls-chunk-07>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
