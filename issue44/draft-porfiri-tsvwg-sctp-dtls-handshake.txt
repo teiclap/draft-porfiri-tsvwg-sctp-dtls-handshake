@@ -5,10 +5,10 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 6 May 2027                                             Ericsson
+Expires: 28 May 2027                                            Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                         2 November 2026
+                                                        24 November 2026
 
 
    Transport Layer Security (TLS) based Key Management of the Stream
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 May 2027.
+   This Internet-Draft will expire on 28 May 2027.
 
 Copyright Notice
 
@@ -530,7 +530,7 @@ Table of Contents
 
    A single TLS Exporter label is used to derive all keying material:
 
-   EXPORTER_DTLS_IN_SCTP
+   EXPORTER_DTLS_PROTECTED_SCTP
 
    The specific key material (direction, role, and type) is
    differentiated by the exporter context (Section 5.2).  Each
@@ -1147,9 +1147,9 @@ Table of Contents
               Westerlund, M., Mattsson, J. P., Porfiri, C., and M.
               Tüxen, "Stream Control Transmission Protocol (SCTP) DTLS
               Chunk", Work in Progress, Internet-Draft, draft-ietf-
-              tsvwg-sctp-dtls-chunk-05, 8 October 2026,
+              tsvwg-sctp-dtls-chunk-07, 18 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-
-              sctp-dtls-chunk-05>.
+              sctp-dtls-chunk-07>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
