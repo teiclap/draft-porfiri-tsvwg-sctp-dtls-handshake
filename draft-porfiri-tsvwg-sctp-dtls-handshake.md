@@ -495,7 +495,7 @@ results in mismatched keys and association failure.
 
 A single TLS Exporter label is used to derive all keying material:
 
-    EXPORTER_DTLS_IN_SCTP
+    EXPORTER_DTLS_PROTECTED_SCTP
 
 The specific key material (direction, role, and type) is
 differentiated by the exporter context ({{exporter-context}}).  Each
