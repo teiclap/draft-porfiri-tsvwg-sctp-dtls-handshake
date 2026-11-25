@@ -340,7 +340,7 @@ Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported ({{tls-config}}).
 
 The cipher suites negotiated in the key management TLS connection
-MUST only include those supported by the DTLS Chunk Protection
+MUST include only those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
 suites (see {{Section 7.3 of I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 
@@ -376,14 +376,14 @@ role MUST still present the same authenticated identity.
 
 ## Rekeying Considerations {#rekey-strategy}
 
-Implementations need to implement criteria for when to initiate
-rekeying.  Implementations are RECOMMENDED to rekey at least every hour
+Implementations MUST support criteria for initiating rekeying.
+Implementations are RECOMMENDED to rekey at least every hour
 and every 100 GB of data, which matches what is specified for IPsec in
 {{ANSSI-DAT-NT-003}}.
 
 Implementations MUST set up a new TLS connection using a full
-handshake with new certificates before any last used certificates
-expire.
+handshake with new certificates before any certificate used in
+the most recent handshake expires.
 
 The PSK key exchange mode psk_ke MUST NOT be used as it does not
 provide ephemeral key exchange ({{tls-config}}).
@@ -455,7 +455,7 @@ There are two classes of these key management messages:
 * SCTP user messages containing TLS records.
 * SCTP user messages containing control information.
 
-These two classes are identified by using a specific PPID each.
+Each class is identified by its own PPID.
 
 ## TLS Records
 
@@ -465,9 +465,10 @@ Other SCTP user messages MUST NOT use this PPID.
 
 ## Control Messages {#control-messages}
 
-Control messages are sent as SCTP user messages, they MUST use PPID 4243
-and contain a single byte identifying the type as shown in the following
-{{control-message-format}}. Other user messages MUST NOT use this PPID.
+Control messages MUST be sent as SCTP user messages with PPID 4243.
+Each control message consists of a single byte that identifies its
+type, as shown in {{control-message-format}}.  Other SCTP user
+messages MUST NOT use PPID 4243.
 
 ~~~~~~~~~~~ aasvg
  0 1 2 3 4 5 6 7
@@ -480,7 +481,7 @@ and contain a single byte identifying the type as shown in the following
 Ctrl Type: 8 bits
 : Identifies the control message type.
 
-The following control message type is defined:
+The following control message types are defined:
 
   | Ctrl Type | Name               | Description                                                          |
   |-----------|--------------------|----------------------------------------------------------------------|
@@ -497,14 +498,12 @@ has completed, MUST also be silently discarded.
 
 ### Read Key Installed {#read-key-installed}
 
-The Read Key Installed control message (Ctrl Type = 0x01) is sent
-by a key manager to its peer key manager for indicating that it has
-set the read key material.
-This enables the peer receiving this message to set its write key
-and, during rekeying, to switch sending to the new Primary DKC.
-
-The message is also used during rekeying in the same way as in the
-initial handshake.
+The Read Key Installed control message (Ctrl Type = 0x01) is sent by
+a key manager to its peer to indicate that it has installed its read
+(receive) key.  On receiving it, the peer installs its write (send)
+key and, during rekeying, switches sending to the new Primary DKC.
+The message is used in the same way during initial establishment and
+rekeying.
 
 ### Rekey Request {#rekey-request}
 
@@ -726,12 +725,12 @@ Restart DKC apply only if SCTP restart is supported by both endpoints
 Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 RKI = Read Key Installed control message; RX+TX = read and write keys.
 
-  The diagram {{initial-establishment-diagram}} shows the case where SCTP
-  Initiator ends up with the Key Manager client role. The opposite case is
-  identical but with inverted roles among Key Managers. In the following
-  procedure we use Initiator and Responder referring to SCTP, Client and Server
-  referring to Keymanager role, and implicitly TLS roles. The key managers drive
-  TLS solely through the TLS user API.
+   {{initial-establishment-diagram}} shows the case where the SCTP
+   Initiator takes the client key manager role; the opposite case is
+   the same with the key manager roles exchanged.  In the following,
+   Initiator and Responder refer to the SCTP roles, and Client and
+   Server refer to the key manager roles, which are also the TLS
+   roles. The key managers drive TLS solely through the TLS user API.
 
   The procedure is as follows:
 
@@ -982,20 +981,19 @@ to be received and processed before those keys are removed.  When the
 drain timer expires, the old Primary DKC is removed and the new
 Restart DKC replaces the old one ({{sctp-restart-prereq}}).
 
-When the client KM receives the Read Key Installed
-control message ({{read-key-installed}}) in step 8, installs the write
-key and starts the drain timer it do knows that the server endpoint
-already is sending using the new DKC. Thus it can set a short timer
-to allow any reordered or delayed packets has been drained before
-removing the old DKS.
+When the client key manager receives the Read Key Installed control
+message in step 8, it knows that the server key manager is already
+sending with the new Primary DKC.  It can therefore use a short drain
+timer, long enough for reordered or delayed packets protected with
+the old keys to be received.
 
-After having installed the write key, the client KM will start
-using the new key for DTLS Chunk. The server KM will be informed
-about the new key use (see {{first-use-indication}}), thus it can set short timer
-to allow any reordered or delayed packets has been drained before
-removing the old DKS.
+The server key manager starts its drain timer when it is notified
+that the client key manager has started to use the new Primary DKC
+({{first-use-indication}}).  For the same reason, a short drain timer
+is sufficient.
 
-For both client and server a timer value of 3 seconds is recommended.
+The RECOMMENDED default value of the drain timer is 3 seconds for
+both key managers.
 
 ### Concurrent Rekey Requests {#sim-rekeying}
 
@@ -1064,23 +1062,22 @@ support (R bit) in the DTLS Key Management Parameter:
 ~~~~~~~~~~~
 {: #restart-diagram title="SCTP Restart Procedure" artwork-align="center"}
 
-Steps 1-5 are following what is defined in {{Section 5.4 of
-I-D.ietf-tsvwg-sctp-dtls-chunk}} (Restart Considerations).
+Steps 1 to 5 follow {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
-1. The restarting endpoint (Initiator) retrieves the restart key
-   material from persistent secure storage and installs the Restart
-   DKC for both send and receive directions; it then
-   removes it from persistent storage, as its sequence
-   numbers will be used.
+1. The restarting endpoint (Initiator) retrieves the Restart DKC from
+   persistent secure storage and installs it for both the send and
+   receive directions.  It then removes the Restart DKC from persistent
+   storage, because its sequence numbers will be used.
 
-2. The Initiator sends INIT (VTag=0). Include the DTLS Key Management
-   Parameter with the same method list and the same role and restart settings,
-   but a new random Tie Breaker.
+2. The Initiator sends an INIT chunk with a Verification Tag of 0.  It
+   includes the DTLS Key Management Parameter with the same method
+   list and the same role and restart settings as before, but with a
+   new random Tie Breaker.
 
-3. The Responder (the not restarting endpoint) replies INIT ACK in
-   plain text per {{RFC9260}}.  Include the DTLS Key Management
-   Parameter with the same method list and the same role and restart
-   settings, but a new random Tie Breaker.
+3. The Responder, which did not restart, replies with an INIT ACK
+   chunk in plaintext as specified in {{RFC9260}}.  It includes the
+   DTLS Key Management Parameter with the same method list and the
+   same role and restart settings, but with a new random Tie Breaker.
 
 4. The Initiator sends COOKIE ECHO in a DTLS chunk protected with
    the Restart DKC (R bit set).
@@ -1147,10 +1144,9 @@ The resulting delay is bounded by the drain timer.
 
 # Error Handling {#error-handling}
 
-TLS has its own error reporting via TLS alert messages.  When a TLS
-handshake error occurs, the TLS alert is sent in an SCTP user message
-(see {{tls-user-message}}) with the TLS records for DTLS Chunk
-Key Management PPID (4242).
+TLS reports errors with TLS alert messages.  A TLS alert is sent in an
+SCTP user message with PPID 4242, like any other TLS record
+({{tls-user-message}}).
 
 If a TLS handshake fails during initial establishment and the
 implementation determines that it can address the cause of the error
@@ -1160,8 +1156,8 @@ the TLS handshake.  Otherwise, the SCTP association MUST be aborted.
 
 If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
-handshake.  If retry is not possible or the current DKC is aged
-beyond limits, the association MUST be aborted.
+handshake. If retry is not possible, or if the current DKC has reached
+its usage limits, the association MUST be aborted.
 
 A TLS handshake that fails because the peer could not be
 authenticated, including a change of the authenticated peer identity
@@ -1200,9 +1196,8 @@ forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.
 
-It is RECOMMENDED that implementations of this key management
-method do not allow the ULP to exchange any data beyond the
-key management information following this specification until
+Implementations of this key management method SHOULD NOT allow the ULP to exchange
+any data, other than the key management messages defined in this document, until
 the peer is authenticated and the local endpoint and the remote
 endpoint have both installed read and write keys and enforced
 protection. This is to avoid any information leakage from
