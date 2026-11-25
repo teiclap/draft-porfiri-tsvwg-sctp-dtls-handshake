@@ -1752,7 +1752,7 @@ or cipher suites without confidentiality MUST NOT be supported.
 Cipher suites and parameters that do not provide ephemeral
 key-exchange MUST NOT be supported (<a href="#tls-config" class="auto internal xref">Section 3</a>).<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.2-2">The cipher suites negotiated in the key management TLS connection
-MUST only include those supported by the DTLS Chunk Protection
+MUST include only those supported by the DTLS Chunk Protection
 Operator.  The DTLS Chunk provides an API to query supported cipher
 suites (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-7.3" class="relref">Section 7.3</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 </section>
@@ -1792,13 +1792,13 @@ role MUST still present the same authenticated identity.<a href="#section-3.3-5"
         <h3 id="name-rekeying-considerations">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-rekeying-considerations" class="section-name selfRef">Rekeying Considerations</a>
         </h3>
-<p id="section-3.4-1">Implementations need to implement criteria for when to initiate
-rekeying.  Implementations are RECOMMENDED to rekey at least every hour
+<p id="section-3.4-1">Implementations MUST support criteria for initiating rekeying.
+Implementations are RECOMMENDED to rekey at least every hour
 and every 100 GB of data, which matches what is specified for IPsec in
 <span>[<a href="#ANSSI-DAT-NT-003" class="cite xref">ANSSI-DAT-NT-003</a>]</span>.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4-2">Implementations MUST set up a new TLS connection using a full
-handshake with new certificates before any last used certificates
-expire.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+handshake with new certificates before any certificate used in
+the most recent handshake expires.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.4-3">The PSK key exchange mode psk_ke MUST NOT be used as it does not
 provide ephemeral key exchange (<a href="#tls-config" class="auto internal xref">Section 3</a>).
 TLS Key Update MUST NOT be used as it
@@ -1881,7 +1881,7 @@ using reliable in-order delivery on stream 0.<a href="#section-4-1" class="pilcr
           <p id="section-4-3.2.1">SCTP user messages containing control information.<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-4-4">These two classes are identified by using a specific PPID each.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-4">Each class is identified by its own PPID.<a href="#section-4-4" class="pilcrow">¶</a></p>
 <div id="tls-records">
 <section id="section-4.1">
         <h3 id="name-tls-records">
@@ -1897,9 +1897,10 @@ Other SCTP user messages MUST NOT use this PPID.<a href="#section-4.1-1" class="
         <h3 id="name-control-messages">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-control-messages" class="section-name selfRef">Control Messages</a>
         </h3>
-<p id="section-4.2-1">Control messages are sent as SCTP user messages, they MUST use PPID 4243
-and contain a single byte identifying the type as shown in the following
-<a href="#control-message-format" class="auto internal xref">Figure 2</a>. Other user messages MUST NOT use this PPID.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">Control messages MUST be sent as SCTP user messages with PPID 4243.
+Each control message consists of a single byte that identifies its
+type, as shown in <a href="#control-message-format" class="auto internal xref">Figure 2</a>.  Other SCTP user
+messages MUST NOT use PPID 4243.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <span id="name-control-message-format"></span><div id="control-message-format">
 <figure id="figure-2">
           <div id="section-4.2-2.1">
@@ -1935,7 +1936,7 @@ and contain a single byte identifying the type as shown in the following
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-4.2-4">The following control message type is defined:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">The following control message types are defined:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 <span id="name-control-message-types"></span><div id="control-message-types">
 <table class="center" id="table-1">
           <caption>
@@ -1974,13 +1975,12 @@ has completed, MUST also be silently discarded.<a href="#section-4.2-6" class="p
           <h4 id="name-read-key-installed">
 <a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-read-key-installed" class="section-name selfRef">Read Key Installed</a>
           </h4>
-<p id="section-4.2.1-1">The Read Key Installed control message (Ctrl Type = 0x01) is sent
-by a key manager to its peer key manager for indicating that it has
-set the read key material.
-This enables the peer receiving this message to set its write key
-and, during rekeying, to switch sending to the new Primary DKC.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.2.1-2">The message is also used during rekeying in the same way as in the
-initial handshake.<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-1">The Read Key Installed control message (Ctrl Type = 0x01) is sent by
+a key manager to its peer to indicate that it has installed its read
+(receive) key.  On receiving it, the peer installs its write (send)
+key and, during rekeying, switches sending to the new Primary DKC.
+The message is used in the same way during initial establishment and
+rekeying.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rekey-request">
@@ -2360,12 +2360,12 @@ Restart DKC apply only if SCTP restart is supported by both endpoints
 </div>
 <p id="section-7.1-2">Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
 RKI = Read Key Installed control message; RX+TX = read and write keys.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<p id="section-7.1-3">The diagram <a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> shows the case where SCTP
-  Initiator ends up with the Key Manager client role. The opposite case is
-  identical but with inverted roles among Key Managers. In the following
-  procedure we use Initiator and Responder referring to SCTP, Client and Server
-  referring to Keymanager role, and implicitly TLS roles. The key managers drive
-  TLS solely through the TLS user API.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-3"><a href="#initial-establishment-diagram" class="auto internal xref">Figure 4</a> shows the case where the SCTP
+   Initiator takes the client key manager role; the opposite case is
+   the same with the key manager roles exchanged.  In the following,
+   Initiator and Responder refer to the SCTP roles, and Client and
+   Server refer to the key manager roles, which are also the TLS
+   roles. The key managers drive TLS solely through the TLS user API.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <p id="section-7.1-4">The procedure is as follows:<a href="#section-7.1-4" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.1-5">
 <li id="section-7.1-5.1">
@@ -2740,18 +2740,17 @@ Its purpose is to allow in-flight packets protected with the old keys
 to be received and processed before those keys are removed.  When the
 drain timer expires, the old Primary DKC is removed and the new
 Restart DKC replaces the old one (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.2.3-2">When the client KM receives the Read Key Installed
-control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) in step 8, installs the write
-key and starts the drain timer it do knows that the server endpoint
-already is sending using the new DKC. Thus it can set a short timer
-to allow any reordered or delayed packets has been drained before
-removing the old DKS.<a href="#section-7.2.3-2" class="pilcrow">¶</a></p>
-<p id="section-7.2.3-3">After having installed the write key, the client KM will start
-using the new key for DTLS Chunk. The server KM will be informed
-about the new key use (see <a href="#first-use-indication" class="auto internal xref">Section 6.1</a>), thus it can set short timer
-to allow any reordered or delayed packets has been drained before
-removing the old DKS.<a href="#section-7.2.3-3" class="pilcrow">¶</a></p>
-<p id="section-7.2.3-4">For both client and server a timer value of 3 seconds is recommended.<a href="#section-7.2.3-4" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-2">When the client key manager receives the Read Key Installed control
+message in step 8, it knows that the server key manager is already
+sending with the new Primary DKC.  It can therefore use a short drain
+timer, long enough for reordered or delayed packets protected with
+the old keys to be received.<a href="#section-7.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-3">The server key manager starts its drain timer when it is notified
+that the client key manager has started to use the new Primary DKC
+(<a href="#first-use-indication" class="auto internal xref">Section 6.1</a>).  For the same reason, a short drain timer
+is sufficient.<a href="#section-7.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-4">The RECOMMENDED default value of the drain timer is 3 seconds for
+both key managers.<a href="#section-7.2.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sim-rekeying">
@@ -2905,25 +2904,25 @@ derived after the restart.<a href="#section-7.3.1-2.4.1" class="pilcrow">¶</a><
 <a href="#name-sctp-restart-procedure" class="selfRef">SCTP Restart Procedure</a>
             </figcaption></figure>
 </div>
-<p id="section-7.3.2-2">Steps 1-5 are following what is defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-5.4" class="relref">Section 5.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span> (Restart Considerations).<a href="#section-7.3.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.3.2-2">Steps 1 to 5 follow <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-5.4" class="relref">Section 5.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-7.3.2-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.3.2-3">
 <li id="section-7.3.2-3.1">
-              <p id="section-7.3.2-3.1.1">The restarting endpoint (Initiator) retrieves the restart key
-material from persistent secure storage and installs the Restart
-DKC for both send and receive directions; it then
-removes it from persistent storage, as its sequence
-numbers will be used.<a href="#section-7.3.2-3.1.1" class="pilcrow">¶</a></p>
+              <p id="section-7.3.2-3.1.1">The restarting endpoint (Initiator) retrieves the Restart DKC from
+persistent secure storage and installs it for both the send and
+receive directions.  It then removes the Restart DKC from persistent
+storage, because its sequence numbers will be used.<a href="#section-7.3.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.3.2-3.2">
-              <p id="section-7.3.2-3.2.1">The Initiator sends INIT (VTag=0). Include the DTLS Key Management
-Parameter with the same method list and the same role and restart settings,
-but a new random Tie Breaker.<a href="#section-7.3.2-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-7.3.2-3.2.1">The Initiator sends an INIT chunk with a Verification Tag of 0.  It
+includes the DTLS Key Management Parameter with the same method
+list and the same role and restart settings as before, but with a
+new random Tie Breaker.<a href="#section-7.3.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.3.2-3.3">
-              <p id="section-7.3.2-3.3.1">The Responder (the not restarting endpoint) replies INIT ACK in
-plain text per <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.  Include the DTLS Key Management
-Parameter with the same method list and the same role and restart
-settings, but a new random Tie Breaker.<a href="#section-7.3.2-3.3.1" class="pilcrow">¶</a></p>
+              <p id="section-7.3.2-3.3.1">The Responder, which did not restart, replies with an INIT ACK
+chunk in plaintext as specified in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.  It includes the
+DTLS Key Management Parameter with the same method list and the
+same role and restart settings, but with a new random Tie Breaker.<a href="#section-7.3.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.3.2-3.4">
               <p id="section-7.3.2-3.4.1">The Initiator sends COOKIE ECHO in a DTLS chunk protected with
@@ -3006,10 +3005,9 @@ The resulting delay is bounded by the drain timer.<a href="#section-7.3.2-8" cla
       <h2 id="name-error-handling">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
       </h2>
-<p id="section-8-1">TLS has its own error reporting via TLS alert messages.  When a TLS
-handshake error occurs, the TLS alert is sent in an SCTP user message
-(see <a href="#tls-user-message" class="auto internal xref">Section 4</a>) with the TLS records for DTLS Chunk
-Key Management PPID (4242).<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">TLS reports errors with TLS alert messages.  A TLS alert is sent in an
+SCTP user message with PPID 4242, like any other TLS record
+(<a href="#tls-user-message" class="auto internal xref">Section 4</a>).<a href="#section-8-1" class="pilcrow">¶</a></p>
 <p id="section-8-2">If a TLS handshake fails during initial establishment and the
 implementation determines that it can address the cause of the error
 (for example, by retrying with different parameters, as long as doing
@@ -3017,8 +3015,8 @@ so does not compromise security), it SHOULD retry
 the TLS handshake.  Otherwise, the SCTP association MUST be aborted.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <p id="section-8-3">If a TLS handshake fails during rekeying, and the current DKC has not
 yet reached its usage limits, the implementation SHOULD retry the
-handshake.  If retry is not possible or the current DKC is aged
-beyond limits, the association MUST be aborted.<a href="#section-8-3" class="pilcrow">¶</a></p>
+handshake. If retry is not possible, or if the current DKC has reached
+its usage limits, the association MUST be aborted.<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">A TLS handshake that fails because the peer could not be
 authenticated, including a change of the authenticated peer identity
 (<a href="#tls-auth" class="auto internal xref">Section 3.3</a>), MUST NOT be retried; the SCTP association MUST be
@@ -3063,9 +3061,8 @@ confidentiality, DTLS in SCTP effectively mitigates many
 forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
-<p id="section-9.2-4">It is RECOMMENDED that implementations of this key management
-method do not allow the ULP to exchange any data beyond the
-key management information following this specification until
+<p id="section-9.2-4">Implementations of this key management method SHOULD NOT allow the ULP to exchange
+any data, other than the key management messages defined in this document, until
 the peer is authenticated and the local endpoint and the remote
 endpoint have both installed read and write keys and enforced
 protection. This is to avoid any information leakage from
