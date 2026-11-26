@@ -68,6 +68,7 @@ informative:
 normative:
   RFC5705:
   RFC8126:
+  RFC8447:
   RFC8996:
   RFC9147:
   RFC9260:
@@ -108,9 +109,9 @@ a DTLS Key Management Identifier.
 
 This document defines one such method: it uses TLS 1.3 {{RFC9846}}
 handshakes carried as SCTP user messages to perform mutual
-authentication and derive keying material for the DTLS Chunk
-Protection Operator.  The combination of the SCTP DTLS Chunk and the
-key management defined in this document is referred to as "DTLS in SCTP".
+authentication and derive keying material for the DTLS Chunk Protection
+Operator.  The combination of the SCTP DTLS Chunk and the key management
+defined in this document is referred to as "DTLS in SCTP".
 
 The key advantages of this approach are:
 
@@ -152,10 +153,10 @@ DTLS Key Context (DKC):
   tuple of (SCTP Association, restart indicator, DTLS epoch).
 
 Epoch:
-: The DTLS epoch {{RFC9147}} that, together with the restart indicator,
-  identifies a DKC.  The first DKC of an SCTP association uses epoch 3,
-  and each rekeying uses the next epoch.  After an SCTP restart, the
-  epoch resets to 3 (see {{dkc-installation}}).
+: The DTLS epoch {{RFC9147}} that, together with the restart
+  indicator, identifies a DKC.  The first DKC of an SCTP association
+  uses epoch 3, and each rekeying procedure uses the next epoch.  After
+  an SCTP restart, the epoch resets to 3 (see {{dkc-installation}}).
 
 Initiator:
 : The endpoint initiating the SCTP association. In case of simultaneous
@@ -272,17 +273,17 @@ SCTP.  Normative procedures are specified in {{procedures}}.
 ~~~~~~~~~~~
 {: #overview-layering title="Architecture" artwork-align="center"}
 
-As shown in {{overview-layering}}, the Key Management Method is
-layered above SCTP alongside the Upper Layer Protocol (ULP), while the
-DTLS Chunk Protection Operator sits within SCTP and performs the actual
-protection of SCTP packets by encrypting and decrypting them and performing
-integrity verification.
+As shown in {{overview-layering}}, the Key Management Method is layered
+above SCTP alongside the Upper Layer Protocol (ULP), while the DTLS
+Chunk Protection Operator sits within SCTP and performs the actual
+protection of SCTP packets by encrypting and decrypting them and
+performing integrity verification.
 
 The Key Management Method instantiates a TLS 1.3 connection that is used
 solely for mutual authentication and key establishment; it never carries
 user data.  The key managers drive this connection through the TLS user
 API (the client key manager acting as the TLS client, the server key
-manager as the TLS server, role determination is specified in
+manager as the TLS server; role determination is specified in
 {{role-determination}}) and relay the resulting TLS records to each
 other as SCTP user messages, so that the TLS handshake is performed
 between the two endpoints.
@@ -314,9 +315,9 @@ The protocol operates in three phases:
 2. **Rekeying:** Either endpoint may trigger rekeying to derive fresh
    DKCs for the next epoch, providing forward secrecy and
    re-authentication.  The client key manager always performs the
-   TLS 1.3 handshake; when the server key manager needs to rekey it
-   requests one via a Rekey Request.  After draining, the old Primary DKC is
-   removed and the new Restart DKC replaces the old one.
+   TLS 1.3 handshake; when the server key manager needs to rekey, it
+   requests one via a Rekey Request.  After draining, the old Primary
+   DKC is removed and the new Restart DKC replaces the old one.
 
 3. **SCTP Restart:** The pre-established Restart DKC protects the
    COOKIE ECHO/COOKIE ACK exchange, followed by a new TLS handshake
@@ -387,8 +388,8 @@ the most recent handshake expires.
 
 The PSK key exchange mode psk_ke MUST NOT be used as it does not
 provide ephemeral key exchange ({{tls-config}}).
-TLS Key Update MUST NOT be used as it
-doesn't provide a new ephemeral key for the key exporter.
+The TLS Key Update procedure MUST NOT be used, as it does not
+provide a new ephemeral key for the key exporter.
 
 TLS 1.3 tickets MAY be used for session resumption (see
 {{session-resumption}}).
@@ -396,27 +397,27 @@ TLS 1.3 tickets MAY be used for session resumption (see
 An endpoint MUST NOT have more than one key management
 TLS connection per SCTP association at any time.
 
-A rekeying is in progress from step 3 to step 8 of the rekeying
-procedure ({{rekey-procedure}}) for the client key manager, and from
-step 4 to step 9 for the server key manager.  A Rekey Request received
-while a rekeying is in progress SHOULD be ignored ({{sim-rekeying}}), and the
-server key manager MUST NOT send a Rekey Request while a rekeying is in
-progress.
+A rekeying procedure is in progress from step 3 to step 8
+({{rekey-procedure}}) for the client key manager, and from step 4 to
+step 9 for the server key manager.  A Rekey Request received while a
+rekeying procedure is in progress SHOULD be ignored ({{sim-rekeying}}),
+and the server key manager MUST NOT send a Rekey Request while a
+rekeying procedure is in progress.
 
-A rekeying, whether triggered locally (for example, by the criteria
-above or by a manual intervention) or by a Rekey Request, is not
-delayed by a running drain timer ({{drain-timer}}).  If a new rekeying
-starts while the drain timer of the previous rekeying is running, the
-drain timer expires immediately: the epoch N Primary DKC is removed,
-and the epoch N+1 Restart DKC replaces the epoch N Restart DKC
-({{sctp-restart-prereq}}).  The client key manager does this when it
-starts the new rekeying (step 3).  The server key manager does this
-when it sends a Rekey Request (step 1) or when it receives the first
-TLS record of the new handshake (step 4), whichever comes first.  SCTP
-packets protected with the removed DKC that are still in flight are
-discarded on reception, and SCTP retransmits their chunks protected
-with the current Primary DKC, as it does for packets that arrive after
-a regular drain timer expiry.
+A rekeying procedure, whether triggered locally (for example, by the
+criteria above or by a manual intervention) or by a Rekey Request, is
+not delayed by a running drain timer ({{drain-timer}}).  If a new
+rekeying procedure starts while the drain timer of the previous rekeying
+procedure is running, the drain timer expires immediately: the epoch N
+Primary DKC is removed, and the epoch N+1 Restart DKC replaces the epoch
+N Restart DKC ({{sctp-restart-prereq}}).  The client key manager does
+this when it starts the new rekeying procedure (step 3).  The server key
+manager does this when it sends a Rekey Request (step 1) or when it
+receives the first TLS record of the new handshake (step 4), whichever
+comes first.  SCTP packets protected with the removed DKC that are still
+in flight are discarded on reception, and SCTP retransmits their chunks
+protected with the current Primary DKC, as it does for packets that
+arrive after a regular drain timer expiry.
 
 ## Session Resumption {#session-resumption}
 
@@ -512,16 +513,16 @@ server key manager to the client key manager to request that the client
 key manager initiate a rekeying TLS handshake (see {{rekeying}}).
 
 Because only the client key manager initiates a TLS handshake, the
-server key manager uses this message when it determines that rekeying
-is needed (per its own criteria in {{rekey-strategy}}).  This division of
-roles allows an endpoint holding only the client role to implement
-a TLS client only, and an endpoint holding only the server role to implement
-a TLS server only.
+server key manager uses this message when it determines that rekeying is
+needed (per its own criteria in {{rekey-strategy}}).  This division of
+roles allows an endpoint holding only the client role to implement a TLS
+client only, and an endpoint holding only the server role to implement a
+TLS server only.
 
 Upon receiving a Rekey Request, the client key manager initiates a
 rekeying TLS handshake as described in {{rekeying}}, unless a rekeying
-is already in progress, in which case the Rekey Request SHOULD be ignored (see
-{{sim-rekeying}}).
+procedure is already in progress, in which case the Rekey Request SHOULD
+be ignored (see {{sim-rekeying}}).
 
 
 # Key Derivation {#dtls-key-derivation}
@@ -545,7 +546,7 @@ the concatenation of the following fields:
 
 | Field | Length | Value |
 |-------|--------|-------|
-| Direction | 1 byte | 0x00 = Client to Server, 0x01 = Server to Client |
+| Direction | 1 byte | 0x00 = Client-to-Server, 0x01 = Server-to-Client |
 | Key role | 1 byte | 0x00 = primary, 0x01 = restart |
 | Key type | 1 byte | 0x00 = Key, 0x01 = SN_KEY, 0x02 = IV |
 | Client KM Param | variable | DTLS Key Management Parameter sent by the endpoint designated as Client |
@@ -574,8 +575,8 @@ distinct export, yielding 12 values in total (2 directions × 2 roles
 × 3 types).
 
 The endpoint with the Client role installs exports with
-Direction=Client to server as its write keys and
-Direction=Server to client as its read keys.  The
+Direction=Client-to-Server as its write keys and
+Direction=Server-to-Client as its read keys.  The
 endpoint with Server role does the reverse.
 
 The length of each exported value is determined by the negotiated
@@ -597,19 +598,18 @@ epoch 3.  Each subsequent Primary DKC, together with its paired
 Restart DKC, uses the next consecutive epoch.  After an SCTP restart,
 the epoch resets to 3.
 
-If SCTP Restart is supported the endpoint MUST generate a Restart DKC
+If SCTP restart is supported, the endpoint MUST generate a Restart DKC
 for each epoch where a Primary DKC is generated.  The Restart DKC uses
 the same DTLS epoch as the Primary DKC generated alongside it; the two
 are distinguished not by epoch but by the restart indicator (the R bit
 in the DTLS chunk, see {{I-D.ietf-tsvwg-sctp-dtls-chunk}}) and by the
 Key role field of the exporter context ({{exporter-context}}).  The
 Restart DKC MUST be maintained in a well-defined state (initialized but
-never used for regular traffic) so that both endpoints have a
-consistent view of sequence numbers and replay window.
-The Restart DKC requirements in {{sctp-restart-prereq}} apply.
-If SCTP restart is supported, the Restart DKC is committed to persistent
-secure storage, replacing the previously stored one, as soon as it has been
-exported.
+never used for regular traffic) so that both endpoints have a consistent
+view of sequence numbers and replay window. The Restart DKC requirements
+in {{sctp-restart-prereq}} apply. If SCTP restart is supported, the
+Restart DKC is committed to persistent secure storage, replacing the
+previously stored one, as soon as it has been exported.
 
 # Requirements on the DTLS Chunk {#dtls-chunk-requirements}
 
@@ -683,10 +683,8 @@ been received yet.
 
 # Procedures {#procedures}
 
-
-Steps that involve the
-Restart DKC apply only if SCTP restart is supported by both endpoints
-({{sctp-restart-prereq}}).
+Steps that involve the Restart DKC apply only if SCTP restart is
+supported by both endpoints ({{sctp-restart-prereq}}).
 
 ## Initial Establishment {#initial-establishment}
 
@@ -722,15 +720,16 @@ Restart DKC apply only if SCTP restart is supported by both endpoints
 ~~~~~~~~~~~
 {: #initial-establishment-diagram title="Initial Establishment" artwork-align="center"}
 
-Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
-RKI = Read Key Installed control message; RX+TX = read and write keys.
+Legend: TLS = local TLS engine; client KM/server KM = client/server key
+manager; RKI = Read Key Installed control message; RX+TX = read and
+write keys.
 
-   {{initial-establishment-diagram}} shows the case where the SCTP
-   Initiator takes the client key manager role; the opposite case is
-   the same with the key manager roles exchanged.  In the following,
-   Initiator and Responder refer to the SCTP roles, and Client and
-   Server refer to the key manager roles, which are also the TLS
-   roles. The key managers drive TLS solely through the TLS user API.
+  {{initial-establishment-diagram}} shows the case where the SCTP
+  Initiator takes the client key manager role; the opposite case is the
+  same with the key manager roles exchanged.  In the following,
+  Initiator and Responder refer to the SCTP roles, and Client and Server
+  refer to the key manager roles, which are also the TLS roles. The key
+  managers drive TLS solely through the TLS user API.
 
   The procedure is as follows:
 
@@ -775,20 +774,19 @@ RKI = Read Key Installed control message; RX+TX = read and write keys.
   8. The server key manager proceeds only after both its own TLS
      handshake has completed (8a) and it has received the client key
      manager's Read Key Installed control message (8b). Once both
-     conditions are met, it exports both direction key material for both
-     the Primary and Restart DKCs, installs both the read (receive) key
-     and the write (send) key of the Primary and Restart DKCs, calls
+     conditions are met, it exports the Primary and Restart DKCs and
+     installs their read (receive) and write (send) keys, calls
      Require Protected SCTP Packets to enforce DTLS chunk protection for
      all future packets, informs the ULP that the association is
      protected, and sends a Read Key Installed control message
      ({{read-key-installed}}) to the client key manager.
 
   9. The client key manager receives the Read Key Installed control
-     message, installs the client key material of the Primary DKC as its
-     write (send) key, installs the read and write keys of the Restart
-     DKC, calls Require Protected SCTP Packets to enforce DTLS chunk
-     protection for all future packets, and informs the ULP that the
-     association is protected.
+     message, installs the Client-to-Server key material of the Primary
+     DKC as its write (send) key, installs the read and write keys of
+     the Restart DKC, calls Require Protected SCTP Packets to enforce
+     DTLS chunk protection for all future packets, and informs the ULP
+     that the association is protected.
 
   10. Protected application traffic can begin.
 
@@ -813,16 +811,16 @@ including:
 
 ### Procedure {#rekey-procedure}
 
-  The client key manager and the server key manager keep the same
-  key management roles for the entire lifetime of the SCTP association:
-  the client key manager is always the TLS client and the server key
-  manager is always the TLS server, for the initial handshake and for
-  every rekeying.  Consequently, only the client key manager ever
+  The client key manager and the server key manager keep the same key
+  management roles for the entire lifetime of the SCTP association: the
+  client key manager is always the TLS client and the server key manager
+  is always the TLS server, for the initial handshake and for every
+  rekeying procedure.  Consequently, only the client key manager ever
   initiates a TLS handshake.  This allows an endpoint holding only the
   client role to implement only a TLS client, and an endpoint holding
   only the server role to implement only a TLS server.
 
-  Either endpoint may need to rekey.  The need is acted upon as follows:
+  Either endpoint may need to rekey.  This is handled as follows:
 
   * If the client key manager needs to rekey, it directly initiates a
     rekeying TLS handshake.
@@ -832,11 +830,11 @@ including:
     ({{rekey-request}}) to the client key manager, which then initiates
     the rekeying TLS handshake.
 
-   Because the key management messages are carried on SCTP stream 0
-   with reliable, in-order delivery, the key managers do not need their
-   own retransmission mechanism: SCTP retransmits lost messages, and if
-   it cannot deliver them, the association fails ({{Section 8.1 of
-   RFC9260}}).
+  Because the key management messages are carried on SCTP stream 0 with
+  reliable, in-order delivery, the key managers do not need their own
+  retransmission mechanism: SCTP retransmits lost messages, and if it
+  cannot deliver them, the association fails ({{Section 8.1 of
+  RFC9260}}).
 
 ~~~~~~~~~~~ aasvg
 
@@ -873,17 +871,16 @@ including:
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
 
-Legend: TLS = local TLS engine; client KM/server KM = client/server key manager;
-Rekey Req = Rekey Request control message;
-RKI = Read Key Installed control message; RX+TX = read and
-write keys; N, N+1 = old and new epoch; TX->N+1 = switch sending to the
-epoch N+1 DKC.
+Legend: TLS = local TLS engine; client KM/server KM = client/server key
+manager; Rekey Req = Rekey Request control message; RKI = Read Key
+Installed control message; RX+TX = read and write keys; N, N+1 = old and
+new epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
 
-  The diagram in {{rekey-diagram}} shows both triggers.  Steps 1 and 2 (the
-  Rekey Request) are present only when the server key manager is the one
-  that needs to rekey; when the client key manager needs to rekey it
-  starts directly at step 3.  As in initial establishment, the key
-  managers drive TLS solely through the TLS user API.
+  {{rekey-diagram}} shows both triggers.  Steps 1 and 2 (the Rekey
+  Request) are present only when the server key manager is the one that
+  needs to rekey; when the client key manager needs to rekey, it starts
+  directly at step 3.  As in initial establishment, the key managers
+  drive TLS solely through the TLS user API.
 
   The procedure is as follows:
 
@@ -893,39 +890,38 @@ epoch N+1 DKC.
 
   2. The client key manager receives the Rekey Request.  If it is not
      already rekeying, it proceeds to initiate a rekeying TLS handshake
-     (step 3).  If it is already rekeying, it SHOULD ignore the Rekey Request
-     (see {{sim-rekeying}}).
+     (step 3).  If it is already rekeying, it SHOULD ignore the Rekey
+     Request (see {{sim-rekeying}}).
 
   3. The client key manager starts a rekeying TLS handshake to derive
-     the epoch N+1 DKCs
-     and relays the resulting flight of TLS records to the server key manager
-     per {{tls-user-message}}.
+     the epoch N+1 DKCs and relays the resulting flight of TLS records
+     to the server key manager per {{tls-user-message}}.
 
-  4. The server key manager acts as the TLS server for the rekeying handshake,
-     as in step 5 of {{initial-establishment}}.
+  4. The server key manager acts as the TLS server for the rekeying
+     handshake, as in step 5 of {{initial-establishment}}.
 
-  5. The TLS endpoints continue exchange TLS messages to complete the
-     TLS handshake.
-     The authenticated peer identity MUST remain the same as in the previous
-     TLS connections (see {{tls-auth}}).
+  5. The TLS endpoints continue to exchange TLS messages to complete the
+     TLS handshake. The authenticated peer identity MUST remain the same
+     as in the previous TLS connections (see {{tls-auth}}).
 
   6. The client key manager's TLS handshake completes.  It exports the
      epoch N+1 Primary and Restart DKCs, installs the Server-to-Client
-     key material of the Primary DKC as its read (receive) key, and sends
-     a Read Key Installed control message ({{read-key-installed}}) to the
-     server key manager.  The Restart DKC is kept for later installation
-     ({{sctp-restart-prereq}}).
+     key material of the Primary DKC as its read (receive) key, and
+     sends a Read Key Installed control message ({{read-key-installed}})
+     to the server key manager.  The Restart DKC is kept for later
+     installation ({{sctp-restart-prereq}}).
 
   7. The server key manager proceeds only after both its own TLS
      handshake has completed (7a) and it has received the client key
      manager's Read Key Installed control message (7b).  It then exports
      the epoch N+1 Primary and Restart DKCs and installs the read
-     (receive) and write (send) keys of the Primary DKC.  The Restart DKC
-     is kept for later installation ({{sctp-restart-prereq}}).  The server
-     key manager switches sending to the epoch N+1 Primary DKC ("Set Key
-     to Use", {{Section 7.8 of I-D.ietf-tsvwg-sctp-dtls-chunk}}) and then
-     sends a Read Key Installed control message ({{read-key-installed}})
-     to the client key manager.
+     (receive) and write (send) keys of the Primary DKC.  The Restart
+     DKC is kept for later installation ({{sctp-restart-prereq}}).  The
+     server key manager switches sending to the epoch N+1 Primary DKC
+     ("Set Key to Use", {{Section 7.8 of
+     I-D.ietf-tsvwg-sctp-dtls-chunk}}) and then sends a Read Key
+     Installed control message ({{read-key-installed}}) to the client
+     key manager.
 
   8. The client key manager receives the Read Key Installed control
      message ({{read-key-installed}}), installs the Client-to-Server
@@ -1002,15 +998,16 @@ two ClientHellos cannot cross and no tie-breaker is needed.
 
 The only concurrency to resolve is when the server key manager sends a
 Rekey Request while the client key manager has already initiated (or is
-about to initiate) a rekeying to epoch N+1.  Since both the direct
-client trigger and the server's Rekey Request lead to the same outcome,
-a single client-initiated rekeying to epoch N+1, the client key
-manager treats an incoming Rekey Request as redundant and SHOULD ignore it
-while a rekeying is already in progress.
+about to initiate) a rekeying procedure to epoch N+1.  Since both the
+direct client trigger and the server's Rekey Request lead to the same
+outcome (a single client-initiated rekeying procedure to epoch N+1), the
+client key manager treats an incoming Rekey Request as redundant and
+SHOULD ignore it while a rekeying procedure is already in progress.
 
 Similarly, if the server key manager needs to rekey while a
-client-initiated rekeying is already in progress, it does not send a
-Rekey Request, as the in-progress rekeying already satisfies the need.
+client-initiated rekeying procedure is already in progress, it does not
+send a Rekey Request, as the in-progress rekeying procedure already
+satisfies the need.
 
 ## SCTP Association Restart {#sctp-restart}
 
@@ -1020,8 +1017,8 @@ The following applies when both endpoints have indicated restart
 support (R bit) in the DTLS Key Management Parameter:
 
 * Both endpoints MUST have a valid Restart DKC.
-* The Restart DKC MUST be stored securely and persistently to
-  survive crash events ({{Section 10.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}).
+* The Restart DKC MUST be stored securely and persistently to survive
+  crash events ({{Section 10.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}).
 * At most one Restart DKC is installed at any time.  A Restart DKC
   derived during rekeying ({{rekey-procedure}}) or after an SCTP
   restart ({{restart-procedure}}) is not installed when it is exported.
@@ -1179,7 +1176,7 @@ followed.
 
 ## Privacy Considerations
 
-Although DTLS in SCTP provides privacy for user messages and
+Although DTLS in SCTP provides confidentiality for user messages and
 almost all SCTP chunks, the SCTP common header, DTLS chunk header,
 and DTLS record header are not confidentiality protected.  An
 attacker can correlate TLS connections over the same SCTP association
@@ -1196,12 +1193,12 @@ forms of passive pervasive monitoring.  Frequent rekeying forces
 attackers to perform dynamic key exfiltration and limits the amount
 of compromised data due to key compromise.
 
-Implementations of this key management method SHOULD NOT allow the ULP to exchange
-any data, other than the key management messages defined in this document, until
-the peer is authenticated and the local endpoint and the remote
-endpoint have both installed read and write keys and enforced
-protection. This is to avoid any information leakage from
-the ULP to unintended parties.
+Implementations of this key management method SHOULD NOT allow the ULP
+to exchange any data, other than the key management messages defined in
+this document, until the peer is authenticated and the local endpoint
+and the remote endpoint have both installed read and write keys and
+enforced protection. This is to avoid any information leakage from the
+ULP to unintended parties.
 
 ## Unprotected Key Management Messages
 
@@ -1220,6 +1217,9 @@ management messages are protected by the DTLS chunk.
 
 # IANA Considerations {#iana-considerations}
 
+Note to the RFC Editor: Please replace "RFC-To-Be" in this section with
+the RFC number assigned to this document, and remove this note.
+
 ## DTLS Key Management Method Identifier {#sec-iana-psi}
 
 IANA is requested to assign one DTLS Key Management Method Identifier
@@ -1228,17 +1228,21 @@ in the "DTLS Key Management Method" registry defined by
 key management method defined in this document.
 
 | Identifier | Key Management Method Name                   | Reference | Contact       |
-| 192        | TLS-Based Key Management for SCTP DTLS Chunk | RFC-TBD   | Draft Authors |
+|------------|----------------------------------------------|-----------|---------------|
+| 192        | TLS-Based Key Management for SCTP DTLS Chunk | RFC-To-Be | Draft Authors |
 {: #iana-psi title="DTLS Key Management Method Identifier" cols="r l l l"}
 
 ## TLS Exporter Labels {#iana-export-label}
 
-IANA is requested to register the following value in the TLS
-Exporter Label Registry {{RFC5705}} with Reference RFC-TBD and empty
-Comment.
+IANA is requested to register the following value in the "TLS
+Exporter Labels" registry within the "Transport Layer Security (TLS)
+Parameters" registry group ({{RFC5705}}, {{RFC8447}}), with Reference
+RFC-To-Be and an empty Comment.  The label is used only with TLS, not
+with DTLS, so DTLS-OK is set to "N".
 
-| Value | DTLS-OK | Recommended |
-| EXPORTER_TLS_FOR_DTLS_IN_SCTP | Y | N |
+| Value                         | DTLS-OK | Recommended |
+|-------------------------------|---------|-------------|
+| EXPORTER_TLS_FOR_DTLS_IN_SCTP | N       | N           |
 {: #iana-tls-exporter title="TLS Exporter Label" cols="l l l"}
 
 ## DTLS Chunk Key Management Control Message Types {#sec-iana-ctrl-types}
@@ -1263,23 +1267,27 @@ The initial contents of the registry are shown in
 {{iana-ctrl-types}}.  The value 0x00 is reserved.
 
 | Ctrl Type   | Name               | Reference |
-| 0x00        | Reserved           | RFC-TBD   |
-| 0x01        | Read Key Installed | RFC-TBD   |
-| 0x02        | Rekey Request      | RFC-TBD   |
+|-------------|--------------------|-----------|
+| 0x00        | Reserved           | RFC-To-Be |
+| 0x01        | Read Key Installed | RFC-To-Be |
+| 0x02        | Rekey Request      | RFC-To-Be |
 | 0x03-0xFF   | Unassigned         |           |
 {: #iana-ctrl-types title="DTLS Chunk Key Management Control Message Types" cols="l l l"}
 
 ## SCTP Payload Protocol Identifier {#sec-iana-ppid}
 
-In the Stream Control Transmission Protocol (SCTP) Parameters group's
-"Payload Protocol Identifiers" registry, IANA is requested to update the
-name and reference for the PPID 4242 as depicted in
-{{iana-payload-protection-id}}.
-Furthermore, IANA is requested to add an entry in the "Payload Protocol
-Identifiers" registry for the PPID 4243 as depicted in
-{{iana-payload-protection-id}}.
+In the "Payload Protocol Identifiers" registry of the "Stream Control
+Transmission Protocol (SCTP) Parameters" registry group, PPID 4242 is
+currently registered as "DTLS Chunk Key-Management Messages" with the
+reference [draft-westerlund-tsvwg-sctp-dtls-chunk-01].  IANA is
+requested to update the name and the reference of this entry as shown
+in {{iana-payload-protection-id}}.
+
+IANA is also requested to register PPID 4243 in the same registry, as
+shown in {{iana-payload-protection-id}}.
 
 | ID Value | SCTP Payload Protocol Identifier              | Reference |
+|----------|-----------------------------------------------|-----------|
 | 4242     | TLS records for DTLS Chunk Key Management      | RFC-To-Be |
 | 4243     | Control Messages for DTLS Chunk Key Management | RFC-To-Be |
 {: #iana-payload-protection-id title="Payload Protocol Identifier" cols="r l l"}
