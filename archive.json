@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-19T05:34:33.266223+00:00",
+  "timestamp": "2026-11-26T06:27:51.504161+00:00",
   "repo": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
   "labels": [
     {
@@ -2309,13 +2309,13 @@
       "labels": [],
       "body": "Resolve issue #44 ",
       "createdAt": "2026-11-02T09:09:56Z",
-      "updatedAt": "2026-11-02T15:01:47Z",
+      "updatedAt": "2026-11-24T13:24:56Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue44",
-      "headRefOid": "0803a0cee696373a346257b8fa4c01bd40e84f85",
+      "headRefOid": "79872ee83a338257d304cbdd53717461d2585ba6",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -2327,6 +2327,27 @@
           "body": "Ok, lets leave it for now and have a discussion on the whole naming and after that decided if we kill, or change this PR. ",
           "createdAt": "2026-11-02T15:01:47Z",
           "updatedAt": "2026-11-02T15:01:47Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "To be agreed on next Design Team 261203",
+          "createdAt": "2026-11-24T13:19:34Z",
+          "updatedAt": "2026-11-24T13:21:17Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think we can update this one to use EXPORTER_DTLS_PROTECTED_SCTP to match the proposed name. ",
+          "createdAt": "2026-11-24T13:21:22Z",
+          "updatedAt": "2026-11-24T13:21:22Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "Fine for me, I do that at once",
+          "createdAt": "2026-11-24T13:22:51Z",
+          "updatedAt": "2026-11-24T13:22:51Z"
         }
       ],
       "reviews": [
@@ -2603,13 +2624,13 @@
       "labels": [],
       "body": "This also changes the PPID names. ",
       "createdAt": "2026-11-02T13:07:35Z",
-      "updatedAt": "2026-11-02T14:04:16Z",
+      "updatedAt": "2026-11-24T13:28:09Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "ece4e48011da9643141221cf77ecafc63ac24a9d",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue48",
-      "headRefOid": "2b7d26562a35159fa994f278f15f5e208d6d6e4c",
+      "headRefOid": "b86cdeb9810db06126960abc77360581a442fd93",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -2628,6 +2649,20 @@
           "body": "Just to clarify mine thinking for why to rename them. The current is descriptive, but not a name. So staying with the current works fine until there actually exists a second one. But we can clearly leave them as they are for now. ",
           "createdAt": "2026-11-02T13:57:11Z",
           "updatedAt": "2026-11-02T13:57:11Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "body": "Let's agree on that next Design Team 261203",
+          "createdAt": "2026-11-24T13:20:55Z",
+          "updatedAt": "2026-11-24T13:20:55Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Also here we should be able to update this PR to use the \"(D)TLS Protected SCTP\"",
+          "createdAt": "2026-11-24T13:22:54Z",
+          "updatedAt": "2026-11-24T13:22:54Z"
         }
       ],
       "reviews": [
@@ -2658,13 +2693,13 @@
       "labels": [],
       "body": "Even if the chunk draft has not been adjusted yet, here we assume that new key usage is notifies to KM via API.",
       "createdAt": "2026-11-06T12:29:16Z",
-      "updatedAt": "2026-11-18T07:17:01Z",
+      "updatedAt": "2026-11-25T15:57:26Z",
       "baseRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "baseRefName": "main",
       "baseRefOid": "931dd395e1c5364c62c0c3e784d84fdf15d79c6e",
       "headRepository": "teiclap/draft-porfiri-tsvwg-sctp-dtls-handshake",
       "headRefName": "issue52",
-      "headRefOid": "137650565cf7102354c801096b6c25a437f0bcbb",
+      "headRefOid": "383cbb646bf09093e7bf9637dcc05d17b3888e2b",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -2754,6 +2789,46 @@
               "body": "Done",
               "createdAt": "2026-11-13T11:51:00Z",
               "updatedAt": "2026-11-13T11:51:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABaTzBZA",
+          "commit": {
+            "abbreviatedOid": "a013440"
+          },
+          "author": "gloinul",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-25T15:31:55Z",
+          "updatedAt": "2026-11-25T15:31:55Z",
+          "comments": [
+            {
+              "originalPosition": 302,
+              "body": "Is this really a SHOULD? If you think we really should use RFC2119 language then I think this is a MUST. ",
+              "createdAt": "2026-11-25T15:31:55Z",
+              "updatedAt": "2026-11-25T15:31:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORGnINM8AAAABaT_EPw",
+          "commit": {
+            "abbreviatedOid": "a013440"
+          },
+          "author": "teiclap",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-25T15:46:53Z",
+          "updatedAt": "2026-11-25T15:46:58Z",
+          "comments": [
+            {
+              "originalPosition": 302,
+              "body": "I agree. There are quite a number of changes in the document though. My editing is not over yet\n",
+              "createdAt": "2026-11-25T15:46:54Z",
+              "updatedAt": "2026-11-25T15:46:58Z"
             }
           ]
         }
