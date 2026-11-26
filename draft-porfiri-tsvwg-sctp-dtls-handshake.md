@@ -521,7 +521,7 @@ TLS server only.
 
 Upon receiving a Rekey Request, the client key manager initiates a
 rekeying TLS handshake as described in {{rekeying}}, unless a rekeying
-procedure is already in progress, in which case the Rekey Request SHOULD
+procedure is already in progress, in which case the Rekey Request MUST
 be ignored (see {{sim-rekeying}}).
 
 
