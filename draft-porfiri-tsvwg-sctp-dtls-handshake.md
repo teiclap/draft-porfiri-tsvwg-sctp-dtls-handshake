@@ -1279,7 +1279,7 @@ The initial contents of the registry are shown in
 In the "Payload Protocol Identifiers" registry of the "Stream Control
 Transmission Protocol (SCTP) Parameters" registry group, PPID 4242 is
 currently registered as "DTLS Chunk Key-Management Messages" with the
-reference [draft-westerlund-tsvwg-sctp-dtls-chunk-01].  IANA is
+reference "\[draft-westerlund-tsvwg-sctp-dtls-chunk-01\]".  IANA is
 requested to update the name and the reference of this entry as shown
 in {{iana-payload-protection-id}}.
 
