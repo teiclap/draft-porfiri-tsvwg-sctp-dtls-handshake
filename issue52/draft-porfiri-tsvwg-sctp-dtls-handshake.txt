@@ -5,10 +5,10 @@
 TSVWG                                                         C. Porfiri
 Internet-Draft                                             M. Westerlund
 Intended status: Standards Track                       J. Preuß Mattsson
-Expires: 30 May 2027                                            Ericsson
+Expires: 31 May 2027                                            Ericsson
                                                                 M. Tüxen
                                          Münster Univ. of Appl. Sciences
-                                                        26 November 2026
+                                                        27 November 2026
 
 
    Transport Layer Security (TLS)-Based Key Management for the Stream
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 May 2027.
+   This Internet-Draft will expire on 31 May 2027.
 
 Copyright Notice
 
@@ -1316,7 +1316,7 @@ Table of Contents
    In the "Payload Protocol Identifiers" registry of the "Stream Control
    Transmission Protocol (SCTP) Parameters" registry group, PPID 4242 is
    currently registered as "DTLS Chunk Key-Management Messages" with the
-   reference [draft-westerlund-tsvwg-sctp-dtls-chunk-01].  IANA is
+   reference "[draft-westerlund-tsvwg-sctp-dtls-chunk-01]".  IANA is
    requested to update the name and the reference of this entry as shown
    in Table 6.
 
