@@ -142,9 +142,8 @@ Connection:
 Drain Timer:
 : A timer that each key manager starts after switching to a new Primary
   DKC.  While it runs, the previous Primary DKC is kept to process
-  packets still in flight.  When it expires, the previous Primary DKC is
-  removed and the new Restart DKC replaces the installed one (see
-  {{drain-timer}}).
+  packets still in flight.  When it expires, the previous Primary DKC
+  and the previous Restart DKC are removed (see {{drain-timer}}).
 
 DTLS Key Context (DKC):
 : The keying material (record payload key, sequence number key, and
@@ -316,8 +315,9 @@ The protocol operates in three phases:
    DKCs for the next epoch, providing forward secrecy and
    re-authentication.  The client key manager always performs the
    TLS 1.3 handshake; when the server key manager needs to rekey, it
-   requests one via a Rekey Request.  After draining, the old Primary
-   DKC is removed and the new Restart DKC replaces the old one.
+   requests one via a Rekey Request.  The new Restart DKC is installed
+   as soon as it is stored.  After draining, the old Primary and Restart
+   DKCs are removed.
 
 3. **SCTP Restart:** The pre-established Restart DKC protects the
    COOKIE ECHO/COOKIE ACK exchange, followed by a new TLS handshake
@@ -400,7 +400,7 @@ TLS connection per SCTP association at any time.
 A rekeying procedure is in progress from step 3 to step 8
 ({{rekey-procedure}}) for the client key manager, and from step 4 to
 step 9 for the server key manager.  A Rekey Request received while a
-rekeying procedure is in progress SHOULD be ignored ({{sim-rekeying}}),
+rekeying procedure is in progress MUST be ignored ({{sim-rekeying}}),
 and the server key manager MUST NOT send a Rekey Request while a
 rekeying procedure is in progress.
 
@@ -409,8 +409,8 @@ criteria above or by a manual intervention) or by a Rekey Request, is
 not delayed by a running drain timer ({{drain-timer}}).  If a new
 rekeying procedure starts while the drain timer of the previous rekeying
 procedure is running, the drain timer expires immediately: the epoch N
-Primary DKC is removed, and the epoch N+1 Restart DKC replaces the epoch
-N Restart DKC ({{sctp-restart-prereq}}).  The client key manager does
+Primary DKC and the previous Restart DKC are removed
+({{sctp-restart-prereq}}).  The client key manager does
 this when it starts the new rekeying procedure (step 3).  The server key
 manager does this when it sends a Rekey Request (step 1) or when it
 receives the first TLS record of the new handshake (step 4), whichever
@@ -609,7 +609,12 @@ never used for regular traffic) so that both endpoints have a consistent
 view of sequence numbers and replay window. The Restart DKC requirements
 in {{sctp-restart-prereq}} apply. If SCTP restart is supported, the
 Restart DKC is committed to persistent secure storage, replacing the
-previously stored one, as soon as it has been exported.
+previously stored one, as soon as it has been exported, and it is
+installed as soon as it has been stored.  The previous Restart DKC
+remains installed until the drain timer expires
+({{sctp-restart-prereq}}).  The only exception is initial
+establishment, where no Primary write key is installed yet when the
+Restart DKC is stored, see {{initial-establishment}}.
 
 # Requirements on the DTLS Chunk {#dtls-chunk-requirements}
 
@@ -680,6 +685,37 @@ does not carry the restart indicator, the key manager associates it
 with the DKC it is waiting for: the Primary DKC whose receive key
 material was most recently installed and for which no indication has
 been received yet.
+
+## Concurrent Restart DKCs {#concurrent-restart-dkcs}
+
+The key management method defined in this document installs a new
+Restart DKC as soon as it is stored ({{dkc-installation}}), while the
+previous Restart DKC remains installed until the drain timer expires
+({{drain-timer}}).  During that time two Restart DKCs are installed for
+the same SCTP association.  A DTLS Chunk implementation used with this
+key management method MUST support this, as follows:
+
+* A received DTLS chunk with the R bit set is processed with the
+  Restart DKC whose epoch matches the epoch bits of the DTLS record
+  header.  During rekeying, the two Restart DKCs use consecutive epochs,
+  so the epoch bits always identify one of them.
+
+* After an SCTP restart, the Restart DKC used for the restart and the
+  new Restart DKC (epoch 3) can have the same epoch bits.  In that case
+  the DTLS Chunk tries both Restart DKCs, starting with the one used
+  for the restart, and processes the chunk with the first one that
+  successfully decrypts and authenticates it.  A failed attempt with
+  the first Restart DKC is not counted as a failed decryption if the
+  second one succeeds.
+
+* Installing a new Restart DKC does not change the DKC used for
+  sending.  In particular, after an SCTP restart the DTLS Chunk keeps
+  sending with the Restart DKC used for the restart until a Primary DKC
+  is set for sending.
+
+* When a COOKIE ECHO protected with one of the Restart DKCs starts an
+  SCTP restart ({{restart-procedure}}), the DTLS Chunk uses that Restart
+  DKC for sending, and the other Restart DKC is removed.
 
 # Procedures {#procedures}
 
@@ -769,17 +805,21 @@ write keys.
      Primary and Restart DKCs, installs the Server-to-Client key
      material of the Primary DKC as its read (receive) key, and sends a
      Read Key Installed control message ({{read-key-installed}}) to the
-     server key manager. The Restart DKC is installed in step 9.
+     server key manager. The Restart DKC is stored in persistent
+     secure storage before the Read Key Installed control message is
+     sent, but it is installed only in step 9.
 
-  8. The server key manager proceeds only after both its own TLS
-     handshake has completed (8a) and it has received the client key
-     manager's Read Key Installed control message (8b). Once both
-     conditions are met, it exports the Primary and Restart DKCs and
-     installs their read (receive) and write (send) keys, calls
-     Require Protected SCTP Packets to enforce DTLS chunk protection for
-     all future packets, informs the ULP that the association is
-     protected, and sends a Read Key Installed control message
-     ({{read-key-installed}}) to the client key manager.
+  8. When its own TLS handshake has completed (8a), the server key
+     manager exports the Primary and Restart DKCs and stores the
+     Restart DKC in persistent secure storage.  It proceeds only after
+     it has also received the client key manager's Read Key Installed
+     control message (8b).  It then installs the read (receive) and
+     write (send) keys of the Primary and Restart DKCs, the Primary
+     DKC first.  It then calls Require Protected SCTP Packets to
+     enforce DTLS chunk protection for all future packets, informs the
+     ULP that the association is protected, and sends a Read Key
+     Installed control message ({{read-key-installed}}) to the client
+     key manager.
 
   9. The client key manager receives the Read Key Installed control
      message, installs the Client-to-Server key material of the Primary
@@ -852,12 +892,13 @@ including:
      |  |    |                               |    |  |
      |  |<---+-------------------------------+--->|  |  5.
      |  |    |                               |    |  |
-  6. |  +--->| READ (epoch N+1)              |    |  |
+  6. |  +--->| READ N+1, Restart N+1         |    |  |
      |  |    +-----------[RKI]-------------->|    |  |  7b.
      |  |    |                               |<---+  |  7a.
-     |  |    |  (wait own done + cli RKI)    |    |  |
-     |  |    |  (install RX+TX Primary N+1,  |    |  |
-     |  |    |    TX->N+1)                   |    |  |
+     |  |    |  (on own done: Restart N+1)   |    |  |
+     |  |    |  (on own done + cli RKI:      |    |  |
+     |  |    |   install RX+TX Primary N+1,  |    |  |
+     |  |    |   TX->N+1)                    |    |  |
      |  |    |<----------[RKI]---------------+    |  |
   8. |  |    |   WRITE N+1, drain, TX->N+1   |    |  |
      |  |    |                               |    |  |
@@ -865,8 +906,8 @@ including:
      |  |    |   start drain)                |    |  |
      |  |    |                               |    |  |
      |    (traffic transitions to epoch N+1 DKC)     |
-     |    (after draining:  remove Primary N,        |
-     |     replace Restart N by N+1)                 |
+     |    (after draining: remove Primary N          |
+     |     and Restart N)                            |
 
 ~~~~~~~~~~~
 {: #rekey-diagram title="Rekeying Procedure" artwork-align="center"}
@@ -906,18 +947,23 @@ new epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
 
   6. The client key manager's TLS handshake completes.  It exports the
      epoch N+1 Primary and Restart DKCs, installs the Server-to-Client
-     key material of the Primary DKC as its read (receive) key, and
-     sends a Read Key Installed control message ({{read-key-installed}})
-     to the server key manager.  The Restart DKC is kept for later
-     installation ({{sctp-restart-prereq}}).
+     key material of the Primary DKC as its read (receive) key, stores
+     the epoch N+1 Restart DKC in persistent secure storage and
+     installs it, and then sends a Read Key Installed control message
+     ({{read-key-installed}}) to the server key manager.  The epoch N
+     Restart DKC remains installed ({{sctp-restart-prereq}}).
 
-  7. The server key manager proceeds only after both its own TLS
-     handshake has completed (7a) and it has received the client key
-     manager's Read Key Installed control message (7b).  It then exports
-     the epoch N+1 Primary and Restart DKCs and installs the read
-     (receive) and write (send) keys of the Primary DKC.  The Restart
-     DKC is kept for later installation ({{sctp-restart-prereq}}).  The
-     server key manager switches sending to the epoch N+1 Primary DKC
+  7. When its own TLS handshake has completed (7a), the server key
+     manager exports the epoch N+1 Primary and Restart DKCs, stores the
+     epoch N+1 Restart DKC in persistent secure storage, and installs
+     it.  The epoch N Restart DKC remains installed
+     ({{sctp-restart-prereq}}).  Installing the Restart DKC does not
+     change the DKC used for sending ({{concurrent-restart-dkcs}}).
+     The server key manager installs the epoch N+1 Primary DKC only
+     after it has also received the client key manager's Read Key
+     Installed control message (7b).  It then installs the read
+     (receive) and write (send) keys of the Primary DKC, switches
+     sending to the epoch N+1 Primary DKC
      ("Set Key to Use", {{Section 7.8 of
      I-D.ietf-tsvwg-sctp-dtls-chunk}}) and then sends a Read Key
      Installed control message ({{read-key-installed}}) to the client
@@ -928,24 +974,23 @@ new epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
      key material of the epoch N+1 Primary DKC as its write (send)
      key, switches sending to the epoch N+1 Primary DKC, and starts
      the drain timer ({{drain-timer}}).  When the drain timer
-     expires, the epoch N Primary DKC is removed and the epoch N+1
-     Restart DKC replaces the epoch N Restart DKC
-     ({{sctp-restart-prereq}}).
+     expires, the epoch N Primary DKC and the epoch N Restart DKC are
+     removed ({{sctp-restart-prereq}}).
 
   9. When the server key manager is notified of the first use of the
      epoch N+1 Primary DKC in a received DTLS chunk
      ({{first-use-indication}}), it starts the drain timer
      ({{drain-timer}}).  When the drain timer expires, the epoch N
-     Primary DKC is removed and the epoch N+1 Restart DKC replaces
-     the epoch N Restart DKC ({{sctp-restart-prereq}}).
+     Primary DKC and the epoch N Restart DKC are removed
+     ({{sctp-restart-prereq}}).
 
   If the TLS handshake fails, the key managers proceed as described in
   {{error-handling}}.
 
   The new DKCs use epoch N+1 (where N is the current epoch when
   initiating rekeying). The epoch N and epoch N+1 Primary DKCs
-  coexist until the drain timer expires. The epoch N Restart
-  DKC remains installed until it is replaced ({{sctp-restart-prereq}}).
+  coexist until the drain timer expires, and so do the epoch N and
+  epoch N+1 Restart DKCs ({{concurrent-restart-dkcs}}).
 
   A client key manager that does not switch sending to the epoch N+1
   Primary DKC after receiving the server's Read Key Installed control
@@ -960,8 +1005,8 @@ new epoch; TX->N+1 = switch sending to the epoch N+1 DKC.
   ({{Section 3.3.10.13 of RFC9260}}).
 
   If the association is idle, the first use indication, and with it
-  the installation of the new Restart DKC, is delayed until the next
-  SCTP packet from the client.
+  the removal of the epoch N Primary and Restart DKCs on the server
+  side, is delayed until the next SCTP packet from the client.
 
   Rekeying always uses ephemeral key exchange ({{tls-config}}).
 
@@ -974,8 +1019,8 @@ The drain timer determines how long the old (epoch N) Primary DKC is
 retained after the new (epoch N+1) Primary DKC has been activated.
 Its purpose is to allow in-flight packets protected with the old keys
 to be received and processed before those keys are removed.  When the
-drain timer expires, the old Primary DKC is removed and the new
-Restart DKC replaces the old one ({{sctp-restart-prereq}}).
+drain timer expires, the old Primary DKC and the old Restart DKC are
+removed ({{sctp-restart-prereq}}).
 
 When the client key manager receives the Read Key Installed control
 message in step 8, it knows that the server key manager is already
@@ -1002,7 +1047,7 @@ about to initiate) a rekeying procedure to epoch N+1.  Since both the
 direct client trigger and the server's Rekey Request lead to the same
 outcome (a single client-initiated rekeying procedure to epoch N+1), the
 client key manager treats an incoming Rekey Request as redundant and
-SHOULD ignore it while a rekeying procedure is already in progress.
+MUST ignore it while a rekeying procedure is already in progress.
 
 Similarly, if the server key manager needs to rekey while a
 client-initiated rekeying procedure is already in progress, it does not
@@ -1019,11 +1064,13 @@ support (R bit) in the DTLS Key Management Parameter:
 * Both endpoints MUST have a valid Restart DKC.
 * The Restart DKC MUST be stored securely and persistently to survive
   crash events ({{Section 10.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}).
-* At most one Restart DKC is installed at any time.  A Restart DKC
-  derived during rekeying ({{rekey-procedure}}) or after an SCTP
-  restart ({{restart-procedure}}) is not installed when it is exported.
-  Instead, when the drain timer ({{drain-timer}}) expires, the new
-  Restart DKC replaces the installed Restart DKC.
+* A new Restart DKC is installed as soon as it has been committed to
+  persistent secure storage ({{dkc-installation}}).  The previous
+  Restart DKC remains installed until the drain timer
+  ({{drain-timer}}) expires, so that it is still available if the peer
+  restarts with it.  During that time two Restart DKCs are installed
+  ({{concurrent-restart-dkcs}}).  Only the most recently stored Restart
+  DKC is kept in persistent storage.
   The Restart DKC derived during initial establishment
   ({{initial-establishment}}) is installed together with the Primary
   DKC, as no Restart DKC exists yet.
@@ -1079,10 +1126,12 @@ Steps 1 to 5 follow {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 4. The Initiator sends COOKIE ECHO in a DTLS chunk protected with
    the Restart DKC (R bit set).
 
-5. The Responder replies COOKIE ACK in a DTLS chunk protected with
-   the Restart DKC (R bit set); it then removes the restart key
-   material from persistent storage, as its sequence
-   numbers will be used.
+5. The Responder processes the COOKIE ECHO with the installed Restart
+   DKC that successfully decrypts it ({{concurrent-restart-dkcs}}), and
+   replies COOKIE ACK in a DTLS chunk protected with that Restart DKC
+   (R bit set).  Any other installed Restart DKC is removed.  It then
+   removes the restart key material from persistent storage, as the
+   sequence numbers of the Restart DKC in use will be used.
 
 6. Both endpoints have a restarted association, whose state is
    as described in {{Section 5.2.4 of RFC9260}}, with two differences
@@ -1111,6 +1160,12 @@ Steps 1 to 5 follow {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
      rather than enforcing protection for the first time; the ULP was
      already informed at step 6.
 
+   * At steps 10 and 11, the new Restart DKC (epoch 3) is stored and
+     installed while the Restart DKC used for the restart is still in
+     use.  The two can have the same epoch bits in the DTLS record
+     header; {{concurrent-restart-dkcs}} specifies how received DTLS
+     chunks are then processed.
+
    * At step 13, the server key manager starts the drain timer when it
      is notified of the first use of the epoch 3 Primary DKC in a
      received DTLS chunk ({{first-use-indication}}).
@@ -1122,22 +1177,47 @@ After restart, the new Primary DKC is required to use epoch 3 (the epoch
 resets), see {{Section 5.4 of I-D.ietf-tsvwg-sctp-dtls-chunk}}.
 
 The Responder MUST NOT change the Restart DKC during the restart
-procedure. The Restart DKC used for the restart is replaced by the
-new Restart DKC when the drain timer expires.
+procedure. The Restart DKC used for the restart is removed when the
+drain timer expires.
 
 It is RECOMMENDED to complete the TLS handshake and install new DKCs
 as soon as possible after restart, to minimize the window during
 which no Restart DKC is available for a subsequent restart.
 
-Note: There may be a short time gap after association establishment
-where no Restart DKC is yet installed.  If an SCTP restart is
-initiated during that time, it will fail.  However, this is unlikely
-as the restarting endpoint sends INIT multiple times with exponential
-back-off. After a crash during the drain, the restarting endpoint uses
-the new Restart DKC, while its peer still has the old one installed
-until its own drain timer expires (about 3 seconds). The restart fails
-until then and succeeds on a later INIT retransmission.
-The resulting delay is bounded by the drain timer.
+Note: Because the previous Restart DKC remains installed until the drain
+timer expires, a restart succeeds whichever of the two Restart DKCs the
+restarting endpoint has stored.  A restart fails only in the following
+cases, which are limited to a crash shortly after a successful TLS
+handshake:
+
+* During rekeying, or during the TLS handshake after an SCTP restart,
+  the client key manager stores the new Restart DKC just after sending
+  its last handshake message (Finished), and the server key manager
+  stores it as soon as it receives that message.  The restart fails if
+  the client crashes after storing the new Restart DKC while its
+  Finished message has not yet been received by the server, because
+  the server then cannot derive the new Restart DKC.
+
+* During initial establishment, no previous Restart DKC exists, and
+  the Restart DKC cannot be installed before the Primary write key
+  ({{dkc-installation}}).  The restart fails if the client crashes
+  after storing the Restart DKC (step 7) before the server key manager
+  has installed it (step 8), or if the server crashes after storing it
+  (step 8a) before the client key manager has installed it (step 9).
+
+In these cases the association cannot be restarted and fails when the
+peer detects that the restarted endpoint no longer responds.
+
+A failed restart during initial establishment is intended.  It can only
+happen before initial establishment has completed at both endpoints,
+so before user data is exchanged in both directions.  The association
+does not proceed, and the ULP of each endpoint is informed that the
+association has failed and needs to establish a new association from
+the beginning, including a new initial establishment
+({{initial-establishment}}).  This document gives priority to the
+security and confidentiality of the association over keeping it
+alive: an SCTP restart is never performed without a Restart DKC that
+both endpoints have derived from an authenticated TLS handshake.
 
 # Error Handling {#error-handling}
 
