@@ -1258,6 +1258,9 @@ management and rekeying.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
                 <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-first-use-indication" class="internal xref">First Use Indication</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-concurrent-restart-dkcs" class="internal xref">Concurrent Restart DKCs</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
@@ -1420,9 +1423,8 @@ Parameter of <span>[<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">
           <dd style="margin-left: 1.5em" id="section-1.2-2.8">
             <p id="section-1.2-2.8.1">A timer that each key manager starts after switching to a new Primary
 DKC.  While it runs, the previous Primary DKC is kept to process
-packets still in flight.  When it expires, the previous Primary DKC is
-removed and the new Restart DKC replaces the installed one (see
-<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>).<a href="#section-1.2-2.8.1" class="pilcrow">¶</a></p>
+packets still in flight.  When it expires, the previous Primary DKC
+and the previous Restart DKC are removed (see <a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>).<a href="#section-1.2-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-1.2-2.9">DTLS Key Context (DKC):</dt>
@@ -1713,8 +1715,9 @@ enforced.<a href="#section-2.2-2.1.1" class="pilcrow">¶</a></p>
 DKCs for the next epoch, providing forward secrecy and
 re-authentication.  The client key manager always performs the
 TLS 1.3 handshake; when the server key manager needs to rekey, it
-requests one via a Rekey Request.  After draining, the old Primary
-DKC is removed and the new Restart DKC replaces the old one.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
+requests one via a Rekey Request.  The new Restart DKC is installed
+as soon as it is stored.  After draining, the old Primary and Restart
+DKCs are removed.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.2-2.3">
             <p id="section-2.2-2.3.1"><strong>SCTP Restart:</strong> The pre-established Restart DKC protects the
@@ -1810,7 +1813,7 @@ TLS connection per SCTP association at any time.<a href="#section-3.4-5" class="
 <p id="section-3.4-6">A rekeying procedure is in progress from step 3 to step 8
 (<a href="#rekey-procedure" class="auto internal xref">Section 7.2.2</a>) for the client key manager, and from step 4 to
 step 9 for the server key manager.  A Rekey Request received while a
-rekeying procedure is in progress SHOULD be ignored (<a href="#sim-rekeying" class="auto internal xref">Section 7.2.4</a>),
+rekeying procedure is in progress MUST be ignored (<a href="#sim-rekeying" class="auto internal xref">Section 7.2.4</a>),
 and the server key manager MUST NOT send a Rekey Request while a
 rekeying procedure is in progress.<a href="#section-3.4-6" class="pilcrow">¶</a></p>
 <p id="section-3.4-7">A rekeying procedure, whether triggered locally (for example, by the
@@ -1818,8 +1821,8 @@ criteria above or by a manual intervention) or by a Rekey Request, is
 not delayed by a running drain timer (<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>).  If a new
 rekeying procedure starts while the drain timer of the previous rekeying
 procedure is running, the drain timer expires immediately: the epoch N
-Primary DKC is removed, and the epoch N+1 Restart DKC replaces the epoch
-N Restart DKC (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).  The client key manager does
+Primary DKC and the previous Restart DKC are removed
+(<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).  The client key manager does
 this when it starts the new rekeying procedure (step 3).  The server key
 manager does this when it sends a Rekey Request (step 1) or when it
 receives the first TLS record of the new handshake (step 4), whichever
@@ -2140,7 +2143,12 @@ never used for regular traffic) so that both endpoints have a consistent
 view of sequence numbers and replay window. The Restart DKC requirements
 in <a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a> apply. If SCTP restart is supported, the
 Restart DKC is committed to persistent secure storage, replacing the
-previously stored one, as soon as it has been exported.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
+previously stored one, as soon as it has been exported, and it is
+installed as soon as it has been stored.  The previous Restart DKC
+remains installed until the drain timer expires
+(<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).  The only exception is initial
+establishment, where no Primary write key is installed yet when the
+Restart DKC is stored, see <a href="#initial-establishment" class="auto internal xref">Section 7.1</a>.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2226,6 +2234,47 @@ does not carry the restart indicator, the key manager associates it
 with the DKC it is waiting for: the Primary DKC whose receive key
 material was most recently installed and for which no indication has
 been received yet.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="concurrent-restart-dkcs">
+<section id="section-6.2">
+        <h3 id="name-concurrent-restart-dkcs">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-concurrent-restart-dkcs" class="section-name selfRef">Concurrent Restart DKCs</a>
+        </h3>
+<p id="section-6.2-1">The key management method defined in this document installs a new
+Restart DKC as soon as it is stored (<a href="#dkc-installation" class="auto internal xref">Section 5.4</a>), while the
+previous Restart DKC remains installed until the drain timer expires
+(<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>).  During that time two Restart DKCs are installed for
+the same SCTP association.  A DTLS Chunk implementation used with this
+key management method MUST support this, as follows:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2-2.1">
+            <p id="section-6.2-2.1.1">A received DTLS chunk with the R bit set is processed with the
+Restart DKC whose epoch matches the epoch bits of the DTLS record
+header.  During rekeying, the two Restart DKCs use consecutive epochs,
+so the epoch bits always identify one of them.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.2">
+            <p id="section-6.2-2.2.1">After an SCTP restart, the Restart DKC used for the restart and the
+new Restart DKC (epoch 3) can have the same epoch bits.  In that case
+the DTLS Chunk tries both Restart DKCs, starting with the one used
+for the restart, and processes the chunk with the first one that
+successfully decrypts and authenticates it.  A failed attempt with
+the first Restart DKC is not counted as a failed decryption if the
+second one succeeds.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.3">
+            <p id="section-6.2-2.3.1">Installing a new Restart DKC does not change the DKC used for
+sending.  In particular, after an SCTP restart the DTLS Chunk keeps
+sending with the Restart DKC used for the restart until a Primary DKC
+is set for sending.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.4">
+            <p id="section-6.2-2.4.1">When a COOKIE ECHO protected with one of the Restart DKCs starts an
+SCTP restart (<a href="#restart-procedure" class="auto internal xref">Section 7.3.2</a>), the DTLS Chunk uses that Restart
+DKC for sending, and the other Restart DKC is removed.<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
 </section>
 </div>
 </section>
@@ -2410,18 +2459,22 @@ TLS handshake.<a href="#section-7.1-5.6.1" class="pilcrow">¶</a></p>
 Primary and Restart DKCs, installs the Server-to-Client key
 material of the Primary DKC as its read (receive) key, and sends a
 Read Key Installed control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the
-server key manager. The Restart DKC is installed in step 9.<a href="#section-7.1-5.7.1" class="pilcrow">¶</a></p>
+server key manager. The Restart DKC is stored in persistent
+secure storage before the Read Key Installed control message is
+sent, but it is installed only in step 9.<a href="#section-7.1-5.7.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.1-5.8">
-            <p id="section-7.1-5.8.1">The server key manager proceeds only after both its own TLS
-handshake has completed (8a) and it has received the client key
-manager's Read Key Installed control message (8b). Once both
-conditions are met, it exports the Primary and Restart DKCs and
-installs their read (receive) and write (send) keys, calls
-Require Protected SCTP Packets to enforce DTLS chunk protection for
-all future packets, informs the ULP that the association is
-protected, and sends a Read Key Installed control message
-(<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the client key manager.<a href="#section-7.1-5.8.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-5.8.1">When its own TLS handshake has completed (8a), the server key
+manager exports the Primary and Restart DKCs and stores the
+Restart DKC in persistent secure storage.  It proceeds only after
+it has also received the client key manager's Read Key Installed
+control message (8b).  It then installs the read (receive) and
+write (send) keys of the Primary and Restart DKCs, the Primary
+DKC first.  It then calls Require Protected SCTP Packets to
+enforce DTLS chunk protection for all future packets, informs the
+ULP that the association is protected, and sends a Read Key
+Installed control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the client
+key manager.<a href="#section-7.1-5.8.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.1-5.9">
             <p id="section-7.1-5.9.1">The client key manager receives the Read Key Installed control
@@ -2501,15 +2554,14 @@ the rekeying TLS handshake.<a href="#section-7.2.2-3.2.1" class="pilcrow">¶</a>
 <figure id="figure-5">
             <div id="section-7.2.2-5.1">
               <div class="alignCenter art-svg artwork" id="section-7.2.2-5.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="528" width="472" viewBox="0 0 472 528" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 40,48 L 40,480" fill="none" stroke="black"></path>
-                  <path d="M 64,96 L 64,432" fill="none" stroke="black"></path>
-                  <path d="M 104,96 L 104,432" fill="none" stroke="black"></path>
-                  <path d="M 224,400 L 224,408" fill="none" stroke="black"></path>
-                  <path d="M 320,312 L 320,320" fill="none" stroke="black"></path>
-                  <path d="M 360,96 L 360,432" fill="none" stroke="black"></path>
-                  <path d="M 400,96 L 400,432" fill="none" stroke="black"></path>
-                  <path d="M 424,48 L 424,480" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="544" width="472" viewBox="0 0 472 544" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 40,48 L 40,496" fill="none" stroke="black"></path>
+                  <path d="M 64,96 L 64,448" fill="none" stroke="black"></path>
+                  <path d="M 104,96 L 104,448" fill="none" stroke="black"></path>
+                  <path d="M 224,416 L 224,424" fill="none" stroke="black"></path>
+                  <path d="M 360,96 L 360,448" fill="none" stroke="black"></path>
+                  <path d="M 400,96 L 400,448" fill="none" stroke="black"></path>
+                  <path d="M 424,48 L 424,496" fill="none" stroke="black"></path>
                   <path d="M 112,128 L 192,128" fill="none" stroke="black"></path>
                   <path d="M 288,128 L 360,128" fill="none" stroke="black"></path>
                   <path d="M 72,192 L 104,192" fill="none" stroke="black"></path>
@@ -2519,13 +2571,13 @@ the rekeying TLS handshake.<a href="#section-7.2.2-3.2.1" class="pilcrow">¶</a>
                   <path d="M 104,272 L 192,272" fill="none" stroke="black"></path>
                   <path d="M 240,272 L 352,272" fill="none" stroke="black"></path>
                   <path d="M 368,288 L 400,288" fill="none" stroke="black"></path>
-                  <path d="M 112,352 L 192,352" fill="none" stroke="black"></path>
-                  <path d="M 240,352 L 360,352" fill="none" stroke="black"></path>
+                  <path d="M 112,368 L 192,368" fill="none" stroke="black"></path>
+                  <path d="M 240,368 L 360,368" fill="none" stroke="black"></path>
                   <polygon class="arrowhead" points="400,224 388,218.4 388,229.6" fill="black" transform="rotate(0,392,224)"></polygon>
                   <polygon class="arrowhead" points="400,192 388,186.4 388,197.6" fill="black" transform="rotate(0,392,192)"></polygon>
                   <polygon class="arrowhead" points="376,288 364,282.4 364,293.6" fill="black" transform="rotate(180,368,288)"></polygon>
                   <polygon class="arrowhead" points="360,272 348,266.4 348,277.6" fill="black" transform="rotate(0,352,272)"></polygon>
-                  <polygon class="arrowhead" points="120,352 108,346.4 108,357.6" fill="black" transform="rotate(180,112,352)"></polygon>
+                  <polygon class="arrowhead" points="120,368 108,362.4 108,373.6" fill="black" transform="rotate(180,112,368)"></polygon>
                   <polygon class="arrowhead" points="120,128 108,122.4 108,133.6" fill="black" transform="rotate(180,112,128)"></polygon>
                   <polygon class="arrowhead" points="104,256 92,250.4 92,261.6" fill="black" transform="rotate(0,96,256)"></polygon>
                   <polygon class="arrowhead" points="80,224 68,218.4 68,229.6" fill="black" transform="rotate(180,72,224)"></polygon>
@@ -2570,52 +2622,55 @@ the rekeying TLS handshake.<a href="#section-7.2.2-3.2.1" class="pilcrow">¶</a>
                     <text x="452" y="228">5.</text>
                     <text x="20" y="260">6.</text>
                     <text x="132" y="260">READ</text>
-                    <text x="180" y="260">(epoch</text>
-                    <text x="228" y="260">N+1)</text>
+                    <text x="172" y="260">N+1,</text>
+                    <text x="224" y="260">Restart</text>
+                    <text x="272" y="260">N+1</text>
                     <text x="216" y="276">[RKI]</text>
                     <text x="456" y="276">7b.</text>
                     <text x="456" y="292">7a.</text>
-                    <text x="144" y="308">(wait</text>
-                    <text x="184" y="308">own</text>
-                    <text x="220" y="308">done</text>
-                    <text x="248" y="308">+</text>
-                    <text x="272" y="308">cli</text>
-                    <text x="308" y="308">RKI)</text>
-                    <text x="156" y="324">(install</text>
-                    <text x="216" y="324">RX+TX</text>
-                    <text x="272" y="324">Primary</text>
-                    <text x="312" y="324">N</text>
-                    <text x="332" y="324">1,</text>
-                    <text x="172" y="340">TX-&gt;N+1)</text>
-                    <text x="216" y="356">[RKI]</text>
-                    <text x="20" y="372">8.</text>
-                    <text x="152" y="372">WRITE</text>
-                    <text x="196" y="372">N+1,</text>
-                    <text x="244" y="372">drain,</text>
-                    <text x="304" y="372">TX-&gt;N+1</text>
-                    <text x="148" y="404">(first</text>
-                    <text x="192" y="404">use</text>
-                    <text x="216" y="404">N</text>
-                    <text x="236" y="404">1,</text>
-                    <text x="452" y="404">9.</text>
-                    <text x="152" y="420">start</text>
-                    <text x="204" y="420">drain)</text>
-                    <text x="108" y="452">(traffic</text>
-                    <text x="192" y="452">transitions</text>
-                    <text x="252" y="452">to</text>
-                    <text x="288" y="452">epoch</text>
-                    <text x="328" y="452">N+1</text>
-                    <text x="364" y="452">DKC)</text>
-                    <text x="100" y="468">(after</text>
-                    <text x="168" y="468">draining:</text>
-                    <text x="244" y="468">remove</text>
-                    <text x="304" y="468">Primary</text>
-                    <text x="348" y="468">N,</text>
-                    <text x="112" y="484">replace</text>
-                    <text x="176" y="484">Restart</text>
-                    <text x="216" y="484">N</text>
-                    <text x="236" y="484">by</text>
-                    <text x="268" y="484">N+1)</text>
+                    <text x="136" y="308">(on</text>
+                    <text x="168" y="308">own</text>
+                    <text x="208" y="308">done:</text>
+                    <text x="264" y="308">Restart</text>
+                    <text x="316" y="308">N+1)</text>
+                    <text x="136" y="324">(on</text>
+                    <text x="168" y="324">own</text>
+                    <text x="204" y="324">done</text>
+                    <text x="232" y="324">+</text>
+                    <text x="256" y="324">cli</text>
+                    <text x="292" y="324">RKI:</text>
+                    <text x="160" y="340">install</text>
+                    <text x="216" y="340">RX+TX</text>
+                    <text x="272" y="340">Primary</text>
+                    <text x="324" y="340">N+1,</text>
+                    <text x="164" y="356">TX-&gt;N+1)</text>
+                    <text x="216" y="372">[RKI]</text>
+                    <text x="20" y="388">8.</text>
+                    <text x="152" y="388">WRITE</text>
+                    <text x="196" y="388">N+1,</text>
+                    <text x="244" y="388">drain,</text>
+                    <text x="304" y="388">TX-&gt;N+1</text>
+                    <text x="148" y="420">(first</text>
+                    <text x="192" y="420">use</text>
+                    <text x="216" y="420">N</text>
+                    <text x="236" y="420">1,</text>
+                    <text x="452" y="420">9.</text>
+                    <text x="152" y="436">start</text>
+                    <text x="204" y="436">drain)</text>
+                    <text x="108" y="468">(traffic</text>
+                    <text x="192" y="468">transitions</text>
+                    <text x="252" y="468">to</text>
+                    <text x="288" y="468">epoch</text>
+                    <text x="328" y="468">N+1</text>
+                    <text x="364" y="468">DKC)</text>
+                    <text x="100" y="484">(after</text>
+                    <text x="168" y="484">draining:</text>
+                    <text x="236" y="484">remove</text>
+                    <text x="296" y="484">Primary</text>
+                    <text x="336" y="484">N</text>
+                    <text x="96" y="500">and</text>
+                    <text x="144" y="500">Restart</text>
+                    <text x="188" y="500">N)</text>
                   </g>
                 </svg><a href="#section-7.2.2-5.1.1" class="pilcrow">¶</a>
 </div>
@@ -2663,19 +2718,24 @@ as in the previous TLS connections (see <a href="#tls-auth" class="auto internal
             <li id="section-7.2.2-9.6">
               <p id="section-7.2.2-9.6.1">The client key manager's TLS handshake completes.  It exports the
 epoch N+1 Primary and Restart DKCs, installs the Server-to-Client
-key material of the Primary DKC as its read (receive) key, and
-sends a Read Key Installed control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>)
-to the server key manager.  The Restart DKC is kept for later
-installation (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-9.6.1" class="pilcrow">¶</a></p>
+key material of the Primary DKC as its read (receive) key, stores
+the epoch N+1 Restart DKC in persistent secure storage and
+installs it, and then sends a Read Key Installed control message
+(<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the server key manager.  The epoch N
+Restart DKC remains installed (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-9.6.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.2.2-9.7">
-              <p id="section-7.2.2-9.7.1">The server key manager proceeds only after both its own TLS
-handshake has completed (7a) and it has received the client key
-manager's Read Key Installed control message (7b).  It then exports
-the epoch N+1 Primary and Restart DKCs and installs the read
-(receive) and write (send) keys of the Primary DKC.  The Restart
-DKC is kept for later installation (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).  The
-server key manager switches sending to the epoch N+1 Primary DKC
+              <p id="section-7.2.2-9.7.1">When its own TLS handshake has completed (7a), the server key
+manager exports the epoch N+1 Primary and Restart DKCs, stores the
+epoch N+1 Restart DKC in persistent secure storage, and installs
+it.  The epoch N Restart DKC remains installed
+(<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).  Installing the Restart DKC does not
+change the DKC used for sending (<a href="#concurrent-restart-dkcs" class="auto internal xref">Section 6.2</a>).
+The server key manager installs the epoch N+1 Primary DKC only
+after it has also received the client key manager's Read Key
+Installed control message (7b).  It then installs the read
+(receive) and write (send) keys of the Primary DKC, switches
+sending to the epoch N+1 Primary DKC
 ("Set Key to Use", <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-7.8" class="relref">Section 7.8</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>) and then sends a Read Key
 Installed control message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1</a>) to the client
 key manager.<a href="#section-7.2.2-9.7.1" class="pilcrow">¶</a></p>
@@ -2686,25 +2746,24 @@ message (<a href="#read-key-installed" class="auto internal xref">Section 4.2.1<
 key material of the epoch N+1 Primary DKC as its write (send)
 key, switches sending to the epoch N+1 Primary DKC, and starts
 the drain timer (<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>).  When the drain timer
-expires, the epoch N Primary DKC is removed and the epoch N+1
-Restart DKC replaces the epoch N Restart DKC
-(<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-9.8.1" class="pilcrow">¶</a></p>
+expires, the epoch N Primary DKC and the epoch N Restart DKC are
+removed (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-9.8.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.2.2-9.9">
               <p id="section-7.2.2-9.9.1">When the server key manager is notified of the first use of the
 epoch N+1 Primary DKC in a received DTLS chunk
 (<a href="#first-use-indication" class="auto internal xref">Section 6.1</a>), it starts the drain timer
 (<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>).  When the drain timer expires, the epoch N
-Primary DKC is removed and the epoch N+1 Restart DKC replaces
-the epoch N Restart DKC (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-9.9.1" class="pilcrow">¶</a></p>
+Primary DKC and the epoch N Restart DKC are removed
+(<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-9.9.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
 <p id="section-7.2.2-10">If the TLS handshake fails, the key managers proceed as described in
   <a href="#error-handling" class="auto internal xref">Section 8</a>.<a href="#section-7.2.2-10" class="pilcrow">¶</a></p>
 <p id="section-7.2.2-11">The new DKCs use epoch N+1 (where N is the current epoch when
   initiating rekeying). The epoch N and epoch N+1 Primary DKCs
-  coexist until the drain timer expires. The epoch N Restart
-  DKC remains installed until it is replaced (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.2-11" class="pilcrow">¶</a></p>
+  coexist until the drain timer expires, and so do the epoch N and
+  epoch N+1 Restart DKCs (<a href="#concurrent-restart-dkcs" class="auto internal xref">Section 6.2</a>).<a href="#section-7.2.2-11" class="pilcrow">¶</a></p>
 <p id="section-7.2.2-12">A client key manager that does not switch sending to the epoch N+1
   Primary DKC after receiving the server's Read Key Installed control
   message violates this specification.  The server key manager can
@@ -2717,8 +2776,8 @@ the epoch N Restart DKC (<a href="#sctp-restart-prereq" class="auto internal xre
   association with a Protocol Violation error cause
   (<span><a href="https://rfc-editor.org/rfc/rfc9260#section-3.3.10.13" class="relref">Section 3.3.10.13</a> of [<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>).<a href="#section-7.2.2-12" class="pilcrow">¶</a></p>
 <p id="section-7.2.2-13">If the association is idle, the first use indication, and with it
-  the installation of the new Restart DKC, is delayed until the next
-  SCTP packet from the client.<a href="#section-7.2.2-13" class="pilcrow">¶</a></p>
+  the removal of the epoch N Primary and Restart DKCs on the server
+  side, is delayed until the next SCTP packet from the client.<a href="#section-7.2.2-13" class="pilcrow">¶</a></p>
 <p id="section-7.2.2-14">Rekeying always uses ephemeral key exchange (<a href="#tls-config" class="auto internal xref">Section 3</a>).<a href="#section-7.2.2-14" class="pilcrow">¶</a></p>
 <p id="section-7.2.2-15">After rekeying, the TLS connection SHOULD be closed promptly
   following the procedure in <a href="#session-resumption" class="auto internal xref">Section 3.5</a>.<a href="#section-7.2.2-15" class="pilcrow">¶</a></p>
@@ -2733,8 +2792,8 @@ the epoch N Restart DKC (<a href="#sctp-restart-prereq" class="auto internal xre
 retained after the new (epoch N+1) Primary DKC has been activated.
 Its purpose is to allow in-flight packets protected with the old keys
 to be received and processed before those keys are removed.  When the
-drain timer expires, the old Primary DKC is removed and the new
-Restart DKC replaces the old one (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.3-1" class="pilcrow">¶</a></p>
+drain timer expires, the old Primary DKC and the old Restart DKC are
+removed (<a href="#sctp-restart-prereq" class="auto internal xref">Section 7.3.1</a>).<a href="#section-7.2.3-1" class="pilcrow">¶</a></p>
 <p id="section-7.2.3-2">When the client key manager receives the Read Key Installed control
 message in step 8, it knows that the server key manager is already
 sending with the new Primary DKC.  It can therefore use a short drain
@@ -2761,7 +2820,7 @@ about to initiate) a rekeying procedure to epoch N+1.  Since both the
 direct client trigger and the server's Rekey Request lead to the same
 outcome (a single client-initiated rekeying procedure to epoch N+1), the
 client key manager treats an incoming Rekey Request as redundant and
-SHOULD ignore it while a rekeying procedure is already in progress.<a href="#section-7.2.4-2" class="pilcrow">¶</a></p>
+MUST ignore it while a rekeying procedure is already in progress.<a href="#section-7.2.4-2" class="pilcrow">¶</a></p>
 <p id="section-7.2.4-3">Similarly, if the server key manager needs to rekey while a
 client-initiated rekeying procedure is already in progress, it does not
 send a Rekey Request, as the in-progress rekeying procedure already
@@ -2791,11 +2850,13 @@ support (R bit) in the DTLS Key Management Parameter:<a href="#section-7.3.1-1" 
 crash events (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-10.4" class="relref">Section 10.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>).<a href="#section-7.3.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-7.3.1-2.3">
-              <p id="section-7.3.1-2.3.1">At most one Restart DKC is installed at any time.  A Restart DKC
-derived during rekeying (<a href="#rekey-procedure" class="auto internal xref">Section 7.2.2</a>) or after an SCTP
-restart (<a href="#restart-procedure" class="auto internal xref">Section 7.3.2</a>) is not installed when it is exported.
-Instead, when the drain timer (<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>) expires, the new
-Restart DKC replaces the installed Restart DKC.
+              <p id="section-7.3.1-2.3.1">A new Restart DKC is installed as soon as it has been committed to
+persistent secure storage (<a href="#dkc-installation" class="auto internal xref">Section 5.4</a>).  The previous
+Restart DKC remains installed until the drain timer
+(<a href="#drain-timer" class="auto internal xref">Section 7.2.3</a>) expires, so that it is still available if the peer
+restarts with it.  During that time two Restart DKCs are installed
+(<a href="#concurrent-restart-dkcs" class="auto internal xref">Section 6.2</a>).  Only the most recently stored Restart
+DKC is kept in persistent storage.
 The Restart DKC derived during initial establishment
 (<a href="#initial-establishment" class="auto internal xref">Section 7.1</a>) is installed together with the Primary
 DKC, as no Restart DKC exists yet.<a href="#section-7.3.1-2.3.1" class="pilcrow">¶</a></p>
@@ -2925,10 +2986,12 @@ same role and restart settings, but with a new random Tie Breaker.<a href="#sect
 the Restart DKC (R bit set).<a href="#section-7.3.2-3.4.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.3.2-3.5">
-              <p id="section-7.3.2-3.5.1">The Responder replies COOKIE ACK in a DTLS chunk protected with
-the Restart DKC (R bit set); it then removes the restart key
-material from persistent storage, as its sequence
-numbers will be used.<a href="#section-7.3.2-3.5.1" class="pilcrow">¶</a></p>
+              <p id="section-7.3.2-3.5.1">The Responder processes the COOKIE ECHO with the installed Restart
+DKC that successfully decrypts it (<a href="#concurrent-restart-dkcs" class="auto internal xref">Section 6.2</a>), and
+replies COOKIE ACK in a DTLS chunk protected with that Restart DKC
+(R bit set).  Any other installed Restart DKC is removed.  It then
+removes the restart key material from persistent storage, as the
+sequence numbers of the Restart DKC in use will be used.<a href="#section-7.3.2-3.5.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.3.2-3.6">
               <p id="section-7.3.2-3.6.1">Both endpoints have a restarted association, whose state is
@@ -2961,9 +3024,16 @@ rather than enforcing protection for the first time; the ULP was
 already informed at step 6.<a href="#section-7.3.2-3.7.2.1.1" class="pilcrow">¶</a></p>
 </li>
                 <li class="normal" id="section-7.3.2-3.7.2.2">
-                  <p id="section-7.3.2-3.7.2.2.1">At step 13, the server key manager starts the drain timer when it
+                  <p id="section-7.3.2-3.7.2.2.1">At steps 10 and 11, the new Restart DKC (epoch 3) is stored and
+installed while the Restart DKC used for the restart is still in
+use.  The two can have the same epoch bits in the DTLS record
+header; <a href="#concurrent-restart-dkcs" class="auto internal xref">Section 6.2</a> specifies how received DTLS
+chunks are then processed.<a href="#section-7.3.2-3.7.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-7.3.2-3.7.2.3">
+                  <p id="section-7.3.2-3.7.2.3.1">At step 13, the server key manager starts the drain timer when it
 is notified of the first use of the epoch 3 Primary DKC in a
-received DTLS chunk (<a href="#first-use-indication" class="auto internal xref">Section 6.1</a>).<a href="#section-7.3.2-3.7.2.2.1" class="pilcrow">¶</a></p>
+received DTLS chunk (<a href="#first-use-indication" class="auto internal xref">Section 6.1</a>).<a href="#section-7.3.2-3.7.2.3.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
@@ -2976,20 +3046,47 @@ received DTLS chunk (<a href="#first-use-indication" class="auto internal xref">
 <p id="section-7.3.2-5">After restart, the new Primary DKC is required to use epoch 3 (the epoch
 resets), see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-sctp-dtls-chunk-06#section-5.4" class="relref">Section 5.4</a> of [<a href="#I-D.ietf-tsvwg-sctp-dtls-chunk" class="cite xref">I-D.ietf-tsvwg-sctp-dtls-chunk</a>]</span>.<a href="#section-7.3.2-5" class="pilcrow">¶</a></p>
 <p id="section-7.3.2-6">The Responder MUST NOT change the Restart DKC during the restart
-procedure. The Restart DKC used for the restart is replaced by the
-new Restart DKC when the drain timer expires.<a href="#section-7.3.2-6" class="pilcrow">¶</a></p>
+procedure. The Restart DKC used for the restart is removed when the
+drain timer expires.<a href="#section-7.3.2-6" class="pilcrow">¶</a></p>
 <p id="section-7.3.2-7">It is RECOMMENDED to complete the TLS handshake and install new DKCs
 as soon as possible after restart, to minimize the window during
 which no Restart DKC is available for a subsequent restart.<a href="#section-7.3.2-7" class="pilcrow">¶</a></p>
-<p id="section-7.3.2-8">Note: There may be a short time gap after association establishment
-where no Restart DKC is yet installed.  If an SCTP restart is
-initiated during that time, it will fail.  However, this is unlikely
-as the restarting endpoint sends INIT multiple times with exponential
-back-off. After a crash during the drain, the restarting endpoint uses
-the new Restart DKC, while its peer still has the old one installed
-until its own drain timer expires (about 3 seconds). The restart fails
-until then and succeeds on a later INIT retransmission.
-The resulting delay is bounded by the drain timer.<a href="#section-7.3.2-8" class="pilcrow">¶</a></p>
+<p id="section-7.3.2-8">Note: Because the previous Restart DKC remains installed until the drain
+timer expires, a restart succeeds whichever of the two Restart DKCs the
+restarting endpoint has stored.  A restart fails only in the following
+cases, which are limited to a crash shortly after a successful TLS
+handshake:<a href="#section-7.3.2-8" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.3.2-9.1">
+              <p id="section-7.3.2-9.1.1">During rekeying, or during the TLS handshake after an SCTP restart,
+the client key manager stores the new Restart DKC just after sending
+its last handshake message (Finished), and the server key manager
+stores it as soon as it receives that message.  The restart fails if
+the client crashes after storing the new Restart DKC while its
+Finished message has not yet been received by the server, because
+the server then cannot derive the new Restart DKC.<a href="#section-7.3.2-9.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-7.3.2-9.2">
+              <p id="section-7.3.2-9.2.1">During initial establishment, no previous Restart DKC exists, and
+the Restart DKC cannot be installed before the Primary write key
+(<a href="#dkc-installation" class="auto internal xref">Section 5.4</a>).  The restart fails if the client crashes
+after storing the Restart DKC (step 7) before the server key manager
+has installed it (step 8), or if the server crashes after storing it
+(step 8a) before the client key manager has installed it (step 9).<a href="#section-7.3.2-9.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-7.3.2-10">In these cases the association cannot be restarted and fails when the
+peer detects that the restarted endpoint no longer responds.<a href="#section-7.3.2-10" class="pilcrow">¶</a></p>
+<p id="section-7.3.2-11">A failed restart during initial establishment is intended.  It can only
+happen before initial establishment has completed at both endpoints,
+so before user data is exchanged in both directions.  The association
+does not proceed, and the ULP of each endpoint is informed that the
+association has failed and needs to establish a new association from
+the beginning, including a new initial establishment
+(<a href="#initial-establishment" class="auto internal xref">Section 7.1</a>).  This document gives priority to the
+security and confidentiality of the association over keeping it
+alive: an SCTP restart is never performed without a Restart DKC that
+both endpoints have derived from an authenticated TLS handshake.<a href="#section-7.3.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
